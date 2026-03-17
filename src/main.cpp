@@ -12,11 +12,21 @@ int main() {
     SetTargetFPS(60);
 
     World world;
-    RigidBody body(10.0f, Vec2(screenWidth/2, 0), Vec2(100.0f, 0.0f), Vec2(), Vec2(), 50.0f, 1.0f);
-    RigidBody body2(10.0f, Vec2(), Vec2(), Vec2(), Vec2(), 50.0f, 1.0f);
+    int ballCount = 100;
+    for (int i = 0; i < ballCount; i++) {
+        float posX = 100 + (i * 50) % (screenWidth - 200);
+        float posY = 100 + (i * 40) % (screenHeight / 2);
 
-    world.AddBody(&body);
-    world.AddBody(&body2);
+        float velX = (float)GetRandomValue(-200, 200);
+        float velY = (float)GetRandomValue(-200, 200);
+
+        float mass = (i % 5 == 0) ? 10.0f : 1.0f;
+        float radius = (mass > 5.0f) ? 30.0f : 15.0f;
+
+        RigidBody* b = new RigidBody(mass, Vec2(posX, posY), Vec2(velX, velY), Vec2(), Vec2(), radius, 0.95f);
+        
+        world.AddBody(b);
+    }
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -28,9 +38,11 @@ int main() {
 
             for (RigidBody* rb : world.bodies)
             {
-                DrawCircle(rb->postion.x, rb->postion.y, rb->GetRadius(), DARKBLUE);
+                DrawCircle(rb->position.x, rb->position.y, rb->GetRadius(), DARKBLUE);
             }
         EndDrawing();
+
+        DrawFPS(10, 10);
     }
 
     CloseWindow();

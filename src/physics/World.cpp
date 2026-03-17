@@ -4,7 +4,16 @@
 
 World::World()
 {
-    gravity = Vec2(0.0f, 9.81f);
+    gravity = Vec2(0.0f, 981.0f);
+    airDensity = 0.001f;
+}
+
+World::~World()
+{
+    for (RigidBody* rb : bodies) {
+        delete rb;
+    }
+    bodies.clear();
 }
 
 void World::AddBody(RigidBody* body)
@@ -20,9 +29,16 @@ void World::Step(float dt)
         float M = rb->GetMass();
 
         rb->ApplyForce(gravity * M);
+        float speedSq = rb->velocity.MagSq();
+        if (speedSq > 0.0001f)
+        {
+            float drag = airDensity * speedSq * rb->GetRadius();
+            rb->ApplyForce(rb->velocity.Norm() * -1.0f * drag);
+        }
+       
         rb->acceleration = rb->GetForce() * iM;
         rb->velocity += rb->acceleration * dt;
-        rb->postion += rb->velocity * dt;
+        rb->position += rb->velocity * dt;
 
         rb->ClearForces();
     }
@@ -35,27 +51,27 @@ void World::CheckCollisons(int screenWidth, int screenHeight)
         RigidBody *rb = bodies[i];
     
         float radius = rb->GetRadius();
-        if (rb->postion.x + radius > screenWidth)
+        if (rb->position.x + radius > screenWidth)
         {
-            rb->postion.x = screenWidth - radius;
+            rb->position.x = screenWidth - radius;
             rb->velocity.x *= -1; 
         }
         
-        if (rb->postion.x - radius < 0)
+        if (rb->position.x - radius < 0)
         {
-            rb->postion.x = radius;
+            rb->position.x = radius;
             rb->velocity.x *= -1; 
         }
 
-        if (rb->postion.y + radius > screenHeight)
+        if (rb->position.y + radius > screenHeight)
         {
-            rb->postion.y = screenHeight - radius;
+            rb->position.y = screenHeight - radius;
             rb->velocity.y *= -1; 
         }
         
-        if (rb->postion.y - radius < 0)
+        if (rb->position.y - radius < 0)
         {
-            rb->postion.y = radius;
+            rb->position.y = radius;
             rb->velocity.y *= -1; 
         }
 
@@ -63,20 +79,26 @@ void World::CheckCollisons(int screenWidth, int screenHeight)
         {
             RigidBody *rbB = bodies[j];
 
-            Vec2 dir = rbB->postion - rb->postion;
-            Vec2 dirN = dir.Norm();
+            Vec2 dir = rbB->position - rb->position;
             if (dir.MagSq() < (rbB->GetRadius() + rb->GetRadius()) * (rbB->GetRadius() + rb->GetRadius()))
             {
+                Vec2 dirN = dir.Norm();
                 Vec2 relativeV = rbB->velocity - rb->velocity;
                 float dot = relativeV.Dot(dirN);
                 if (dot > 0) continue;
-                
+
                 float bounce = (rb->GetRes() + rbB->GetRes()) / 2.0f; 
                 float impulse = -1 * (1 + bounce) * dot / (rb->GetInvMass() + rbB->GetInvMass());
                 Vec2 impulseVec = dirN * impulse;
 
                 rb->velocity += impulseVec * rb->GetInvMass() * -1;
                 rbB->velocity += impulseVec * rbB->GetInvMass();
+
+                float overlap = (rb->GetRadius() + rbB->GetRadius()) - dir.Mag();
+                Vec2 correction = dirN * (overlap / (rb->GetInvMass() + rbB->GetInvMass())) * 0.8f; 
+
+                rb->position += correction * rb->GetInvMass() * -1;
+                rbB->position += correction * rbB->GetInvMass();
             }
         }
     }

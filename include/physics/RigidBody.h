@@ -4,7 +4,7 @@
 class RigidBody 
 {
     public: 
-        Vec2 postion;
+        Vec2 position;
         Vec2 velocity;
         Vec2 acceleration;
 

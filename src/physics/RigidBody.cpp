@@ -5,7 +5,7 @@ RigidBody::RigidBody(float m, Vec2 pos, Vec2 v, Vec2 a, Vec2 F, float r, float e
 {
     mass = m;
     invMass = 1 / m;
-    postion = pos;
+    position = pos;
     velocity = v;
     acceleration = a;
     forceSum = F;
