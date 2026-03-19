@@ -1,7 +1,9 @@
 #include "raylib.h"
-#include "physics/world.h"
-#include "physics/RigidBody.h"
+#include "main/World.h"
+#include "main/GameObject.h"
 #include "math/Vec2.h"
+#include "main/components/collidertypes/BoxCollider.h"
+#include "main/components/collidertypes/CircleCollider.h"
 #include <vector>
 
 int main() {
@@ -12,21 +14,16 @@ int main() {
     SetTargetFPS(60);
 
     World world;
-    int ballCount = 100;
-    for (int i = 0; i < ballCount; i++) {
-        float posX = 100 + (i * 50) % (screenWidth - 200);
-        float posY = 100 + (i * 40) % (screenHeight / 2);
+    GameObject* obj = new GameObject();
 
-        float velX = (float)GetRandomValue(-200, 200);
-        float velY = (float)GetRandomValue(-200, 200);
+    Collider* col = new CircleCollider(15.0f);
+    obj->SetCollider(col);
+    Renderer* rend = new Renderer(BLUE);
+    obj->SetRenderer(rend);
+    RigidBody* rb = new RigidBody(1.0f, 0.5f, Vec2(), Vec2(), Vec2());
+    obj->SetRigidBody(rb);
 
-        float mass = (i % 5 == 0) ? 10.0f : 1.0f;
-        float radius = (mass > 5.0f) ? 30.0f : 15.0f;
-
-        RigidBody* b = new RigidBody(mass, Vec2(posX, posY), Vec2(velX, velY), Vec2(), Vec2(), radius, 0.95f);
-        
-        world.AddBody(b);
-    }
+    world.AddGameObject(obj);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -36,10 +33,9 @@ int main() {
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
-            for (RigidBody* rb : world.bodies)
-            {
-                DrawCircle(rb->position.x, rb->position.y, rb->GetRadius(), DARKBLUE);
-            }
+            CircleCollider* c = static_cast<CircleCollider*>(obj->GetCollider());
+
+            DrawCircle(obj->transform.position.x, obj->transform.position.y, c->radius, obj->GetRenderer()->color);
         EndDrawing();
 
         DrawFPS(10, 10);
