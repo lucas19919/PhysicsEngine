@@ -42,10 +42,47 @@ int main() {
     LinearState linearState = { Vec2(100.0f, 0.0f), Vec2(), Vec2() };
     AngularState angularState = { 1.0f, 0.0f, 0.0f };
     
-    GameObject* obj = Instantiate()
+    GameObject* box = Instantiate()
         .WithTransform(Vec2(screenWidth / 2, 50.0f), 0.0f)
         .WithCollider(ColliderType::BOX, Vec2(30.0f, 50.0f))
-        .WithRenderer({ RenderShape::R_BOX, BLUE, { Vec2(30.0f, 50.0f) } })
+        .WithRenderer({ RenderShape::R_BOX, BLUE, Vec2(30.0f, 50.0f) })
+        .WithRigidBody(properties, linearState, angularState)
+        .Create(world);
+
+    GameObject* circle = Instantiate()
+        .WithTransform(Vec2(400.0f, 50.0f), 0.0f)
+        .WithCollider(ColliderType::CIRCLE, 25.0f)
+        .WithRenderer({ RenderShape::R_CIRCLE, RED, 25.0f})
+        .WithRigidBody(properties, linearState, angularState)
+        .Create(world);
+
+    std::vector<Vec2> polyVerts = { 
+        Vec2(-20.0f, -20.0f), // Top Left
+        Vec2(-20.0f,  20.0f), // Bottom Left
+        Vec2( 20.0f,  20.0f), // Bottom Right
+        Vec2( 30.0f,  0.0f),  // Pointy Right Edge
+        Vec2( 20.0f, -20.0f)  // Top Right
+    };
+
+    GameObject* poly = Instantiate()
+        .WithTransform(Vec2(200.0f, 100.0f), 0.0f)
+        .WithCollider(ColliderType::POLYGON, polyVerts)
+        .WithRenderer({ RenderShape::R_POLYGON, GREEN, polyVerts })
+        .WithRigidBody(properties, linearState, angularState)
+        .Create(world);
+
+        std::vector<Vec2> polyVerts2 = { 
+            Vec2(0.0f, 0.0f),  // Top Left     
+            Vec2(0.0f,  50.0f),  // Bottom Left   
+            Vec2( 30.0f,  10.0f),  // Bottom Right
+            Vec2( 00.0f, 10.0f),  // Top Right
+        };
+
+
+    GameObject* poly2 = Instantiate()
+        .WithTransform(Vec2(300.0f, 150.0f), 0.0f)
+        .WithCollider(ColliderType::POLYGON, polyVerts2)
+        .WithRenderer({ RenderShape::R_POLYGON, PURPLE, polyVerts2 })
         .WithRigidBody(properties, linearState, angularState)
         .Create(world);
 
@@ -59,7 +96,10 @@ int main() {
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            Render(obj);
+            Render(box);
+            Render(circle);
+            Render(poly);
+            Render(poly2);
         EndDrawing();
 
         DrawFPS(10, 10);

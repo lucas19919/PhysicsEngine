@@ -4,7 +4,8 @@ class GameObject;
 
 enum ColliderType { 
     CIRCLE, 
-    BOX 
+    BOX,
+    POLYGON
 };
 
 class Collider

@@ -2,22 +2,21 @@
 #include "raylib.h"
 #include <vector>
 #include "math/Vec2.h"
+#include <variant>
 
 class GameObject;
 
 enum RenderShape {
     R_CIRCLE,
-    R_BOX
+    R_BOX,
+    R_POLYGON
+
 };
 
 typedef struct {
     RenderShape form;
     Color color = RED;
-    union Scale
-    {
-        Vec2 size;
-        float radius;
-    } scale;
+    std::variant<Vec2, float, std::vector<Vec2>> scale; 
 } Shape;
 
 class Renderer

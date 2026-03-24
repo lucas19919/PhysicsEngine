@@ -5,8 +5,8 @@ Renderer::Renderer(Shape shape) : shape(shape)
 {
     if (shape.form == RenderShape::R_BOX)
     {
-        float x = shape.scale.size.x / 2.0f;
-        float y = shape.scale.size.y / 2.0f;
+        float x = std::get<Vec2>(shape.scale).x / 2.0f;
+        float y = std::get<Vec2>(shape.scale).y / 2.0f;
         
         localCoordinates.push_back(Vec2(-x, -y));
         localCoordinates.push_back(Vec2(x, -y));
@@ -14,6 +14,17 @@ Renderer::Renderer(Shape shape) : shape(shape)
         localCoordinates.push_back(Vec2(-x, y));
 
         worldCoordinates.resize(4);
+    }
+
+    if (shape.form == RenderShape::R_POLYGON)
+    {
+        localCoordinates = std::get<std::vector<Vec2>>(shape.scale);
+        worldCoordinates.resize(localCoordinates.size());
+    }
+    else if (shape.form == RenderShape::R_CIRCLE)
+    {
+        localCoordinates.push_back(Vec2());
+        worldCoordinates.resize(1);
     }
 }
 
@@ -29,6 +40,10 @@ std::vector<Vec2> Renderer::GetWorldCoordinates(Vec2 position) const
         return { position };
     }
     else if (shape.form == RenderShape::R_BOX)
+    {
+        return worldCoordinates;
+    }
+    else if (shape.form == RenderShape::R_POLYGON)
     {
         return worldCoordinates;
     }

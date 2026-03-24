@@ -28,7 +28,7 @@ class SAT
 
         static Projection Project(std::vector<Vec2> vertices, const Vec2 axis);
         static Projection CircleProject(CircleCollider* c, const Vec2 axis);
-        static std::vector<Vec2> GetVertices(BoxCollider* b);
+        static std::vector<Vec2> GetVertices(Collider* b);
         static std::vector<Vec2> GetNormals(std::vector<Vec2> vertices);
 
     public:
