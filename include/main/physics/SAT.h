@@ -4,18 +4,11 @@
 #include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/collidertypes/PolygonCollider.h"
 
-struct Collision {
+struct Manifold {
     bool isColliding;
     Vec2 normal;
     float depth;
-    Vec2 contacts[2];
-    int contactCount;
-};
-
-struct Edge {
-    Vec2 p1;
-    Vec2 p2;
-    Vec2 maxVertex;
+    std::vector<Vec2> contactPoints;
 };
 
 class SAT
@@ -32,10 +25,10 @@ class SAT
         static std::vector<Vec2> GetNormals(std::vector<Vec2> vertices);
 
     public:
-        static Collision CircleCircle(Collider* c1, Collider* c2);
-        static Collision BoxBox(Collider* b1, Collider* b2);
-        static Collision BoxCircle(Collider* b1, Collider* c1);
-        static Collision PolygonCircle(Collider* p1, Collider* c1);
-        static Collision PolygonBox(Collider* p1, Collider* b1);
-        static Collision PolygonPolygon(Collider* p1, Collider* p2);
+        static Manifold CircleCircle(Collider* c1, Collider* c2);
+        static Manifold BoxBox(Collider* b1, Collider* b2);
+        static Manifold BoxCircle(Collider* b1, Collider* c1);
+        static Manifold PolygonCircle(Collider* p1, Collider* c1);
+        static Manifold PolygonBox(Collider* p1, Collider* b1);
+        static Manifold PolygonPolygon(Collider* p1, Collider* p2);
 };

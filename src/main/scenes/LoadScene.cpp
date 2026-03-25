@@ -1,7 +1,8 @@
 #include "main/scenes/LoadScene.h"
-#include <raylib.h>
+#include "main/utility/Instantiate.h"
+#include "main/GameObject.h"
+#include "math/Vec2.h"
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <libraries/json/json.hpp>
@@ -13,56 +14,53 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     world.Clear();
 
     std::ifstream file(filePath);
-    if (!file.is_open())
-    {
-        std::cerr << "Loading Scene Failed: " << filePath << std::endl;
-        return;
-    }
+    if (!file.is_open()) return;
 
     json sceneData;
     file >> sceneData;
 
-    if (sceneData.contains("useWalls") && sceneData["useWalls"] == true) {
-        GameObject* floor = Instantiate()
+    if (sceneData.value("useWalls", false))
+    {
+        Instantiate()
             .WithTransform(Vec2(screenWidth / 2.0f, screenHeight + 25.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(screenWidth, 50.0f))
             .Create(world);
 
-        GameObject* ceiling = Instantiate()
+        Instantiate()
             .WithTransform(Vec2(screenWidth / 2.0f, -25.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(screenWidth, 50.0f))
             .Create(world);
 
-        GameObject* leftWall = Instantiate()
+        Instantiate()
             .WithTransform(Vec2(-25.0f, screenHeight / 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(50.0f, screenHeight))
             .Create(world);
 
-        GameObject* rightWall = Instantiate()
+        Instantiate()
             .WithTransform(Vec2(screenWidth + 25.0f, screenHeight / 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(50.0f, screenHeight))
             .Create(world);
     }
 
-    for (const auto& item : sceneData["objects"]) 
+    for (const auto& item : sceneData["objects"])
     {
         if (!item.contains("components")) continue;
         const auto& components = item["components"];
 
-        float x;
-        float y;
-        float rot;
+        float posX = 0.0f;
+        float posY = 0.0f;
+        float rotation = 0.0f;
 
         if (components.contains("TransformComponent"))
         {
-            x = components["TransformComponent"]["position"]["x"];
-            y = components["TransformComponent"]["position"]["y"];
-            rot = components["TransformComponent"]["rotation"];
+            posX = components["TransformComponent"]["position"]["x"];
+            posY = components["TransformComponent"]["position"]["y"];
+            rotation = components["TransformComponent"]["rotation"];
         }
 
-        ColliderType collider;
-        Vec2 size;
-        float radius = 0.0f;
+        ColliderType colType = ColliderType::BOX;
+        Vec2 boxSize;
+        float circleRadius = 0.0f;
         std::vector<Vec2> polyVerts;
         
         if (components.contains("Collider"))
@@ -70,18 +68,18 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
             std::string type = components["Collider"]["type"];
             if (type == "BOX")
             {
-                collider = ColliderType::BOX;
-                size.x = components["Collider"]["size"]["x"];
-                size.y = components["Collider"]["size"]["y"];
+                colType = ColliderType::BOX;
+                boxSize.x = components["Collider"]["size"]["x"];
+                boxSize.y = components["Collider"]["size"]["y"];
             }
             else if (type == "CIRCLE")
             {
-                collider = ColliderType::CIRCLE;
-                radius = components["Collider"]["radius"];
+                colType = ColliderType::CIRCLE;
+                circleRadius = components["Collider"]["radius"];
             }
             else if (type == "POLYGON")
             {
-                collider = ColliderType::POLYGON;
+                colType = ColliderType::POLYGON;
                 for (const auto& v : components["Collider"]["vertices"])
                 {
                     polyVerts.push_back(Vec2(v["x"], v["y"]));
@@ -105,7 +103,7 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
             if (form == "R_BOX")
             {
                 renderShape.form = RenderShape::R_BOX;
-                size = Vec2(components["Renderer"]["scale"]["x"], components["Renderer"]["scale"]["y"]);
+                Vec2 size = Vec2(components["Renderer"]["scale"]["x"], components["Renderer"]["scale"]["y"]);
                 renderShape.scale = size;
             }
             else if (form == "R_CIRCLE")
@@ -116,22 +114,46 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
             else if (form == "R_POLYGON")
             {
                 renderShape.form = RenderShape::R_POLYGON;
-                std::vector<Vec2> pVertices;
+                std::vector<Vec2> vertices;
+
                 for (const auto& v : components["Renderer"]["scale"])
                 {
-                    pVertices.push_back(Vec2(v["x"], v["y"]));
+                    vertices.push_back(Vec2(v["x"], v["y"]));
                 }
 
-                renderShape.scale = pVertices;
+                renderShape.scale = vertices;
             }
         }
 
-        Properties props;
-        LinearState linear;
-        AngularState angular;
+        Instantiate& builder = Instantiate().WithTransform(Vec2(posX, posY), rotation);
+
+        if (components.contains("Collider"))
+        {
+            if (colType == ColliderType::BOX)
+            {
+                builder.WithCollider(colType, boxSize);
+            }
+            else if (colType == ColliderType::CIRCLE)
+            {
+                builder.WithCollider(colType, circleRadius);
+            }
+            else if (colType == ColliderType::POLYGON)
+            {
+                builder.WithCollider(colType, polyVerts);
+            }
+        }
+
+        if (components.contains("Renderer"))
+        {
+            builder.WithRenderer(renderShape);
+        }
 
         if (components.contains("RigidBody"))
         {
+            Properties props = { 1.0f, 0.5f, 100.0f, 1.0f };
+            LinearState linear = { Vec2(), Vec2(), Vec2() };
+            AngularState angular = { 0.0f, 0.0f, 0.0f };
+
             props.mass = components["RigidBody"]["properties"]["mass"];
             props.restitution = components["RigidBody"]["properties"]["restitution"];
             props.friction = components["RigidBody"]["properties"]["friction"];
@@ -147,25 +169,10 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
             angular.angularVelocity = components["RigidBody"]["angularState"]["angularVelocity"];
             angular.angularAcceleration = components["RigidBody"]["angularState"]["angularAcceleration"];
             angular.torque = components["RigidBody"]["angularState"]["torque"];
+
+            builder.WithRigidBody(props, linear, angular);
         }
 
-        Instantiate& builder = Instantiate().WithTransform(Vec2(x, y), rot);
-
-        if (collider == ColliderType::BOX)
-        {
-            builder.WithCollider(collider, size);
-        }
-        else if (collider == ColliderType::CIRCLE)
-        {
-            builder.WithCollider(collider, radius);
-        }
-        else if (collider == ColliderType::POLYGON)
-        {
-            builder.WithCollider(collider, polyVerts);
-        }
-
-        builder.WithRenderer(renderShape);
-        builder.WithRigidBody(props, linear, angular);
         builder.Create(world);
     }
 }

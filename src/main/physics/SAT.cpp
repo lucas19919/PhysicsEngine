@@ -2,7 +2,7 @@
 #include "main/GameObject.h"
 #include "main/components/Collider.h"
 
-Collision SAT::CircleCircle(Collider *c1, Collider *c2)
+Manifold SAT::CircleCircle(Collider *c1, Collider *c2)
 {
     float distanceSq = (c1->parent->transform.position - c2->parent->transform.position).MagSq();
     float radiusSum = static_cast<CircleCollider*>(c1)->radius + static_cast<CircleCollider*>(c2)->radius;
@@ -14,13 +14,14 @@ Collision SAT::CircleCircle(Collider *c1, Collider *c2)
         
         float distance = std::sqrt(distanceSq);
         Vec2 axis = (c2->parent->transform.position - c1->parent->transform.position).Norm();
+
         return { true, axis, radiusSum - distance };
     }
     
     return { false, Vec2(), 0.0f };
 }
 
-Collision SAT::BoxBox(Collider *b1, Collider *b2)
+Manifold SAT::BoxBox(Collider *b1, Collider *b2)
 {
     std::vector<Vec2> vertices1 = GetVertices(static_cast<BoxCollider*>(b1));
     std::vector<Vec2> vertices2 = GetVertices(static_cast<BoxCollider*>(b2));
@@ -71,7 +72,7 @@ Collision SAT::BoxBox(Collider *b1, Collider *b2)
     return { true, smallestAxis, minOverlap };
 }
 
-Collision SAT::BoxCircle(Collider *b1, Collider *c1)
+Manifold SAT::BoxCircle(Collider *b1, Collider *c1)
 {
     CircleCollider* circle = static_cast<CircleCollider*>(c1);
     Vec2 center = circle->parent->transform.position;
@@ -124,7 +125,7 @@ Collision SAT::BoxCircle(Collider *b1, Collider *c1)
     return { true, smallestAxis, minOverlap };
 }
 
-Collision SAT::PolygonCircle(Collider *p1, Collider *c1)
+Manifold SAT::PolygonCircle(Collider *p1, Collider *c1)
 {
     CircleCollider* circle = static_cast<CircleCollider*>(c1);
     Vec2 center = circle->parent->transform.position;
@@ -177,7 +178,7 @@ Collision SAT::PolygonCircle(Collider *p1, Collider *c1)
     return { true, smallestAxis, minOverlap };
 }
 
-Collision SAT::PolygonBox(Collider *p1, Collider *b1)
+Manifold SAT::PolygonBox(Collider *p1, Collider *b1)
 {
     std::vector<Vec2> vertices1 = GetVertices(static_cast<PolygonCollider*>(p1));
     std::vector<Vec2> vertices2 = GetVertices(static_cast<BoxCollider*>(b1));
@@ -227,7 +228,7 @@ Collision SAT::PolygonBox(Collider *p1, Collider *b1)
     return { true, smallestAxis, minOverlap };
 }
 
-Collision SAT::PolygonPolygon(Collider *p1, Collider *p2)
+Manifold SAT::PolygonPolygon(Collider *p1, Collider *p2)
 {
     std::vector<Vec2> vertices1 = GetVertices(static_cast<PolygonCollider*>(p1));
     std::vector<Vec2> vertices2 = GetVertices(static_cast<PolygonCollider*>(p2));
@@ -242,7 +243,7 @@ Collision SAT::PolygonPolygon(Collider *p1, Collider *p2)
         Projection p2 = Project(vertices2, axis);
 
         if (p1.max < p2.min || p2.max < p1.min) {
-            return { false, Vec2(), 0.0f }; // Found a gap! No collision.
+            return { false, Vec2(), 0.0f }; 
         }
 
         float overlap = std::min(p1.max, p2.max) - std::max(p1.min, p2.min);

@@ -1,0 +1,220 @@
+{
+  "name": "Domino Cascade",
+  "useWalls": true,
+  "objects": [
+    {
+      "name": "Striker_Ball",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 100.0, "y": 880.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "CIRCLE",
+          "isActive": true,
+          "radius": 40.0
+        },
+        "Renderer": {
+          "form": "R_CIRCLE",
+          "color": "RED",
+          "scale": 40.0
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 25.0,
+            "restitution": 0.2,
+            "friction": 120.0,
+            "inertia": 8.0
+          },
+          "linearState": {
+            "velocity": { "x": 900.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": {
+            "angularVelocity": 20.0,
+            "angularAcceleration": 0.0,
+            "torque": 0.0
+          }
+        }
+      }
+    },
+    {
+      "name": "Domino_1",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 350.0, "y": 870.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "isActive": true,
+          "size": { "x": 20.0, "y": 140.0 }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": { "x": 20.0, "y": 140.0 }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 2.0,
+            "restitution": 0.05,
+            "friction": 200.0,
+            "inertia": 3.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Domino_2",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 480.0, "y": 870.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "isActive": true,
+          "size": { "x": 20.0, "y": 140.0 }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": { "x": 20.0, "y": 140.0 }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 2.0,
+            "restitution": 0.05,
+            "friction": 200.0,
+            "inertia": 3.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Domino_3",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 610.0, "y": 870.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "isActive": true,
+          "size": { "x": 20.0, "y": 140.0 }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": { "x": 20.0, "y": 140.0 }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 2.0,
+            "restitution": 0.05,
+            "friction": 200.0,
+            "inertia": 3.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Domino_4",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 740.0, "y": 870.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "isActive": true,
+          "size": { "x": 20.0, "y": 140.0 }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": { "x": 20.0, "y": 140.0 }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 2.0,
+            "restitution": 0.05,
+            "friction": 200.0,
+            "inertia": 3.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Target_Polygon",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 900.0, "y": 860.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "POLYGON",
+          "isActive": true,
+          "vertices": [
+            { "x": -40.0, "y": -50.0 },
+            { "x": -40.0, "y": 50.0 },
+            { "x": 40.0, "y": 50.0 },
+            { "x": 60.0, "y": 0.0 },
+            { "x": 40.0, "y": -50.0 }
+          ]
+        },
+        "Renderer": {
+          "form": "R_POLYGON",
+          "color": "GREEN",
+          "scale": [
+            { "x": -40.0, "y": -50.0 },
+            { "x": -40.0, "y": 50.0 },
+            { "x": 40.0, "y": 50.0 },
+            { "x": 60.0, "y": 0.0 },
+            { "x": 40.0, "y": -50.0 }
+          ]
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 5.0,
+            "restitution": 0.2,
+            "friction": 150.0,
+            "inertia": 8.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    }
+  ]
+}

@@ -63,7 +63,7 @@ void World::CheckCollisons(int screenWidth, int screenHeight)
             Collider* otherCol = other->GetCollider();
             if (otherCol == nullptr) continue;
 
-            Collision collision = CollisionHandler::SortCollision(c, otherCol);
+            Manifold collision = CollisionHandler::SortCollision(c, otherCol);
             if (collision.isColliding) {
                 RigidBody* rb = obj->GetRigidBody();
                 RigidBody* otherRb = other->GetRigidBody();

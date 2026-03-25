@@ -14,11 +14,20 @@ void Render(GameObject *obj)
     switch (shape.form)
     {
     case RenderShape::R_CIRCLE:
-        DrawCircle(obj->transform.position.x, obj->transform.position.y, std::get<float>(shape.scale), shape.color);
+    {
+        float radius = std::get<float>(shape.scale);
+        Vec2 pos = obj->transform.position;
+        float rot = obj->transform.rotation;
+
+        DrawCircle(pos.x, pos.y, radius, shape.color);
+        
+        DrawRing({ pos.x, pos.y }, radius - 2.0f, radius, 0.0f, 360.0f, 36, BLACK);
         break;
+    }
     case RenderShape::R_BOX:
     {
         Vec2 size = std::get<Vec2>(shape.scale);
+        
         DrawRectanglePro(
             Rectangle{ obj->transform.position.x, obj->transform.position.y, size.x, size.y },
             { size.x / 2.0f, size.y / 2.0f },
@@ -26,6 +35,13 @@ void Render(GameObject *obj)
             shape.color
         );        
 
+        std::vector<Vec2> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
+        for (size_t i = 0; i < vertices.size(); i++) 
+        {
+            Vec2 p1 = vertices[i];
+            Vec2 p2 = vertices[(i + 1) % vertices.size()];
+            DrawLineEx({ p1.x, p1.y }, { p2.x, p2.y }, 2.0f, BLACK);
+        }
         break;
     }
     case RenderShape::R_POLYGON:
@@ -35,11 +51,17 @@ void Render(GameObject *obj)
         if (vertexCount < 3) break; 
 
         std::vector<Vector2> raylibVerts(vertexCount);
-        for (int i = 0; i < vertexCount; i++) {
+        for (int i = 0; i < vertexCount; i++) 
+        {
             raylibVerts[i] = { vertices[i].x, vertices[i].y }; 
         }
 
         DrawTriangleFan(raylibVerts.data(), vertexCount, shape.color);
+        
+        for (int i = 0; i < vertexCount; i++) 
+        {
+            DrawLineEx(raylibVerts[i], raylibVerts[(i + 1) % vertexCount], 2.0f, BLACK);
+        }
         break;
     }
     default:

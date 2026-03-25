@@ -5,5 +5,5 @@
 class CollisionHandler
 {
     public:
-        static Collision SortCollision(Collider* c1, Collider* c2);
+        static Manifold SortCollision(Collider* c1, Collider* c2);
 };
