@@ -6,7 +6,7 @@
 
 World::World()
 {
-    gravity = Vec2(0.0f, 981.0f);
+    gravity = Vec2(0.0f, 600.0f);
 }
 
 void World::Clear()

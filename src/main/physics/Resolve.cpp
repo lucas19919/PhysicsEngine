@@ -49,7 +49,7 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         if (magnitude > 0.0f) continue;
 
         float cross1 = r1.Cross(normal) * r1.Cross(normal);
-        float cross2 = r1.Cross(normal) * r1.Cross(normal);
+        float cross2 = r2.Cross(normal) * r2.Cross(normal);
 
         float j = (-(1 + e) * magnitude) / (invMass1 + invMass2 + (cross1 * invInertia1) + (cross2 * invInertia2));
         j /= manifold.points.size();

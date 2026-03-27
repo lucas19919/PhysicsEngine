@@ -9,7 +9,7 @@ int main() {
     const int screenHeight = 960;
 
     World world;
-    LoadScene::Load("assets/testrotation.json", world, screenWidth, screenHeight);
+    LoadScene::Load("assets/stresstest.json", world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");
     SetTargetFPS(60);    
