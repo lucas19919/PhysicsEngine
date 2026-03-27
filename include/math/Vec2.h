@@ -33,4 +33,5 @@ struct Vec2 {
     float MagSq() const;
     Vec2 Norm() const;
     float Dot(const Vec2& other) const;
+    float Cross(const Vec2& other) const;
 };

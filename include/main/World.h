@@ -7,23 +7,21 @@ class World
 {
     public:
         World();
-
         void Clear();
         
         std::vector<GameObject*> GetGameObjects() const { return gameObjects; }
         void AddGameObject(GameObject* obj) { gameObjects.push_back(obj); }
-        void removeGameObject(GameObject* obj) 
+        void RemoveGameObject(GameObject* obj) 
         { 
             gameObjects.erase(std::remove(gameObjects.begin(), gameObjects.end(), obj), gameObjects.end());
             delete obj;
         }
 
         void Step(float dt);
-        void CheckCollisons(int screenWidth, int screenHeight);
+        void CheckCollisions();
 
         Vec2 gravity;
-        float airDensity;
 
-        private:
-            std::vector<GameObject*> gameObjects;
+    private:
+        std::vector<GameObject*> gameObjects;
 };

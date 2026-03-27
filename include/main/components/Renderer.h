@@ -10,7 +10,6 @@ enum RenderShape {
     R_CIRCLE,
     R_BOX,
     R_POLYGON
-
 };
 
 typedef struct {

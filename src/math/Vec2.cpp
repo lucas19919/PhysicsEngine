@@ -19,3 +19,8 @@ float Vec2::Dot(const Vec2& other) const
 {
     return (x * other.x) + (y * other.y);
 }
+
+float Vec2::Cross(const Vec2& other) const
+{
+    return (x * other.y) - (y * other.x);
+}

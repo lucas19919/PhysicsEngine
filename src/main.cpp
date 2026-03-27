@@ -1,13 +1,8 @@
 #include "raylib.h"
 #include "main/World.h"
 #include "main/GameObject.h"
-#include "math/Vec2.h"
-#include "main/components/collidertypes/BoxCollider.h"
-#include "main/components/collidertypes/CircleCollider.h"
 #include "main/scenes/LoadScene.h"
-#include <vector>
 #include "main/utility/Draw.h"
-#include "main/utility/Instantiate.h"
 
 int main() {
     const int screenWidth = 1280;
@@ -22,7 +17,7 @@ int main() {
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         world.Step(dt);
-        world.CheckCollisons(screenWidth, screenHeight);
+        world.CheckCollisions();
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
