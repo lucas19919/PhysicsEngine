@@ -2,6 +2,9 @@
 
 A custom 2D Physics Engine built in C++.
 
+# Plinko
+![](https://github.com/lucas19919/PhysicsEngine/blob/main/plinko.gif)
+
 Using:
  - Raylib for rendering,
  - SAT for collision detection
