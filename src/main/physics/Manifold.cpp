@@ -89,9 +89,31 @@ CollisionManifold Manifold::GenPolyPoly(Collider* c1, Collider* c2)
 std::vector<Vec2> Manifold::GetPolygonCircleContacts(std::vector<Vec2> vertices1, Vec2 center)
 {
     std::vector<Vec2> points;
+    std::vector<Edge> edges = GetEdges(vertices1);
 
+    float minDistSq = INFINITY;
+    Vec2 closestPoint;
 
+    for (int i = 0; i < edges.size(); i++)
+    {
+        Vec2 cLine = center - edges[i].p1;
+        float t = cLine.Dot(edges[i].line) / edges[i].line.MagSq();
+        
+        t = std::max(0.0f, std::min(1.0f, t));
+        
+        Vec2 nearest = edges[i].p1 + (edges[i].line * t);
+        
+        Vec2 distVector = center - nearest;
+        float distSq = distVector.MagSq();
 
+        if (distSq < minDistSq)
+        {
+            minDistSq = distSq;
+            closestPoint = nearest;
+        }
+    }
+
+    points.push_back(closestPoint);
     return points;
 }
 

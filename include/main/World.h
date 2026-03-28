@@ -21,6 +21,7 @@ class World
         void CheckCollisions();
 
         Vec2 gravity;
+        bool isPaused = true;
 
     private:
         std::vector<GameObject*> gameObjects;

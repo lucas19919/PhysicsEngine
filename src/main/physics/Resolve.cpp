@@ -82,6 +82,10 @@ void Resolve::ResolvePosition(CollisionManifold manifold, GameObject* obj1, Game
     if (totalInvMass == 0.0f) return;
 
     Collision collision = manifold.Collision;
+
+    float slop = 0.05f;
+
+    float penetration = std::min(collision.depth - slop, 0.0f);
     Vec2 correction = collision.normal * (collision.depth / totalInvMass);
     
     if (rb1)

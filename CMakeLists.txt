@@ -29,6 +29,10 @@ endif()
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+if(MINGW)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 #set(raylib_VERBOSE 1)

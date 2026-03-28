@@ -1,0 +1,115 @@
+{
+  "name": "The Sniper Catapult",
+  "useWalls": false,
+  "objects": [
+    {
+      "name": "Pivot_Left",
+      "components": {
+        "TransformComponent": { "position": { "x": 1010.0, "y": 800.0 }, "rotation": 0.0 },
+        "Collider": {
+          "type": "POLYGON", "isActive": true,
+          "vertices": [ 
+            { "x": 0.0, "y": -46.2 }, 
+            { "x": 40.0, "y": 23.1 }, 
+            { "x": -40.0, "y": 23.1 } 
+          ]
+        },
+        "Renderer": { 
+          "form": "R_POLYGON", "color": "BLUE", 
+          "scale": [ { "x": 0.0, "y": -46.2 }, { "x": 40.0, "y": 23.1 }, { "x": -40.0, "y": 23.1 } ] 
+        }
+      }
+    },
+    {
+      "name": "Pivot_Right",
+      "components": {
+        "TransformComponent": { "position": { "x": 1090.0, "y": 800.0 }, "rotation": 0.0 },
+        "Collider": {
+          "type": "POLYGON", "isActive": true,
+          "vertices": [ 
+            { "x": 0.0, "y": -46.2 }, 
+            { "x": 40.0, "y": 23.1 }, 
+            { "x": -40.0, "y": 23.1 } 
+          ]
+        },
+        "Renderer": { 
+          "form": "R_POLYGON", "color": "BLUE", 
+          "scale": [ { "x": 0.0, "y": -46.2 }, { "x": 40.0, "y": 23.1 }, { "x": -40.0, "y": 23.1 } ] 
+        }
+      }
+    },
+    {
+      "name": "Catapult_Plank",
+      "components": {
+        "TransformComponent": { "position": { "x": 1050.0, "y": 746.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 400.0, "y": 15.0 } },
+        "Renderer": { "form": "R_BOX", "color": "RED", "scale": { "x": 400.0, "y": 15.0 } },
+        "RigidBody": {
+          "properties": { "mass": 8.0, "restitution": 0.0, "friction": 0.9, "inertia": 106800.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "The_Striker",
+      "components": {
+        "TransformComponent": { "position": { "x": 900.0, "y": 100.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 60.0, "y": 60.0 } },
+        "Renderer": { "form": "R_BOX", "color": "YELLOW", "scale": { "x": 60.0, "y": 60.0 } },
+        "RigidBody": {
+          "properties": { "mass": 25.0, "restitution": 0.2, "friction": 0.5, "inertia": 24000.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 900.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Projectile",
+      "components": {
+        "TransformComponent": { "position": { "x": 1200.0, "y": 703.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 40.0, "y": 40.0 } },
+        "Renderer": { "form": "R_BOX", "color": "GREEN", "scale": { "x": 40.0, "y": 40.0 } },
+        "RigidBody": {
+          "properties": { "mass": 3.0, "restitution": 0.3, "friction": 0.6, "inertia": 300.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Target_Pedestal",
+      "components": {
+        "TransformComponent": { "position": { "x": 250.0, "y": 850.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 200.0, "y": 40.0 } },
+        "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 200.0, "y": 40.0 } }
+      }
+    },
+    {
+      "name": "Target_Block_1",
+      "components": {
+        "TransformComponent": { "position": { "x": 200.0, "y": 790.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 40.0, "y": 80.0 } },
+        "Renderer": { "form": "R_BOX", "color": "GREEN", "scale": { "x": 40.0, "y": 80.0 } },
+        "RigidBody": {
+          "properties": { "mass": 3.0, "restitution": 0.1, "friction": 0.9, "inertia": 2000.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "name": "Target_Block_2",
+      "components": {
+        "TransformComponent": { "position": { "x": 300.0, "y": 790.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 40.0, "y": 80.0 } },
+        "Renderer": { "form": "R_BOX", "color": "GREEN", "scale": { "x": 40.0, "y": 80.0 } },
+        "RigidBody": {
+          "properties": { "mass": 3.0, "restitution": 0.1, "friction": 0.9, "inertia": 2000.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    }
+  ]
+}

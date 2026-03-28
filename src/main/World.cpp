@@ -20,6 +20,8 @@ void World::Clear()
 
 void World::Step(float dt)
 {
+    if (isPaused) return;
+
     for (GameObject *obj : GetGameObjects())
     {
         RigidBody *rb = obj->GetRigidBody();
