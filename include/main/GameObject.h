@@ -3,6 +3,7 @@
 #include "components/RigidBody.h"
 #include "components/Renderer.h"
 #include "components/Collider.h"
+#include <memory>
 
 class GameObject
 {
@@ -12,16 +13,16 @@ class GameObject
 
         TransformComponent transform;
 
-        RigidBody* GetRigidBody() { return rigidBody; }
-        Renderer* GetRenderer() { return renderer; }
-        Collider* GetCollider() { return collider; }
+        RigidBody* GetRigidBody() { return rigidBody.get(); }
+        Collider* GetCollider() { return collider.get(); }
+        Renderer* GetRenderer() { return renderer.get(); }
 
-        void SetRigidBody(RigidBody* rb);
-        void SetRenderer(Renderer* r);
-        void SetCollider(Collider* c);
+        void SetRigidBody(std::unique_ptr<RigidBody> rb);
+        void SetCollider(std::unique_ptr<Collider> c);
+        void SetRenderer(std::unique_ptr<Renderer> r);
 
     private:
-        RigidBody* rigidBody;
-        Collider* collider;
-        Renderer* renderer;
+        std::unique_ptr<RigidBody> rigidBody;
+        std::unique_ptr<Collider> collider;
+        std::unique_ptr<Renderer> renderer;
 };

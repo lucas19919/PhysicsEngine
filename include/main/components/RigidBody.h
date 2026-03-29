@@ -43,6 +43,9 @@ class RigidBody
         void SetRestitution(float e) { restitution = e; }
         float GetRestitution() const { return restitution; }
 
+        void SetFriction(float f) { friction = f; }
+        float GetFriction() const { return friction; }
+
         void ApplyForce(Vec2 force);
         Vec2 GetForce() const { return netForce; }   
         void ClearForces();

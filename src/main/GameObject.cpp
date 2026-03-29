@@ -2,43 +2,33 @@
 
 GameObject::GameObject() : transform(this)
 {
-    rigidBody = nullptr;
-    collider = nullptr;
-    renderer = nullptr;
 }
 
 GameObject::~GameObject()
 {
-    if (rigidBody) delete rigidBody;
-    if (collider) delete collider;
-    if (renderer) delete renderer;
 }
 
-void GameObject::SetRigidBody(RigidBody* rb) 
+void GameObject::SetRigidBody(std::unique_ptr<RigidBody> rb) 
 {
-    if (rigidBody != nullptr) delete rigidBody; 
-    
-    rigidBody = rb; 
+    rigidBody = std::move(rb);    
     
     if (rigidBody != nullptr) {
         rigidBody->parent = this; 
     }
 }
 
-void GameObject::SetRenderer(Renderer* r)
+void GameObject::SetRenderer(std::unique_ptr<Renderer> r)
 {
-    if (renderer != nullptr) delete renderer;
-    renderer = r;
+    renderer = std::move(r);
     
     if (renderer != nullptr) {
         renderer->parent = this;
     }
 }
 
-void GameObject::SetCollider(Collider* c)
+void GameObject::SetCollider(std::unique_ptr<Collider> c)
 {
-    if (collider != nullptr) delete collider;
-    collider = c;
+    collider = std::move(c);
     
     if (collider != nullptr) {
         collider->parent = this;

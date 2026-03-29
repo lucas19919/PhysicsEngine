@@ -5,13 +5,15 @@
 
 Instantiate& Instantiate::WithRigidBody(Properties properties, LinearState linearState, AngularState angularState)
 {
-    obj->SetRigidBody(new RigidBody(properties, linearState, angularState));
+    std::unique_ptr<RigidBody> rb = std::make_unique<RigidBody>(properties, linearState, angularState);
+    obj->SetRigidBody(std::move(rb));
     return *this;
 }
 
 Instantiate& Instantiate::WithRenderer(Shape shape)
 {
-    obj->SetRenderer(new Renderer(shape));
+    std::unique_ptr<Renderer> r = std::make_unique<Renderer>(shape);
+    obj->SetRenderer(std::move(r));
     return *this;
 }
 
@@ -20,13 +22,13 @@ Instantiate& Instantiate::WithCollider(ColliderType type, std::variant<Vec2, flo
     switch (type)
     {
     case ColliderType::CIRCLE:
-        obj->SetCollider(new CircleCollider(std::get<float>(bounds)));
+        obj->SetCollider(std::move(std::make_unique<CircleCollider>(std::get<float>(bounds))));
         break;
     case ColliderType::BOX:
-        obj->SetCollider(new BoxCollider(std::get<Vec2>(bounds)));
+        obj->SetCollider(std::move(std::make_unique<BoxCollider>(std::get<Vec2>(bounds))));
         break;
     case ColliderType::POLYGON:
-        obj->SetCollider(new PolygonCollider(std::get<std::vector<Vec2>>(bounds)));
+        obj->SetCollider(std::move(std::make_unique<PolygonCollider>(std::get<std::vector<Vec2>>(bounds))));
         break;
     default:
         break;
@@ -44,7 +46,7 @@ Instantiate& Instantiate::WithTransform(Vec2 position, float rotation)
 
 GameObject* Instantiate::Create(World& world)
 {
-    world.AddGameObject(obj);
+    world.AddGameObject(std::unique_ptr<GameObject>(obj));
     return obj;
 }
 

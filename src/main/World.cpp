@@ -9,12 +9,23 @@ World::World()
     gravity = Vec2(0.0f, 600.0f);
 }
 
+void World::AddGameObject(std::unique_ptr<GameObject> obj)
+{
+    gameObjects.push_back(std::move(obj));
+}
+
+std::vector<std::unique_ptr<GameObject>>& World::GetGameObjects()
+{
+    return gameObjects;
+}
+
+const std::vector<std::unique_ptr<GameObject>>& World::GetGameObjects() const
+{
+    return gameObjects;
+}
+
 void World::Clear()
 {
-    for (GameObject* obj : GetGameObjects()) {
-        delete obj;
-    }
-    
     GetGameObjects().clear();
 }
 
@@ -22,8 +33,10 @@ void World::Step(float dt)
 {
     if (isPaused) return;
 
-    for (GameObject *obj : GetGameObjects())
+    for (const auto& objPtr : GetGameObjects())
     {
+        GameObject* obj = objPtr.get();
+
         RigidBody *rb = obj->GetRigidBody();
         Collider *c = obj->GetCollider();
         if (rb == nullptr) continue;
@@ -53,13 +66,15 @@ void World::Step(float dt)
 
 void World::CheckCollisions()
 {
+    auto& objects = GetGameObjects();
+
     for (int i = 0; i < GetGameObjects().size(); i++)
     {
-        GameObject* obj = GetGameObjects()[i];
-
+        GameObject* obj = objects[i].get();
+        
         for (int j = i + 1; j < GetGameObjects().size(); j++)
         {
-            GameObject* obj2 = GetGameObjects()[j];
+            GameObject* obj2 = objects[j].get();
             CollisionManifold cm = Resolve::ResolveManifold(obj, obj2);
             if (cm.Collision.isColliding == true)
             {

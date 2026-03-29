@@ -8,6 +8,8 @@ CollisionManifold Resolve::ResolveManifold(GameObject* obj1, GameObject* obj2)
 
 void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameObject* obj2)
 {
+    if (manifold.points.size() == 0) return;
+    
     RigidBody *rb1 = obj1->GetRigidBody();
     RigidBody *rb2 = obj2->GetRigidBody();
 
@@ -19,17 +21,27 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
     if (invMass1 == 0.0f && invMass2 == 0.0f) return;
 
     float e = 0.0f;
-    if (rb1 && rb2)
-        e = std::min(rb1->GetRestitution(), rb2->GetRestitution());
-    else if (rb1)
-        e = rb1->GetRestitution();
-    else if (rb2)
-        e = rb2->GetRestitution();
+    float f = 0.0f;
 
-    if (manifold.points.size() == 0) return;
+    if (rb1 && rb2)
+    {
+        e = std::min(rb1->GetRestitution(), rb2->GetRestitution());
+        f = std::sqrt(rb1->GetFriction() * rb2->GetFriction());
+    }
+    else if (rb1)
+    {
+        e = rb1->GetRestitution();
+        f = rb1->GetFriction();
+    }
+    else if (rb2)
+    {
+        e = rb2->GetRestitution();
+        f = rb2->GetFriction();
+    }
     
     for (Vec2 contact : manifold.points)
     {
+        //j impulse
         Vec2 normal = manifold.Collision.normal;
 
         Vec2 r1 = contact - obj1->transform.position;
@@ -48,10 +60,10 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         
         if (magnitude > 0.0f) continue;
 
-        float cross1 = r1.Cross(normal) * r1.Cross(normal);
-        float cross2 = r2.Cross(normal) * r2.Cross(normal);
+        float cross1 = r1.Cross(normal);
+        float cross2 = r2.Cross(normal);
 
-        float j = (-(1 + e) * magnitude) / (invMass1 + invMass2 + (cross1 * invInertia1) + (cross2 * invInertia2));
+        float j = (-(1 + e) * magnitude) / (invMass1 + invMass2 + (cross1 * cross1 * invInertia1) + (cross2 * cross2 * invInertia2));
         j /= manifold.points.size();
 
         Vec2 impulse = normal * j;
@@ -65,6 +77,39 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         {
             rb2->velocity = rb2->velocity + impulse * invMass2;
             rb2->angularVelocity += (r2.x * impulse.y - r2.y * impulse.x) * invInertia2;
+        }
+
+        //friction impulse
+        Vec2 tangent = relative - (normal * relative.Dot(normal));
+        
+        if (tangent.MagSq() > 0.0001f)
+            tangent = tangent.Norm();
+        else continue;
+
+        float crossT1 = r1.Cross(tangent);
+        float crossT2 = r2.Cross(tangent);
+
+        float jt = -relative.Dot(tangent) / (invMass1 + invMass2 + (crossT1 * crossT1 * invInertia1) + (crossT2 * crossT2 * invInertia2));
+        jt /= manifold.points.size();
+
+        float jtMag = 0.0f;
+        
+        if (std::abs(jt) <= j * f)
+            jtMag = jt;
+        else
+            jtMag = (jt > 0.0f ? 1.0f : -1.0f) * j * f;
+
+        Vec2 frictionImpulse = tangent * jtMag;
+
+        if (rb1)
+        {
+            rb1->velocity = rb1->velocity - frictionImpulse * invMass1;
+            rb1->angularVelocity -= (r1.x * frictionImpulse.y - r1.y * frictionImpulse.x) * invInertia1;
+        }
+        if (rb2)
+        {
+            rb2->velocity = rb2->velocity + frictionImpulse * invMass2;
+            rb2->angularVelocity += (r2.x * frictionImpulse.y - r2.y * frictionImpulse.x) * invInertia2;
         }
     }
 }
@@ -85,7 +130,7 @@ void Resolve::ResolvePosition(CollisionManifold manifold, GameObject* obj1, Game
 
     float slop = 0.05f;
 
-    float penetration = std::min(collision.depth - slop, 0.0f);
+    float penetration = std::max(collision.depth - slop, 0.0f);
     Vec2 correction = collision.normal * (collision.depth / totalInvMass);
     
     if (rb1)

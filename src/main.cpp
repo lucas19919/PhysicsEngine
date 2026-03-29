@@ -4,6 +4,7 @@
 #include "main/scenes/LoadScene.h"
 #include "main/utility/Draw.h"
 #include "main/utility/InputHandler.h"
+#include <string>
 
 int main() {
     const int screenWidth = 1280;
@@ -13,7 +14,8 @@ int main() {
     InputHandler input;
 
     //all levels under assets/( ... ).json
-    LoadScene::Load("assets/plinko.json", world, screenWidth, screenHeight);
+    const std::string& filepath = "assets/test.json";
+    LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");
     SetTargetFPS(60);    
@@ -22,7 +24,7 @@ int main() {
     bool FPS = false;
 
     while (!WindowShouldClose()) {
-        input.Update(world);
+        input.Update(world, filepath, screenWidth, screenHeight);
 
         float dt = GetFrameTime();
         world.Step(dt);
@@ -30,9 +32,9 @@ int main() {
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            for (GameObject* obj : world.GetGameObjects())
+            for (const auto& objPtr : world.GetGameObjects())
             {
-                Render(obj);
+                Render(objPtr.get());
             }
         EndDrawing();
 

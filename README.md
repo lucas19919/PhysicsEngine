@@ -22,11 +22,16 @@ A custom 2D Physics Engine built in C++.
 	cmake ..
 	cmake --build .
 
+<<<<<<< Updated upstream
 # Usage:
 
 To load a scene, please change the relative path in main.cpp, "assets/(...).json", to the name of your file name.
+=======
+**Usage**
+To load a scene, please change the relative path in main.cpp, "assets/(...).json", to the name of your file.
+>>>>>>> Stashed changes
 
-To pause and unpause the simulation please press *space* once loaded. 
+*Space* to pause, *R* to reset the level.
 
 # Engine and Architechture:
 
@@ -38,8 +43,15 @@ To handle the physics, a World class is created containing base vectors such as 
 
 The collision management is handled by the Resolve class including 3 methods, ResolveManifold, ResolveImpulse, and ResolvePosition. ResolveManifold is called first and checks for any 2 colliders, if a collision is occuring between them. If yes it returns a Manifold, containing collision data and a list of contact points. Following this, ResolveImpulse calculates the impulse introudced by said collisions between bodies, updating the states of each rigidbody. Lastly, the ResolvePosition method adjusts the position of overlapping bodies to prevent any overlap, by slightly moving them away from each other depending on their relative velocities.
   
+<<<<<<< Updated upstream
 # To-Do:
 *1. Collision optimization (world tiling)
 2. Input System (refresh scene)
 3. Constraints
 4. Collision Optimization (box v box)*
+=======
+**TODO:**
+1. Collision optimization (world tiling)
+2. Collision Optimization (box v box)
+3. Constraints
+>>>>>>> Stashed changes
