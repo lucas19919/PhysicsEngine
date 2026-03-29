@@ -10,8 +10,8 @@ void InputHandler::Update(World& world, const std::string& filePath, int screenW
     }
     if (IsKeyPressed(KEY_R))
     {
-        world.Clear();
         world.isPaused = true;
+        world.Clear();
         LoadScene::Load(filePath, world, screenWidth, screenHeight);
     }
 }

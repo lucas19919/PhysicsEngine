@@ -1,10 +1,17 @@
 #include "main/components/RigidBody.h"
 #include "math/Vec2.h"
+#include <algorithm>
 
 RigidBody::RigidBody(Properties properties, LinearState linearState, AngularState angularState)
 {
+    mass = properties.mass > 0.0f ? properties.mass : 1.0f;
+    inertia = properties.inertia > 0.0f ? properties.inertia : 1.0f;
+    restitution = std::clamp(properties.restitution, 0.0f, 1.0f);
+    friction = std::max(0.0f, properties.friction);
+
     mass = properties.mass;
-    invMass = 1 / properties.mass;
+    invMass = (properties.mass > 0.0f) ? (1.0f / properties.mass) : 0.0f;
+    
     restitution = properties.restitution;
     friction = properties.friction;
 
@@ -13,11 +20,10 @@ RigidBody::RigidBody(Properties properties, LinearState linearState, AngularStat
     netForce = linearState.netForce;
 
     inertia = properties.inertia;
-    invInertia = 1 / properties.inertia;
+    invInertia = (properties.inertia > 0.0f) ? (1.0f / properties.inertia) : 0.0f;
 
     angularVelocity = angularState.angularVelocity;
     angularAcceleration = angularState.angularAcceleration;
-
     torque = angularState.torque;
 }
 
@@ -25,11 +31,10 @@ RigidBody::~RigidBody()
 {
 }
 
-
 void RigidBody::SetMass(float m)
 {
     mass = m;
-    invMass = 1 / m;
+    invMass = (m > 0.0f) ? (1.0f / m) : 0.0f;
 }
 
 void RigidBody::ApplyForce(Vec2 force)

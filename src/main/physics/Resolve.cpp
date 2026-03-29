@@ -47,10 +47,10 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         Vec2 r1 = contact - obj1->transform.position;
         Vec2 r2 = contact - obj2->transform.position;
 
-        Vec2 v1 = rb1 ? rb1->velocity : Vec2(0,0);
-        Vec2 v2 = rb2 ? rb2->velocity : Vec2(0,0);
-        float w1 = rb1 ? rb1->angularVelocity : 0;
-        float w2 = rb2 ? rb2->angularVelocity : 0;
+        Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
+        Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
+        float w1 = rb1 ? rb1->GetAngularVelocity() : 0;
+        float w2 = rb2 ? rb2->GetAngularVelocity() : 0;
 
         Vec2 totalV1 = v1 + Vec2(-w1 * r1.y, w1 * r1.x);
         Vec2 totalV2 = v2 + Vec2(-w2 * r2.y, w2 * r2.x);
@@ -70,13 +70,13 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
 
         if (rb1)
         {
-            rb1->velocity = rb1->velocity - impulse * invMass1;
-            rb1->angularVelocity -= (r1.x * impulse.y - r1.y * impulse.x) * invInertia1;
+            rb1->SetVelocity(rb1->GetVelocity() - impulse * invMass1);
+            rb1->SetAngularVelocity(rb1->GetAngularVelocity() - (r1.x * impulse.y - r1.y * impulse.x) * invInertia1);
         }
         if (rb2)
         {
-            rb2->velocity = rb2->velocity + impulse * invMass2;
-            rb2->angularVelocity += (r2.x * impulse.y - r2.y * impulse.x) * invInertia2;
+            rb2->SetVelocity(rb2->GetVelocity() + impulse * invMass2);
+            rb2->SetAngularVelocity(rb2->GetAngularVelocity() + (r2.x * impulse.y - r2.y * impulse.x) * invInertia2);
         }
 
         //friction impulse
@@ -103,13 +103,13 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
 
         if (rb1)
         {
-            rb1->velocity = rb1->velocity - frictionImpulse * invMass1;
-            rb1->angularVelocity -= (r1.x * frictionImpulse.y - r1.y * frictionImpulse.x) * invInertia1;
+            rb1->SetVelocity(rb1->GetVelocity() - frictionImpulse * invMass1);
+            rb1->SetAngularVelocity(rb1->GetAngularVelocity() - (r1.x * frictionImpulse.y - r1.y * frictionImpulse.x) * invInertia1);
         }
         if (rb2)
         {
-            rb2->velocity = rb2->velocity + frictionImpulse * invMass2;
-            rb2->angularVelocity += (r2.x * frictionImpulse.y - r2.y * frictionImpulse.x) * invInertia2;
+            rb2->SetVelocity(rb2->GetVelocity() + frictionImpulse * invMass2);
+            rb2->SetAngularVelocity(rb2->GetAngularVelocity() + (r2.x * frictionImpulse.y - r2.y * frictionImpulse.x) * invInertia2);
         }
     }
 }

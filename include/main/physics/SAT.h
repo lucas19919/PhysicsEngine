@@ -13,21 +13,22 @@ struct Collision {
 class SAT
 {
     public:
-        static Collision CircleCircle(Collider* c1, Collider* c2);
-        static Collision BoxBox(Collider* b1, Collider* b2);
-        static Collision BoxCircle(Collider* b1, Collider* c1);
-        static Collision PolygonCircle(Collider* p1, Collider* c1);
-        static Collision PolygonBox(Collider* p1, Collider* b1);
-        static Collision PolygonPolygon(Collider* p1, Collider* p2);
+        static Collision CircleCircle(GameObject* obj1, GameObject* obj2);
+        static Collision BoxBox(GameObject* obj1, GameObject* obj2);
+        static Collision BoxCircle(GameObject* obj1, GameObject* obj2);
+        static Collision PolygonCircle(GameObject* obj1, GameObject* obj2);
+        static Collision PolygonBox(GameObject* obj1, GameObject* obj2);
+        static Collision PolygonPolygon(GameObject* obj1, GameObject* obj2);
 
-    private:
         struct Projection {
             float min;
             float max;
         };
 
         static Projection Project(std::vector<Vec2> vertices, const Vec2 axis);
-        static Projection CircleProject(CircleCollider* c, const Vec2 axis);
-        static std::vector<Vec2> GetVertices(Collider* b);
+        static std::vector<Vec2> GetVertices(GameObject* obj);
+
+    private:
+        static Projection CircleProject(GameObject* obj, const Vec2 axis);
         static std::vector<Vec2> GetNormals(std::vector<Vec2> vertices);        
 };

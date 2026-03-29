@@ -4,7 +4,7 @@
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Resolve.h"
 
-World::World()
+World::World() : spatialHash(100.0f)
 {
     gravity = Vec2(0.0f, 600.0f);
 }
@@ -27,19 +27,39 @@ const std::vector<std::unique_ptr<GameObject>>& World::GetGameObjects() const
 void World::Clear()
 {
     GetGameObjects().clear();
+    gridMap.clear();
 }
 
 void World::Step(float dt)
 {
     if (isPaused) return;
 
+    gridMap.clear();
+
     for (const auto& objPtr : GetGameObjects())
     {
         GameObject* obj = objPtr.get();
-
+        Collider* c = obj->GetCollider();
         RigidBody *rb = obj->GetRigidBody();
-        Collider *c = obj->GetCollider();
+
+        std::vector<Vec2> bounds = spatialHash.GetBounding(obj);
+
+        int minX = std::floor(bounds[0].x / spatialHash.GetCellSize());
+        int maxX = std::floor(bounds[1].x / spatialHash.GetCellSize());
+        int minY = std::floor(bounds[0].y / spatialHash.GetCellSize());
+        int maxY = std::floor(bounds[1].y / spatialHash.GetCellSize());
+
+        for (int x = minX; x <= maxX; x++)
+        {
+            for (int y = minY; y <= maxY; y++)
+            {
+                unsigned int hash = spatialHash.GetHash(Vec2(x * spatialHash.GetCellSize(), y * spatialHash.GetCellSize()));
+                gridMap[hash].push_back(obj);
+            }
+        }
+
         if (rb == nullptr) continue;
+        if (rb->isSleeping) continue;
 
         float iM = rb->GetInvMass();
         float M = rb->GetMass();
@@ -49,15 +69,15 @@ void World::Step(float dt)
 
         rb->ApplyForce(gravity * M);
         
-        rb->acceleration = rb->GetForce() * iM;
-        rb->velocity += rb->acceleration * dt;
+        rb->SetAcceleration(rb->GetForce() * iM);
+        rb->SetVelocity(rb->GetVelocity() + rb->GetAcceleration() * dt);
 
-        obj->transform.position += rb->velocity * dt;
+        obj->transform.position += rb->GetVelocity() * dt;
 
-        rb->angularAcceleration = rb->GetTorque() * iI;
-        rb->angularVelocity += rb->angularAcceleration * dt;
+        rb->SetAngularAcceleration(rb->GetTorque() * iI);
+        rb->SetAngularVelocity(rb->GetAngularVelocity() + rb->GetAngularAcceleration() * dt);
 
-        obj->transform.rotation += rb->angularVelocity * dt;
+        obj->transform.rotation += rb->GetAngularVelocity() * dt;
 
         rb->ClearTorque();
         rb->ClearForces();
@@ -66,21 +86,43 @@ void World::Step(float dt)
 
 void World::CheckCollisions()
 {
-    auto& objects = GetGameObjects();
+    std::set<std::pair<GameObject*, GameObject*>> checked;
 
-    for (int i = 0; i < GetGameObjects().size(); i++)
+    for (auto& pair : gridMap)
     {
-        GameObject* obj = objects[i].get();
-        
-        for (int j = i + 1; j < GetGameObjects().size(); j++)
+        std::vector<GameObject*>& cell = pair.second;
+        if (cell.size() < 2) continue;        
+
+        for (int i = 0; i < cell.size(); i++)
         {
-            GameObject* obj2 = objects[j].get();
-            CollisionManifold cm = Resolve::ResolveManifold(obj, obj2);
-            if (cm.Collision.isColliding == true)
+            for (int j = i + 1; j < cell.size(); j++)    
             {
-                Resolve::ResolvePosition(cm, obj, obj2);
-                Resolve::ResolveImpulse(cm, obj, obj2);
+                GameObject* obj1 = cell[i];
+                GameObject* obj2 = cell[j];
+
+                if (obj1 > obj2) std::swap(obj1, obj2);
+                std::pair<GameObject*, GameObject*> collisionPair = {obj1, obj2};
+
+                if (checked.find(collisionPair) != checked.end()) continue;
+                checked.insert(collisionPair);
+
+                CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
+                if (cm.Collision.isColliding == true)
+                {
+                    Resolve::ResolvePosition(cm, obj1, obj2);
+                    Resolve::ResolveImpulse(cm, obj1, obj2);
+                }                
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
 }

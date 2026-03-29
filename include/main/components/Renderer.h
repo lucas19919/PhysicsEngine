@@ -30,7 +30,6 @@ class Renderer
 
         Shape GetShape() const { return shape; }
 
-        GameObject *parent;
     private:
         Shape shape;
         

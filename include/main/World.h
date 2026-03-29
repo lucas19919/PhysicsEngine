@@ -3,24 +3,30 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include <unordered_map>
+#include <set>
+#include "main/physics/SpatialHash.h"
 
 class World
 {
-    public:
-        World();
-        
-        void AddGameObject(std::unique_ptr<GameObject> obj);
+public:
+    World();
+    
+    void AddGameObject(std::unique_ptr<GameObject> obj);
 
-        std::vector<std::unique_ptr<GameObject>>& GetGameObjects();
-        const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const;
+    std::vector<std::unique_ptr<GameObject>>& GetGameObjects();
+    const std::vector<std::unique_ptr<GameObject>>& GetGameObjects() const;
 
-        void Clear();        
-        void Step(float dt);
-        void CheckCollisions();
+    void Clear();        
+    void Step(float dt);
+    void CheckCollisions();
 
-        Vec2 gravity;
-        bool isPaused = true;
+    Vec2 gravity;
+    bool isPaused = true;
 
-    private:
-        std::vector<std::unique_ptr<GameObject>> gameObjects;
+    SpatialHash spatialHash;
+    std::unordered_map<unsigned int, std::vector<GameObject*>> gridMap;
+
+private:
+    std::vector<std::unique_ptr<GameObject>> gameObjects;
 };

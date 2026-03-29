@@ -15,15 +15,15 @@ struct Edge {
 class Manifold
 {
     public:
-        static CollisionManifold GenCircleCircle(Collider* c1, Collider* c2);
-        static CollisionManifold GenBoxCircle(Collider* c1, Collider* c2);
-        static CollisionManifold GenBoxBox(Collider* c1, Collider* c2);
-        static CollisionManifold GenPolyCircle(Collider* c1, Collider* c2);
-        static CollisionManifold GenPolyBox(Collider* c1, Collider* c2);
-        static CollisionManifold GenPolyPoly(Collider* c1, Collider* c2);
+        static CollisionManifold GenCircleCircle(GameObject* obj1, GameObject* obj2);
+        static CollisionManifold GenBoxCircle(GameObject* obj1, GameObject* obj2);
+        static CollisionManifold GenBoxBox(GameObject* obj1, GameObject* obj2);
+        static CollisionManifold GenPolyCircle(GameObject* obj1, GameObject* obj2);
+        static CollisionManifold GenPolyBox(GameObject* obj1, GameObject* obj2);
+        static CollisionManifold GenPolyPoly(GameObject* obj1, GameObject* obj2);
 
     private:
-        static std::vector<Vec2> GetVertices(Collider* c);
+        static std::vector<Vec2> GetVertices(GameObject* obj);
         static std::vector<Edge> GetEdges(std::vector<Vec2> vertices);
 
         static Edge GetSupportFace(std::vector<Vec2> vertices, Vec2 normal);

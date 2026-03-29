@@ -24,38 +24,38 @@ CollisionManifold ManifoldHandler::SortManifold(GameObject* obj1, GameObject* ob
 
     if (t1 == ColliderType::CIRCLE && t2 == ColliderType::CIRCLE) 
     {
-        return Manifold::GenCircleCircle(c1, c2);
+        return Manifold::GenCircleCircle(obj1, obj2);
     }
 
     if (t1 == ColliderType::CIRCLE && t2 == ColliderType::BOX) 
     {
-        CollisionManifold col = Manifold::GenBoxCircle(c2, c1);
+        CollisionManifold col = Manifold::GenBoxCircle(obj2, obj1);
         col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
         return col;
     }
 
     if (t1 == ColliderType::CIRCLE && t2 == ColliderType::POLYGON) 
     {
-        CollisionManifold col = Manifold::GenPolyCircle(c2, c1);
+        CollisionManifold col = Manifold::GenPolyCircle(obj2, obj1);
         col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
         return col;
     }
 
     if (t1 == ColliderType::BOX && t2 == ColliderType::BOX) 
     {
-        return Manifold::GenBoxBox(c1, c2);
+        return Manifold::GenBoxBox(obj1, obj2);
     }
 
     if (t1 == ColliderType::BOX && t2 == ColliderType::POLYGON) 
     {
-        CollisionManifold col = Manifold::GenPolyBox(c2, c1);
+        CollisionManifold col = Manifold::GenPolyBox(obj2, obj1);
         col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
         return col;
     }
 
     if (t1 == ColliderType::POLYGON && t2 == ColliderType::POLYGON) 
     {
-        return Manifold::GenPolyPoly(c1, c2);
+        return Manifold::GenPolyPoly(obj1, obj2);
     }
 
     return {};

@@ -2,85 +2,85 @@
 #include "main/physics/SAT.h"
 #include "main/GameObject.h"
         
-CollisionManifold Manifold::GenCircleCircle(Collider* c1, Collider* c2)
+CollisionManifold Manifold::GenCircleCircle(GameObject* obj1, GameObject* obj2)
 {
-    Collision collision = SAT::CircleCircle(c1, c2);
+    Collision collision = SAT::CircleCircle(obj1, obj2);
     CollisionManifold cm = { collision };
 
     if (!collision.isColliding) return cm;
 
-    CircleCollider *circle1 = static_cast<CircleCollider*>(c1);
-    Vec2 point = c1->parent->transform.position + (collision.normal * circle1->radius);
+    CircleCollider *circle1 = static_cast<CircleCollider*>(obj1->GetCollider());
+    Vec2 point = obj1->transform.position + (collision.normal * circle1->radius);
     cm.points.push_back(point);
 
     return cm;
 }
 
-CollisionManifold Manifold::GenBoxCircle(Collider* c1, Collider* c2)
+CollisionManifold Manifold::GenBoxCircle(GameObject* obj1, GameObject* obj2)
 {
-    Collision collision = SAT::BoxCircle(c1, c2);
+    Collision collision = SAT::BoxCircle(obj1, obj2);
     CollisionManifold cm = { collision };
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices = GetVertices(c1);
-    Vec2 center = c2->parent->transform.position;
+    std::vector<Vec2> vertices = GetVertices(obj1);
+    Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
     return cm;
 }
 
-CollisionManifold Manifold::GenBoxBox(Collider* c1, Collider* c2)
+CollisionManifold Manifold::GenBoxBox(GameObject* obj1, GameObject* obj2)
 {
-    Collision collision = SAT::BoxBox(c1, c2);
+    Collision collision = SAT::BoxBox(obj1, obj2);
     CollisionManifold cm = { collision };
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices1 = GetVertices(c1);
-    std::vector<Vec2> vertices2 = GetVertices(c2);
+    std::vector<Vec2> vertices1 = GetVertices(obj1);
+    std::vector<Vec2> vertices2 = GetVertices(obj2);
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
 }
 
-CollisionManifold Manifold::GenPolyCircle(Collider* c1, Collider* c2)
+CollisionManifold Manifold::GenPolyCircle(GameObject* obj1, GameObject* obj2)
 {
-    Collision collision = SAT::PolygonCircle(c1, c2);
+    Collision collision = SAT::PolygonCircle(obj1, obj2);
     CollisionManifold cm = { collision };
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices = GetVertices(c1);
-    Vec2 center = c2->parent->transform.position;
+    std::vector<Vec2> vertices = GetVertices(obj1);
+    Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
     return cm;  
 }
 
-CollisionManifold Manifold::GenPolyBox(Collider* c1, Collider* c2)
+CollisionManifold Manifold::GenPolyBox(GameObject* obj1, GameObject* obj2)
 {
-    Collision collision = SAT::PolygonBox(c1, c2);
+    Collision collision = SAT::PolygonBox(obj1, obj2);
     CollisionManifold cm = { collision };
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices1 = GetVertices(c1);
-    std::vector<Vec2> vertices2 = GetVertices(c2);
+    std::vector<Vec2> vertices1 = GetVertices(obj1);
+    std::vector<Vec2> vertices2 = GetVertices(obj2);
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
 }
 
-CollisionManifold Manifold::GenPolyPoly(Collider* c1, Collider* c2)
+CollisionManifold Manifold::GenPolyPoly(GameObject* obj1, GameObject* obj2)
 {
-    Collision collision = SAT::PolygonPolygon(c1, c2);
+    Collision collision = SAT::PolygonPolygon(obj1, obj2);
     CollisionManifold cm = { collision };
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices1 = GetVertices(c1);
-    std::vector<Vec2> vertices2 = GetVertices(c2);
+    std::vector<Vec2> vertices1 = GetVertices(obj1);
+    std::vector<Vec2> vertices2 = GetVertices(obj2);
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -225,13 +225,14 @@ std::vector<Edge> Manifold::GetEdges(std::vector<Vec2> vertices)
     return edges;
 }
 
-std::vector<Vec2> Manifold::GetVertices(Collider* c)
+std::vector<Vec2> Manifold::GetVertices(GameObject* obj)
 {
-    Vec2 worldPosition = c->parent->transform.position;
-    float rotation = c->parent->transform.rotation;
+    Vec2 worldPosition = obj->transform.position;
+    float rotation = obj->transform.rotation;
 
     std::vector<Vec2> vertices;
 
+    Collider* c = obj->GetCollider();
     switch (c->GetType())
     {
         case ColliderType::CIRCLE:

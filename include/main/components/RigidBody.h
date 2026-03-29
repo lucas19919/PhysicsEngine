@@ -31,14 +31,15 @@ class RigidBody
         RigidBody(Properties properties, LinearState linearState, AngularState angularState);
         ~RigidBody();
 
-        GameObject* parent;
-
-        Vec2 velocity;
-        Vec2 acceleration;
+        bool isSleeping = false;
 
         void SetMass(float m);
         float GetMass() const { return mass; }
         float GetInvMass() const { return invMass; }
+
+        void SetInertia(float i) { inertia = i; invInertia = 1.0f / i; }
+        float GetInertia() const { return inertia; }
+        float GetInvInertia() const { return invInertia; }
 
         void SetRestitution(float e) { restitution = e; }
         float GetRestitution() const { return restitution; }
@@ -46,17 +47,21 @@ class RigidBody
         void SetFriction(float f) { friction = f; }
         float GetFriction() const { return friction; }
 
+        Vec2 GetVelocity() const { return velocity; }
+        void SetVelocity(Vec2 v) { velocity = v; }
+
+        Vec2 GetAcceleration() const { return acceleration; }
+        void SetAcceleration(Vec2 a) { acceleration = a; }
+
         void ApplyForce(Vec2 force);
         Vec2 GetForce() const { return netForce; }   
         void ClearForces();
         
-        //clockwise rotation is positive
-        float angularVelocity;
-        float angularAcceleration;        
+        float GetAngularVelocity() const { return angularVelocity; }
+        void SetAngularVelocity(float w) { angularVelocity = w; }
 
-        void SetInertia(float i) { inertia = i; invInertia = 1 / i; }
-        float GetInertia() const { return inertia; }
-        float GetInvInertia() const { return invInertia; }
+        float GetAngularAcceleration() const { return angularAcceleration; }
+        void SetAngularAcceleration(float a) { angularAcceleration = a; }
 
         void ApplyTorque(float t) { torque += t; }
         float GetTorque() const { return torque; }
@@ -65,13 +70,16 @@ class RigidBody
     private:
         float mass;
         float invMass;
+        float inertia;
+        float invInertia;        
         float restitution;
         float friction;
 
+        Vec2 velocity;
+        Vec2 acceleration;
         Vec2 netForce;
 
-        float inertia;
-        float invInertia;
-
+        float angularVelocity;
+        float angularAcceleration;  
         float torque;
 };

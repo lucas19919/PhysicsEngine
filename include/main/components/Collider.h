@@ -17,5 +17,4 @@ class Collider
         bool isActive = true;
         void Toggle();
 
-        GameObject* parent;
     };

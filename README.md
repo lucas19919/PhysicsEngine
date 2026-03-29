@@ -32,7 +32,7 @@ To load a scene, please change the relative path in main.cpp, "assets/(...).json
 
 Currently the engine includes circles, rectangles and convex polygons, and calculates both linear and rotational physics. The rigidbody includes forces, torque, mass, inertia and so on.
 
-Each physics body is instantiated as a GameObject. A GameObject can then hold the following components: TransformComponent, Rigidbody, Collider, Renderer. Each component is then doubly linked back to the GameObject to allow for easy access between components and GameObjects. This was based on Unity's system of GameObjects and components.
+Each physics body is instantiated as a GameObject. A GameObject can then hold the following components: TransformComponent, Rigidbody, Collider, Renderer. This was based on Unity's system of GameObjects and components.
 
 To handle the physics, a World class is created containing base vectors such as gravity, and also a list of all GameObjects. For each frame, the world first steps, updating all rigidbodies by the delta time, and then checks for any occouring collisions.
 

@@ -14,7 +14,7 @@ int main() {
     InputHandler input;
 
     //all levels under assets/( ... ).json
-    const std::string& filepath = "assets/test.json";
+    const std::string& filepath = "assets/balltest.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");

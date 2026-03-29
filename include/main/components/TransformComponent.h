@@ -6,9 +6,7 @@ class GameObject;
 class TransformComponent
 {
     public:
-        TransformComponent(GameObject* parentObj);
-
-        GameObject* parent;
+        TransformComponent();
 
         Vec2 position;
         float rotation;
