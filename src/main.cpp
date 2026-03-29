@@ -27,7 +27,7 @@ int main() {
         input.Update(world, filepath, screenWidth, screenHeight);
 
         float dt = GetFrameTime();
-        int subTicks = 5;
+        int subTicks = 6;
         for (int i = 0; i < subTicks; i++)
         {
             world.Step(dt / subTicks);

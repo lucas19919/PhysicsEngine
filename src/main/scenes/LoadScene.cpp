@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <random>
 #include <libraries/json/json.hpp>
 
 using json = nlohmann::json;
@@ -49,6 +50,38 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
 
     if (sceneData.contains("generators"))
     {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> jitter(-4.0f, 4.0f);
+
+        for (const auto& generator : sceneData["generators"])
+        {
+            if (!generator.contains("grid") || !generator.contains("object")) continue;
+
+            int rows = generator["grid"]["rows"];
+            int cols = generator["grid"]["columns"];
+            float startX = generator["grid"]["startX"];
+            float startY = generator["grid"]["startY"];
+            float spacingX = generator["grid"]["spacingX"];
+            float spacingY = generator["grid"]["spacingY"];
+
+            json genObject = generator["object"];
+
+            for (int r = 0; r < rows; r++)
+            {
+                for (int c = 0; c < cols; c++)
+                {
+                    float posX = startX + (c * spacingX) + jitter(gen);
+                    float posY = startY + (r * spacingY) + jitter(gen);
+
+                    genObject["components"]["TransformComponent"]["position"]["x"] = posX;
+                    genObject["components"]["TransformComponent"]["position"]["y"] = posY;
+
+                    LoadObject(genObject, world);
+                }
+            }
+        }
+    }    {
         for (const auto& generator : sceneData["generators"])
         {
             if (!generator.contains("grid") || !generator.contains("object")) continue;
@@ -98,7 +131,7 @@ void LoadScene::LoadObject(const json& item, World& world)
     ColliderType colType = ColliderType::BOX;
     Vec2 boxSize;
     float circleRadius = 0.0f;
-    std::vector<Vec2> polyVerts;
+    Array<20> polyVerts;
     
     if (components.contains("Collider"))
     {
@@ -151,7 +184,7 @@ void LoadScene::LoadObject(const json& item, World& world)
         else if (form == "R_POLYGON")
         {
             renderShape.form = RenderShape::R_POLYGON;
-            std::vector<Vec2> vertices;
+            Array<20> vertices;
 
             for (const auto& v : components["Renderer"]["scale"])
             {
@@ -162,7 +195,7 @@ void LoadScene::LoadObject(const json& item, World& world)
         }
     }
 
-    Instantiate& builder = Instantiate().WithTransform(Vec2(posX, posY), rotation);
+    Instantiate builder = Instantiate().WithTransform(Vec2(posX, posY), rotation);
 
     if (components.contains("Collider"))
     {

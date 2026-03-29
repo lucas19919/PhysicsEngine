@@ -5,7 +5,8 @@
 CollisionManifold Manifold::GenCircleCircle(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::CircleCircle(obj1, obj2);
-    CollisionManifold cm = { collision };
+    CollisionManifold cm;
+    cm.Collision = collision;
 
     if (!collision.isColliding) return cm;
 
@@ -19,11 +20,12 @@ CollisionManifold Manifold::GenCircleCircle(GameObject* obj1, GameObject* obj2)
 CollisionManifold Manifold::GenBoxCircle(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::BoxCircle(obj1, obj2);
-    CollisionManifold cm = { collision };
+    CollisionManifold cm;
+    cm.Collision = collision;
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices = GetVertices(obj1);
+    Array<20> vertices = GetVertices(obj1);
     Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
@@ -33,12 +35,13 @@ CollisionManifold Manifold::GenBoxCircle(GameObject* obj1, GameObject* obj2)
 CollisionManifold Manifold::GenBoxBox(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::BoxBox(obj1, obj2);
-    CollisionManifold cm = { collision };
+    CollisionManifold cm;
+    cm.Collision = collision;
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices1 = GetVertices(obj1);
-    std::vector<Vec2> vertices2 = GetVertices(obj2);
+    Array<20> vertices1 = GetVertices(obj1);
+    Array<20> vertices2 = GetVertices(obj2);
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -47,11 +50,12 @@ CollisionManifold Manifold::GenBoxBox(GameObject* obj1, GameObject* obj2)
 CollisionManifold Manifold::GenPolyCircle(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::PolygonCircle(obj1, obj2);
-    CollisionManifold cm = { collision };
+    CollisionManifold cm;
+    cm.Collision = collision;
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices = GetVertices(obj1);
+    Array<20> vertices = GetVertices(obj1);
     Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
@@ -61,12 +65,13 @@ CollisionManifold Manifold::GenPolyCircle(GameObject* obj1, GameObject* obj2)
 CollisionManifold Manifold::GenPolyBox(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::PolygonBox(obj1, obj2);
-    CollisionManifold cm = { collision };
+    CollisionManifold cm;
+    cm.Collision = collision;
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices1 = GetVertices(obj1);
-    std::vector<Vec2> vertices2 = GetVertices(obj2);
+    Array<20> vertices1 = GetVertices(obj1);
+    Array<20> vertices2 = GetVertices(obj2);
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -75,33 +80,37 @@ CollisionManifold Manifold::GenPolyBox(GameObject* obj1, GameObject* obj2)
 CollisionManifold Manifold::GenPolyPoly(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::PolygonPolygon(obj1, obj2);
-    CollisionManifold cm = { collision };
+    CollisionManifold cm;
+    cm.Collision = collision;
 
     if (!collision.isColliding) return cm;
 
-    std::vector<Vec2> vertices1 = GetVertices(obj1);
-    std::vector<Vec2> vertices2 = GetVertices(obj2);
+    Array<20> vertices1 = GetVertices(obj1);
+    Array<20> vertices2 = GetVertices(obj2);
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
 }
 
-std::vector<Vec2> Manifold::GetPolygonCircleContacts(std::vector<Vec2> vertices1, Vec2 center)
+Array<20> Manifold::GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 center)
 {
-    std::vector<Vec2> points;
-    std::vector<Edge> edges = GetEdges(vertices1);
-
+    Array<20> points;
+    
     float minDistSq = INFINITY;
     Vec2 closestPoint;
 
-    for (int i = 0; i < edges.size(); i++)
+    for (size_t i = 0; i < vertices1.size(); i++)
     {
-        Vec2 cLine = center - edges[i].p1;
-        float t = cLine.Dot(edges[i].line) / edges[i].line.MagSq();
+        Vec2 p1 = vertices1[i];
+        Vec2 p2 = vertices1[(i + 1) % vertices1.size()];
+        Vec2 line = p2 - p1;
+
+        Vec2 cLine = center - p1;
+        float t = cLine.Dot(line) / line.MagSq();
         
         t = std::max(0.0f, std::min(1.0f, t));
         
-        Vec2 nearest = edges[i].p1 + (edges[i].line * t);
+        Vec2 nearest = p1 + (line * t);
         
         Vec2 distVector = center - nearest;
         float distSq = distVector.MagSq();
@@ -117,9 +126,9 @@ std::vector<Vec2> Manifold::GetPolygonCircleContacts(std::vector<Vec2> vertices1
     return points;
 }
 
-std::vector<Vec2> Manifold::GetPolygonContacts(std::vector<Vec2> vertices1, std::vector<Vec2> vertices2, Vec2 normal)
+Array<20> Manifold::GetPolygonContacts(const Array<20>& vertices1, const Array<20>& vertices2, Vec2 normal)
 {
-    std::vector<Vec2> points;
+    Array<20> points;
     
     Edge edge1 = GetSupportFace(vertices1, normal);
     Edge edge2 = GetSupportFace(vertices2, normal * -1.0f); 
@@ -140,7 +149,7 @@ std::vector<Vec2> Manifold::GetPolygonContacts(std::vector<Vec2> vertices1, std:
 
     Vec2 refDir = reference.line.Norm();
 
-    std::vector<Vec2> clip1;
+    Array<20> clip1;
     float d1 = refDir.Dot(incident.p1 - reference.p1);
     float d2 = refDir.Dot(incident.p2 - reference.p1);
 
@@ -154,9 +163,9 @@ std::vector<Vec2> Manifold::GetPolygonContacts(std::vector<Vec2> vertices1, std:
     }
     if (clip1.size() < 2) return points;
 
-    std::vector<Vec2> clip2;
-    float d3 = (refDir * -1).Dot(clip1[0] - reference.p2);
-    float d4 = (refDir * -1).Dot(clip1[1] - reference.p2);
+    Array<20> clip2;
+    float d3 = (refDir * -1.0f).Dot(clip1[0] - reference.p2);
+    float d4 = (refDir * -1.0f).Dot(clip1[1] - reference.p2);
 
     if (d3 >= 0.0f) clip2.push_back(clip1[0]);
     if (d4 >= 0.0f) clip2.push_back(clip1[1]);
@@ -170,8 +179,9 @@ std::vector<Vec2> Manifold::GetPolygonContacts(std::vector<Vec2> vertices1, std:
 
     Vec2 refOutNormal = Vec2(reference.line.y, -reference.line.x).Norm();
     
-    for (const auto& p : clip2)
+    for (size_t i = 0; i < clip2.size(); i++)
     {
+        Vec2 p = clip2[i];
         float separation = refOutNormal.Dot(p - reference.p1);
         
         if (separation <= 0.0f) 
@@ -183,17 +193,17 @@ std::vector<Vec2> Manifold::GetPolygonContacts(std::vector<Vec2> vertices1, std:
     return points;    
 }
 
-Edge Manifold::GetSupportFace(std::vector<Vec2> vertices, Vec2 normal)
+Edge Manifold::GetSupportFace(const Array<20>& vertices, Vec2 normal)
 {
     float maxDot = -INFINITY;
     int index = 0;
 
-    for (int i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.size(); i++)
     {
         float dot = vertices[i].Dot(normal);
         if (dot > maxDot)
         {
-            index = i;
+            index = static_cast<int>(i);
             maxDot = dot;
         }
     }
@@ -211,26 +221,12 @@ Edge Manifold::GetSupportFace(std::vector<Vec2> vertices, Vec2 normal)
         return { spear, next, (next - spear).Norm() };
 }
 
-std::vector<Edge> Manifold::GetEdges(std::vector<Vec2> vertices)
-{
-    std::vector<Edge> edges;
-
-    for(int i = 0; i < vertices.size(); i++)
-    {
-        Vec2 p1 = vertices[i];
-        Vec2 p2 = vertices[(i + 1) % vertices.size()];
-        edges.push_back( { p1, p2, p2 - p1} );
-    }
-
-    return edges;
-}
-
-std::vector<Vec2> Manifold::GetVertices(GameObject* obj)
+Array<20> Manifold::GetVertices(GameObject* obj)
 {
     Vec2 worldPosition = obj->transform.position;
     float rotation = obj->transform.rotation;
 
-    std::vector<Vec2> vertices;
+    Array<20> vertices;
 
     Collider* c = obj->GetCollider();
     switch (c->GetType())
@@ -249,18 +245,18 @@ std::vector<Vec2> Manifold::GetVertices(GameObject* obj)
             vertices.push_back(Vec2(x, -y));
             vertices.push_back(Vec2(x, y));
             vertices.push_back(Vec2(-x, y));
-            break;
+            break;            
         }
 
         case ColliderType::POLYGON:
             vertices = static_cast<PolygonCollider*>(c)->vertices;
-            break;
+            break;            
 
         default:
             break;
     }
 
-    for (int i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.size(); i++)
     {
         Vec2 vertex = vertices[i];
         float x = vertex.x * std::cos(rotation) - vertex.y * std::sin(rotation);

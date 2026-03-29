@@ -35,7 +35,7 @@ void Render(GameObject *obj)
             shape.color
         );        
 
-        std::vector<Vec2> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
+        Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
         for (size_t i = 0; i < vertices.size(); i++) 
         {
             Vec2 p1 = vertices[i];
@@ -46,7 +46,7 @@ void Render(GameObject *obj)
     }
     case RenderShape::R_POLYGON:
     {
-        std::vector<Vec2> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
+        Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
         int vertexCount = vertices.size();
         if (vertexCount < 3) break; 
 

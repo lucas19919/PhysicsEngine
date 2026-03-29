@@ -17,7 +17,7 @@ Instantiate& Instantiate::WithRenderer(Shape shape)
     return *this;
 }
 
-Instantiate& Instantiate::WithCollider(ColliderType type, std::variant<Vec2, float, std::vector<Vec2>> bounds)
+Instantiate& Instantiate::WithCollider(ColliderType type, std::variant<Vec2, float, Array<20>> bounds)
 {
     switch (type)
     {
@@ -28,7 +28,7 @@ Instantiate& Instantiate::WithCollider(ColliderType type, std::variant<Vec2, flo
         obj->SetCollider(std::move(std::make_unique<BoxCollider>(std::get<Vec2>(bounds))));
         break;
     case ColliderType::POLYGON:
-        obj->SetCollider(std::move(std::make_unique<PolygonCollider>(std::get<std::vector<Vec2>>(bounds))));
+        obj->SetCollider(std::move(std::make_unique<PolygonCollider>(std::get<Array<20>>(bounds))));
         break;
     default:
         break;

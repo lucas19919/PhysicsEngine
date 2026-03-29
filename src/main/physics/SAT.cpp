@@ -1,6 +1,7 @@
 #include "main/physics/SAT.h"
 #include "main/GameObject.h"
 #include "main/components/Collider.h"
+#include <cmath>
 
 Collision SAT::CircleCircle(GameObject *obj1, GameObject *obj2)
 {
@@ -23,16 +24,17 @@ Collision SAT::CircleCircle(GameObject *obj1, GameObject *obj2)
 
 Collision SAT::BoxBox(GameObject *obj1, GameObject *obj2)
 {
-    std::vector<Vec2> vertices1 = GetVertices(obj1);
-    std::vector<Vec2> vertices2 = GetVertices(obj2);
-    std::vector<Vec2> normals1 = GetNormals(vertices1);
-    std::vector<Vec2> normals2 = GetNormals(vertices2);
+    Array<20> vertices1 = GetVertices(obj1);
+    Array<20> vertices2 = GetVertices(obj2);
+    Array<20> normals1 = GetNormals(vertices1);
+    Array<20> normals2 = GetNormals(vertices2);
 
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
-    for (Vec2 axis : normals1)
+    for (size_t i = 0; i < normals1.size(); i++)
     {
+        Vec2 axis = normals1[i];
         Projection p1 = Project(vertices1, axis);
         Projection p2 = Project(vertices2, axis);
 
@@ -47,8 +49,9 @@ Collision SAT::BoxBox(GameObject *obj1, GameObject *obj2)
         }
     }
 
-    for (Vec2 axis : normals2)
+    for (size_t i = 0; i < normals2.size(); i++)
     {
+        Vec2 axis = normals2[i];
         Projection p1 = Project(vertices1, axis);
         Projection p2 = Project(vertices2, axis);
 
@@ -74,18 +77,17 @@ Collision SAT::BoxBox(GameObject *obj1, GameObject *obj2)
 
 Collision SAT::BoxCircle(GameObject *obj1, GameObject *obj2)
 {
-    CircleCollider* circle = static_cast<CircleCollider*>(obj2->GetCollider());
     Vec2 center = obj2->transform.position;
 
-    std::vector<Vec2> vertices = GetVertices(obj1);
-    std::vector<Vec2> normals = GetNormals(vertices);
+    Array<20> vertices = GetVertices(obj1);
+    Array<20> normals = GetNormals(vertices);
     
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
     Vec2 distAxis = center - vertices[0];
     float dist = (center - vertices[0]).MagSq();
-    for (int i = 1; i < vertices.size(); i++)
+    for (size_t i = 1; i < vertices.size(); i++)
     {
         float currentDistSq = (center - vertices[i]).MagSq();
         if (dist > currentDistSq) {
@@ -100,8 +102,9 @@ Collision SAT::BoxCircle(GameObject *obj1, GameObject *obj2)
         normals.push_back(Vec2(1.0f, 0.0f));
     }
 
-    for (Vec2 axis : normals)
+    for (size_t i = 0; i < normals.size(); i++)
     {
+        Vec2 axis = normals[i];
         Projection p1 = Project(vertices, axis);
         Projection p2 = CircleProject(obj2, axis);
 
@@ -127,11 +130,10 @@ Collision SAT::BoxCircle(GameObject *obj1, GameObject *obj2)
 
 Collision SAT::PolygonCircle(GameObject *obj1, GameObject *obj2)
 {
-    CircleCollider* circle = static_cast<CircleCollider*>(obj2->GetCollider());
     Vec2 center = obj2->transform.position;
 
-    std::vector<Vec2> vertices = GetVertices(obj1);
-    std::vector<Vec2> normals = GetNormals(vertices);
+    Array<20> vertices = GetVertices(obj1);
+    Array<20> normals = GetNormals(vertices);
     
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
@@ -153,8 +155,9 @@ Collision SAT::PolygonCircle(GameObject *obj1, GameObject *obj2)
         normals.push_back(Vec2(1.0f, 0.0f));
     }
 
-    for (Vec2 axis : normals)
+    for (size_t i = 0; i < normals.size(); i++)
     {
+        Vec2 axis = normals[i];
         Projection p1 = Project(vertices, axis);
         Projection p2 = CircleProject(obj2, axis);
 
@@ -180,20 +183,22 @@ Collision SAT::PolygonCircle(GameObject *obj1, GameObject *obj2)
 
 Collision SAT::PolygonBox(GameObject *obj1, GameObject *obj2)
 {
-    std::vector<Vec2> vertices1 = GetVertices(obj1);
-    std::vector<Vec2> vertices2 = GetVertices(obj2);
-    std::vector<Vec2> normals1 = GetNormals(vertices1);
-    std::vector<Vec2> normals2 = GetNormals(vertices2);
+    Array<20> vertices1 = GetVertices(obj1);
+    Array<20> vertices2 = GetVertices(obj2);
+    Array<20> normals1 = GetNormals(vertices1);
+    Array<20> normals2 = GetNormals(vertices2);
 
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
-    for (Vec2 axis : normals1) {
+    for (size_t i = 0; i < normals1.size(); i++) 
+    {
+        Vec2 axis = normals1[i];
         Projection p1 = Project(vertices1, axis);
         Projection p2 = Project(vertices2, axis);
 
         if (p1.max < p2.min || p2.max < p1.min) {
-            return { false, Vec2(), 0.0f }; // Found a gap! No collision.
+            return { false, Vec2(), 0.0f }; 
         }
 
         float overlap = std::min(p1.max, p2.max) - std::max(p1.min, p2.min);
@@ -203,8 +208,9 @@ Collision SAT::PolygonBox(GameObject *obj1, GameObject *obj2)
         }
     }
 
-    for (Vec2 axis : normals2)
+    for (size_t i = 0; i < normals2.size(); i++)
     {
+        Vec2 axis = normals2[i];
         Projection p1 = Project(vertices1, axis);
         Projection p2 = Project(vertices2, axis);
 
@@ -230,15 +236,17 @@ Collision SAT::PolygonBox(GameObject *obj1, GameObject *obj2)
 
 Collision SAT::PolygonPolygon(GameObject *obj1, GameObject *obj2)
 {
-    std::vector<Vec2> vertices1 = GetVertices(obj1);
-    std::vector<Vec2> vertices2 = GetVertices(obj2);
-    std::vector<Vec2> normals1 = GetNormals(vertices1);
-    std::vector<Vec2> normals2 = GetNormals(vertices2);
+    Array<20> vertices1 = GetVertices(obj1);
+    Array<20> vertices2 = GetVertices(obj2);
+    Array<20> normals1 = GetNormals(vertices1);
+    Array<20> normals2 = GetNormals(vertices2);
 
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
-    for (Vec2 axis : normals1) {
+    for (size_t i = 0; i < normals1.size(); i++) 
+    {
+        Vec2 axis = normals1[i];
         Projection p1 = Project(vertices1, axis);
         Projection p2 = Project(vertices2, axis);
 
@@ -253,8 +261,9 @@ Collision SAT::PolygonPolygon(GameObject *obj1, GameObject *obj2)
         }
     }
 
-    for (Vec2 axis : normals2)
+    for (size_t i = 0; i < normals2.size(); i++)
     {
+        Vec2 axis = normals2[i];
         Projection p1 = Project(vertices1, axis);
         Projection p2 = Project(vertices2, axis);
 
@@ -289,14 +298,14 @@ SAT::Projection SAT::CircleProject(GameObject* obj, const Vec2 axis)
     };
 }
 
-SAT::Projection SAT::Project(std::vector<Vec2> vertices, const Vec2 axis)
+SAT::Projection SAT::Project(const Array<20>& vertices, const Vec2 axis)
 {
     Projection project;
 
     project.min = axis.Dot(vertices[0]);
     project.max = project.min;
     
-    for (int i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.size(); i++)
     {
         float dot = axis.Dot(vertices[i]);
         if (dot < project.min) project.min = dot;
@@ -306,13 +315,15 @@ SAT::Projection SAT::Project(std::vector<Vec2> vertices, const Vec2 axis)
     return project;
 }
 
-std::vector<Vec2> SAT::GetVertices(GameObject* obj1)
+Array<20> SAT::GetVertices(GameObject* obj1)
 {
+    Array<20> worldVertices;
+
     if (obj1 == nullptr || obj1->GetCollider() == nullptr) 
-        return {}; 
+        return worldVertices; 
 
     TransformComponent transform = obj1->transform;
-    std::vector<Vec2> localVertices;
+    Array<20> localVertices;
 
     if (obj1->GetCollider()->GetType() == ColliderType::BOX) 
     {
@@ -320,24 +331,20 @@ std::vector<Vec2> SAT::GetVertices(GameObject* obj1)
         float x = b->size.x / 2.0f;
         float y = b->size.y / 2.0f;
         
-        localVertices = {
-            Vec2(-x, -y), // bot left
-            Vec2( x, -y), // bot right
-            Vec2( x,  y), // top right
-            Vec2(-x,  y)  // top left
-        };
+        localVertices.push_back(Vec2(-x, -y));
+        localVertices.push_back(Vec2( x, -y));
+        localVertices.push_back(Vec2( x,  y));
+        localVertices.push_back(Vec2(-x,  y));
     } 
     else if (obj1->GetCollider()->GetType() == ColliderType::POLYGON) 
     {
         PolygonCollider* p = static_cast<PolygonCollider*>(obj1->GetCollider());
-        localVertices = p->vertices; 
+        localVertices = p->vertices;
     }
     else 
     {
-        return {}; 
+        return worldVertices; 
     }
-
-    std::vector<Vec2> worldVertices(localVertices.size());
     
     float cos = std::cos(transform.rotation);
     float sin = std::sin(transform.rotation);
@@ -347,19 +354,19 @@ std::vector<Vec2> SAT::GetVertices(GameObject* obj1)
         float x = localVertices[i].x;
         float y = localVertices[i].y;
 
-        worldVertices[i] = Vec2(
+        worldVertices.push_back(Vec2(
             (x * cos) - (y * sin) + transform.position.x,
             (x * sin) + (y * cos) + transform.position.y
-        );
+        ));
     }
 
     return worldVertices;
 }
 
-std::vector<Vec2> SAT::GetNormals(std::vector<Vec2> vertices)
+Array<20> SAT::GetNormals(const Array<20>& vertices)
 {
-    std::vector<Vec2> normals;
-    for (int i = 0; i < vertices.size(); i++)
+    Array<20> normals;
+    for (size_t i = 0; i < vertices.size(); i++)
     {
         Vec2 line = vertices[(i + 1) % vertices.size()] - vertices[i];
         Vec2 pLine = Vec2(line.y, -line.x);

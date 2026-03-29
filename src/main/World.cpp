@@ -4,7 +4,7 @@
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Resolve.h"
 
-World::World() : spatialHash(30.0f)
+World::World() : spatialHash(100.0f)
 {
     gravity = Vec2(0.0f, 600.0f);
 }
@@ -110,16 +110,21 @@ void World::CheckCollisions()
     std::sort(collisionPairs.begin(), collisionPairs.end());
     collisionPairs.erase(std::unique(collisionPairs.begin(), collisionPairs.end()), collisionPairs.end());
 
-    for (const auto& collisionPair : collisionPairs)
-    {
-        GameObject* obj1 = collisionPair.first;
-        GameObject* obj2 = collisionPair.second;
+    int solverSubTicks = 6;
 
-        CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
-        if (cm.Collision.isColliding)
+    for (int i = 0; i < solverSubTicks; i++)
+    {
+        for (const auto& collisionPair : collisionPairs)
         {
-            Resolve::ResolvePosition(cm, obj1, obj2);
-            Resolve::ResolveImpulse(cm, obj1, obj2);
-        }                
+            GameObject* obj1 = collisionPair.first;
+            GameObject* obj2 = collisionPair.second;
+
+            CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
+            if (cm.Collision.isColliding)
+            {
+                Resolve::ResolvePosition(cm, obj1, obj2);
+                Resolve::ResolveImpulse(cm, obj1, obj2);
+            }                
+        }
     }
 }

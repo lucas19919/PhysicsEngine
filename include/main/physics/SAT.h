@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include "main/utility/templates/Array.h"
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/collidertypes/PolygonCollider.h"
@@ -25,10 +25,10 @@ class SAT
             float max;
         };
 
-        static Projection Project(std::vector<Vec2> vertices, const Vec2 axis);
-        static std::vector<Vec2> GetVertices(GameObject* obj);
+        static Projection Project(const Array<20>& vertices, const Vec2 axis);
+        static Array<20> GetVertices(GameObject* obj);
 
     private:
         static Projection CircleProject(GameObject* obj, const Vec2 axis);
-        static std::vector<Vec2> GetNormals(std::vector<Vec2> vertices);        
+        static Array<20> GetNormals(const Array<20>& vertices);        
 };

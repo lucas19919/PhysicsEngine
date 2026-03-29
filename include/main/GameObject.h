@@ -21,8 +21,13 @@ class GameObject
         void SetCollider(std::unique_ptr<Collider> c);
         void SetRenderer(std::unique_ptr<Renderer> r);
 
+        int GetID() const { return id; }
+
     private:
         std::unique_ptr<RigidBody> rigidBody;
         std::unique_ptr<Collider> collider;
         std::unique_ptr<Renderer> renderer;
+
+        int id;
+        int i = 1;
 };

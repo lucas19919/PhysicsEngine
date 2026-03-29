@@ -1,9 +1,10 @@
 #pragma once
 #include "main/physics/SAT.h"
+#include "main/utility/templates/Array.h"
 
 struct CollisionManifold {
     Collision Collision;
-    std::vector<Vec2> points;
+    Array<20> points;
 };
 
 struct Edge {
@@ -23,12 +24,9 @@ class Manifold
         static CollisionManifold GenPolyPoly(GameObject* obj1, GameObject* obj2);
 
     private:
-        static std::vector<Vec2> GetVertices(GameObject* obj);
-        static std::vector<Edge> GetEdges(std::vector<Vec2> vertices);
+        static Array<20> GetVertices(GameObject* obj);
+        static Edge GetSupportFace(const Array<20>& vertices, Vec2 normal);
 
-        static Edge GetSupportFace(std::vector<Vec2> vertices, Vec2 normal);
-
-
-        static std::vector<Vec2> GetPolygonContacts(std::vector<Vec2> vertices1, std::vector<Vec2> vertices2, Vec2 normal);
-        static std::vector<Vec2> GetPolygonCircleContacts(std::vector<Vec2> vertices1, Vec2 center);
+        static Array<20> GetPolygonContacts(const Array<20>& vertices1, const Array<20>& vertices2, Vec2 normal);
+        static Array<20> GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 center);
 };

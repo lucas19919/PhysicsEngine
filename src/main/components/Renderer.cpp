@@ -12,28 +12,24 @@ Renderer::Renderer(Shape shape) : shape(shape)
         localCoordinates.push_back(Vec2(x, -y));
         localCoordinates.push_back(Vec2(x, y));
         localCoordinates.push_back(Vec2(-x, y));
-
-        worldCoordinates.resize(4);
     }
 
     if (shape.form == RenderShape::R_POLYGON)
     {
-        localCoordinates = std::get<std::vector<Vec2>>(shape.scale);
-        worldCoordinates.resize(localCoordinates.size());
+        localCoordinates = std::get<Array<20>>(shape.scale);
     }
     else if (shape.form == RenderShape::R_CIRCLE)
     {
         localCoordinates.push_back(Vec2());
-        worldCoordinates.resize(1);
     }
 }
 
-std::vector<Vec2> Renderer::GetLocalCoordinates() const
+Array<20> Renderer::GetLocalCoordinates() const
 {
     return localCoordinates;
 }
 
-std::vector<Vec2> Renderer::GetWorldCoordinates(Vec2 position) const
+Array<20> Renderer::GetWorldCoordinates(Vec2 position) const
 {
     if (shape.form == RenderShape::R_CIRCLE)
     {
@@ -51,7 +47,7 @@ std::vector<Vec2> Renderer::GetWorldCoordinates(Vec2 position) const
     return {};
 }
 
-std::vector<Vec2> Renderer::UpdateWorldCoordinates(Vec2 position, float rotation)
+Array<20> Renderer::UpdateWorldCoordinates(Vec2 position, float rotation)
 {
     for (int i = 0; i < localCoordinates.size(); i++)
     {

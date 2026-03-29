@@ -1,6 +1,7 @@
 #pragma once
 #include "math/Vec2.h"
 #include "main/components/Collider.h"
+#include "main/utility/templates/Array.h"
 #include <vector>
 
 class GameObject;
@@ -8,7 +9,7 @@ class GameObject;
 class PolygonCollider : public Collider
 {
     public:
-        std::vector<Vec2> vertices;
-        PolygonCollider(const std::vector<Vec2>& vertices);
+        Array<20> vertices;
+        PolygonCollider(const Array<20>& vertices);
         ColliderType GetType() const override;
 };

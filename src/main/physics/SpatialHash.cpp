@@ -1,4 +1,5 @@
 #include "main/physics/SpatialHash.h"
+#include "main/utility/templates/Array.h"
 #include "main/physics/SAT.h"
 #include <vector>
 
@@ -27,7 +28,7 @@ BBox SpatialHash::GetBounding(GameObject* obj)
         };
     }
 
-    std::vector<Vec2> vertices = SAT::GetVertices(obj);
+    Array<20> vertices = SAT::GetVertices(obj);
 
     SAT::Projection xProj = SAT::Project(vertices, Vec2(1, 0));
     SAT::Projection yProj = SAT::Project(vertices, Vec2(0, 1));

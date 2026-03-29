@@ -1,7 +1,8 @@
 #include "main/components/collidertypes/PolygonCollider.h"
 #include "main/components/Collider.h"
+#include "main/utility/templates/array.h"
 
-PolygonCollider::PolygonCollider(const std::vector<Vec2>& vertices) : vertices(vertices) {}
+PolygonCollider::PolygonCollider(const Array<20>& vertices) : vertices(vertices) {}
 
 ColliderType PolygonCollider::GetType() const
 {

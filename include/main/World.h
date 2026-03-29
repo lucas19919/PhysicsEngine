@@ -29,5 +29,8 @@ public:
 
 private:
     std::vector<std::unique_ptr<GameObject>> gameObjects;
+
     std::vector<std::pair<GameObject*, GameObject*>> collisionPairs;
+    std::vector<bool> pairChecked;
+    std::vector<int> activePairs;
 };
