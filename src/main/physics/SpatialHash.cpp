@@ -11,7 +11,7 @@ unsigned int SpatialHash::GetHash(Vec2 position) const
     return hash;
 }
 
-std::vector<Vec2> SpatialHash::GetBounding(GameObject* obj)
+BBox SpatialHash::GetBounding(GameObject* obj)
 {
     Collider* c = obj->GetCollider();
 

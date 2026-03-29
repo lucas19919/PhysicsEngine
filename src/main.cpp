@@ -14,21 +14,25 @@ int main() {
     InputHandler input;
 
     //all levels under assets/( ... ).json
-    const std::string& filepath = "assets/balltest.json";
+    const std::string& filepath = "assets/gentest.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");
     SetTargetFPS(60);    
 
     //draw fps?
-    bool FPS = false;
+    bool FPS = true;
 
     while (!WindowShouldClose()) {
         input.Update(world, filepath, screenWidth, screenHeight);
 
         float dt = GetFrameTime();
-        world.Step(dt);
-        world.CheckCollisions();
+        int subTicks = 5;
+        for (int i = 0; i < subTicks; i++)
+        {
+            world.Step(dt / subTicks);
+            world.CheckCollisions();
+        }
 
         BeginDrawing();
             ClearBackground(RAYWHITE);

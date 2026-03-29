@@ -116,7 +116,6 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
 
 void Resolve::ResolvePosition(CollisionManifold manifold, GameObject* obj1, GameObject* obj2)
 {
-
     RigidBody* rb1 = obj1->GetRigidBody();
     RigidBody* rb2 = obj2->GetRigidBody();
 

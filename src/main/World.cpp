@@ -4,7 +4,7 @@
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Resolve.h"
 
-World::World() : spatialHash(100.0f)
+World::World() : spatialHash(30.0f)
 {
     gravity = Vec2(0.0f, 600.0f);
 }
@@ -42,12 +42,12 @@ void World::Step(float dt)
         Collider* c = obj->GetCollider();
         RigidBody *rb = obj->GetRigidBody();
 
-        std::vector<Vec2> bounds = spatialHash.GetBounding(obj);
+        BBox bounds = spatialHash.GetBounding(obj);
 
-        int minX = std::floor(bounds[0].x / spatialHash.GetCellSize());
-        int maxX = std::floor(bounds[1].x / spatialHash.GetCellSize());
-        int minY = std::floor(bounds[0].y / spatialHash.GetCellSize());
-        int maxY = std::floor(bounds[1].y / spatialHash.GetCellSize());
+        int minX = std::floor(bounds.min.x / spatialHash.GetCellSize());
+        int maxX = std::floor(bounds.max.x / spatialHash.GetCellSize());
+        int minY = std::floor(bounds.min.y / spatialHash.GetCellSize());
+        int maxY = std::floor(bounds.max.y / spatialHash.GetCellSize());
 
         for (int x = minX; x <= maxX; x++)
         {
@@ -86,7 +86,7 @@ void World::Step(float dt)
 
 void World::CheckCollisions()
 {
-    std::set<std::pair<GameObject*, GameObject*>> checked;
+    collisionPairs.clear();
 
     for (auto& pair : gridMap)
     {
@@ -101,28 +101,25 @@ void World::CheckCollisions()
                 GameObject* obj2 = cell[j];
 
                 if (obj1 > obj2) std::swap(obj1, obj2);
-                std::pair<GameObject*, GameObject*> collisionPair = {obj1, obj2};
-
-                if (checked.find(collisionPair) != checked.end()) continue;
-                checked.insert(collisionPair);
-
-                CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
-                if (cm.Collision.isColliding == true)
-                {
-                    Resolve::ResolvePosition(cm, obj1, obj2);
-                    Resolve::ResolveImpulse(cm, obj1, obj2);
-                }                
+                
+                collisionPairs.push_back({obj1, obj2}); 
             }
         }
     }
 
+    std::sort(collisionPairs.begin(), collisionPairs.end());
+    collisionPairs.erase(std::unique(collisionPairs.begin(), collisionPairs.end()), collisionPairs.end());
 
+    for (const auto& collisionPair : collisionPairs)
+    {
+        GameObject* obj1 = collisionPair.first;
+        GameObject* obj2 = collisionPair.second;
 
-
-
-
-
-
-
-
+        CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
+        if (cm.Collision.isColliding)
+        {
+            Resolve::ResolvePosition(cm, obj1, obj2);
+            Resolve::ResolveImpulse(cm, obj1, obj2);
+        }                
+    }
 }

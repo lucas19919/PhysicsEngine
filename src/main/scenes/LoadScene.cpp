@@ -44,135 +44,171 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
 
     for (const auto& item : sceneData["objects"])
     {
-        if (!item.contains("components")) continue;
-        const auto& components = item["components"];
+        LoadObject(item, world);
+    }
 
-        float posX = 0.0f;
-        float posY = 0.0f;
-        float rotation = 0.0f;
-
-        if (components.contains("TransformComponent"))
+    if (sceneData.contains("generators"))
+    {
+        for (const auto& generator : sceneData["generators"])
         {
-            posX = components["TransformComponent"]["position"]["x"];
-            posY = components["TransformComponent"]["position"]["y"];
-            rotation = components["TransformComponent"]["rotation"];
-        }
+            if (!generator.contains("grid") || !generator.contains("object")) continue;
 
-        ColliderType colType = ColliderType::BOX;
-        Vec2 boxSize;
-        float circleRadius = 0.0f;
-        std::vector<Vec2> polyVerts;
-        
-        if (components.contains("Collider"))
-        {
-            std::string type = components["Collider"]["type"];
-            if (type == "BOX")
+            int rows = generator["grid"]["rows"];
+            int cols = generator["grid"]["columns"];
+            float startX = generator["grid"]["startX"];
+            float startY = generator["grid"]["startY"];
+            float spacingX = generator["grid"]["spacingX"];
+            float spacingY = generator["grid"]["spacingY"];
+
+            json genObject = generator["object"];
+
+            for (int r = 0; r < rows; r++)
             {
-                colType = ColliderType::BOX;
-                boxSize.x = components["Collider"]["size"]["x"];
-                boxSize.y = components["Collider"]["size"]["y"];
-            }
-            else if (type == "CIRCLE")
-            {
-                colType = ColliderType::CIRCLE;
-                circleRadius = components["Collider"]["radius"];
-            }
-            else if (type == "POLYGON")
-            {
-                colType = ColliderType::POLYGON;
-                for (const auto& v : components["Collider"]["vertices"])
+                for (int c = 0; c < cols; c++)
                 {
-                    polyVerts.push_back(Vec2(v["x"], v["y"]));
+                    float posX = startX + (c * spacingX);
+                    float posY = startY + (r * spacingY);
+
+                    genObject["components"]["TransformComponent"]["position"]["x"] = posX;
+                    genObject["components"]["TransformComponent"]["position"]["y"] = posY;
+
+                    LoadObject(genObject, world);
                 }
             }
         }
-
-        Shape renderShape;
-        if (components.contains("Renderer"))
-        {
-            std::string form = components["Renderer"]["form"];
-            std::string colorStr = components["Renderer"]["color"];
-
-            Color col = GRAY;
-            if (colorStr == "RED") col = RED;
-            else if (colorStr == "GREEN") col = GREEN;
-            else if (colorStr == "BLUE") col = BLUE;
-
-            renderShape.color = col;
-
-            if (form == "R_BOX")
-            {
-                renderShape.form = RenderShape::R_BOX;
-                Vec2 size = Vec2(components["Renderer"]["scale"]["x"], components["Renderer"]["scale"]["y"]);
-                renderShape.scale = size;
-            }
-            else if (form == "R_CIRCLE")
-            {
-                renderShape.form = RenderShape::R_CIRCLE;
-                renderShape.scale = components["Renderer"]["scale"];
-            }
-            else if (form == "R_POLYGON")
-            {
-                renderShape.form = RenderShape::R_POLYGON;
-                std::vector<Vec2> vertices;
-
-                for (const auto& v : components["Renderer"]["scale"])
-                {
-                    vertices.push_back(Vec2(v["x"], v["y"]));
-                }
-
-                renderShape.scale = vertices;
-            }
-        }
-
-        Instantiate& builder = Instantiate().WithTransform(Vec2(posX, posY), rotation);
-
-        if (components.contains("Collider"))
-        {
-            if (colType == ColliderType::BOX)
-            {
-                builder.WithCollider(colType, boxSize);
-            }
-            else if (colType == ColliderType::CIRCLE)
-            {
-                builder.WithCollider(colType, circleRadius);
-            }
-            else if (colType == ColliderType::POLYGON)
-            {
-                builder.WithCollider(colType, polyVerts);
-            }
-        }
-
-        if (components.contains("Renderer"))
-        {
-            builder.WithRenderer(renderShape);
-        }
-
-        if (components.contains("RigidBody"))
-        {
-            Properties props = { 1.0f, 0.5f, 100.0f, 1.0f };
-            LinearState linear = { Vec2(), Vec2(), Vec2() };
-            AngularState angular = { 0.0f, 0.0f, 0.0f };
-
-            props.mass = components["RigidBody"]["properties"]["mass"];
-            props.restitution = components["RigidBody"]["properties"]["restitution"];
-            props.friction = components["RigidBody"]["properties"]["friction"];
-            props.inertia = components["RigidBody"]["properties"]["inertia"];
-
-            linear.velocity.x = components["RigidBody"]["linearState"]["velocity"]["x"];
-            linear.velocity.y = components["RigidBody"]["linearState"]["velocity"]["y"];
-            linear.acceleration.x = components["RigidBody"]["linearState"]["acceleration"]["x"];
-            linear.acceleration.y = components["RigidBody"]["linearState"]["acceleration"]["y"];
-            linear.netForce.x = components["RigidBody"]["linearState"]["netForce"]["x"];
-            linear.netForce.y = components["RigidBody"]["linearState"]["netForce"]["y"];
-
-            angular.angularVelocity = components["RigidBody"]["angularState"]["angularVelocity"];
-            angular.angularAcceleration = components["RigidBody"]["angularState"]["angularAcceleration"];
-            angular.torque = components["RigidBody"]["angularState"]["torque"];
-
-            builder.WithRigidBody(props, linear, angular);
-        }
-
-        builder.Create(world);
     }
 }
+
+void LoadScene::LoadObject(const json& item, World& world)
+{
+    if (!item.contains("components")) return;
+    const auto& components = item["components"];
+
+    float posX = 0.0f;
+    float posY = 0.0f;
+    float rotation = 0.0f;
+
+    if (components.contains("TransformComponent"))
+    {
+        posX = components["TransformComponent"]["position"]["x"];
+        posY = components["TransformComponent"]["position"]["y"];
+        rotation = components["TransformComponent"]["rotation"];
+    }
+
+    ColliderType colType = ColliderType::BOX;
+    Vec2 boxSize;
+    float circleRadius = 0.0f;
+    std::vector<Vec2> polyVerts;
+    
+    if (components.contains("Collider"))
+    {
+        std::string type = components["Collider"]["type"];
+        if (type == "BOX")
+        {
+            colType = ColliderType::BOX;
+            boxSize.x = components["Collider"]["size"]["x"];
+            boxSize.y = components["Collider"]["size"]["y"];
+        }
+        else if (type == "CIRCLE")
+        {
+            colType = ColliderType::CIRCLE;
+            circleRadius = components["Collider"]["radius"];
+        }
+        else if (type == "POLYGON")
+        {
+            colType = ColliderType::POLYGON;
+            for (const auto& v : components["Collider"]["vertices"])
+            {
+                polyVerts.push_back(Vec2(v["x"], v["y"]));
+            }
+        }
+    }
+
+    Shape renderShape;
+    if (components.contains("Renderer"))
+    {
+        std::string form = components["Renderer"]["form"];
+        std::string colorStr = components["Renderer"]["color"];
+
+        Color col = GRAY;
+        if (colorStr == "RED") col = RED;
+        else if (colorStr == "GREEN") col = GREEN;
+        else if (colorStr == "BLUE") col = BLUE;
+
+        renderShape.color = col;
+
+        if (form == "R_BOX")
+        {
+            renderShape.form = RenderShape::R_BOX;
+            Vec2 size = Vec2(components["Renderer"]["scale"]["x"], components["Renderer"]["scale"]["y"]);
+            renderShape.scale = size;
+        }
+        else if (form == "R_CIRCLE")
+        {
+            renderShape.form = RenderShape::R_CIRCLE;
+            renderShape.scale = components["Renderer"]["scale"];
+        }
+        else if (form == "R_POLYGON")
+        {
+            renderShape.form = RenderShape::R_POLYGON;
+            std::vector<Vec2> vertices;
+
+            for (const auto& v : components["Renderer"]["scale"])
+            {
+                vertices.push_back(Vec2(v["x"], v["y"]));
+            }
+
+            renderShape.scale = vertices;
+        }
+    }
+
+    Instantiate& builder = Instantiate().WithTransform(Vec2(posX, posY), rotation);
+
+    if (components.contains("Collider"))
+    {
+        if (colType == ColliderType::BOX)
+        {
+            builder.WithCollider(colType, boxSize);
+        }
+        else if (colType == ColliderType::CIRCLE)
+        {
+            builder.WithCollider(colType, circleRadius);
+        }
+        else if (colType == ColliderType::POLYGON)
+        {
+            builder.WithCollider(colType, polyVerts);
+        }
+    }
+
+    if (components.contains("Renderer"))
+    {
+        builder.WithRenderer(renderShape);
+    }
+
+    if (components.contains("RigidBody"))
+    {
+        Properties props = { 1.0f, 0.5f, 100.0f, 1.0f };
+        LinearState linear = { Vec2(), Vec2(), Vec2() };
+        AngularState angular = { 0.0f, 0.0f, 0.0f };
+
+        props.mass = components["RigidBody"]["properties"]["mass"];
+        props.restitution = components["RigidBody"]["properties"]["restitution"];
+        props.friction = components["RigidBody"]["properties"]["friction"];
+        props.inertia = components["RigidBody"]["properties"]["inertia"];
+
+        linear.velocity.x = components["RigidBody"]["linearState"]["velocity"]["x"];
+        linear.velocity.y = components["RigidBody"]["linearState"]["velocity"]["y"];
+        linear.acceleration.x = components["RigidBody"]["linearState"]["acceleration"]["x"];
+        linear.acceleration.y = components["RigidBody"]["linearState"]["acceleration"]["y"];
+        linear.netForce.x = components["RigidBody"]["linearState"]["netForce"]["x"];
+        linear.netForce.y = components["RigidBody"]["linearState"]["netForce"]["y"];
+
+        angular.angularVelocity = components["RigidBody"]["angularState"]["angularVelocity"];
+        angular.angularAcceleration = components["RigidBody"]["angularState"]["angularAcceleration"];
+        angular.torque = components["RigidBody"]["angularState"]["torque"];
+
+        builder.WithRigidBody(props, linear, angular);
+    }
+
+    builder.Create(world);
+}    
