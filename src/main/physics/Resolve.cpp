@@ -66,7 +66,6 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         float magnitude = normal.Dot(relative);
         
         if (magnitude > 0.0f) continue;
-        //if (magnitude < 30.0f) e = 0.0f;
 
         float cross1 = r1.Cross(normal);
         float cross2 = r2.Cross(normal);
@@ -135,8 +134,8 @@ void Resolve::ResolvePosition(CollisionManifold manifold, GameObject* obj1, Game
 
     Collision collision = manifold.Collision;
 
-    float slop = 0.01f;
-    float percent = 0.75f;
+    float slop = 0.05f;
+    float percent = 1.0f;
 
     float penetration = std::max(collision.depth - slop, 0.0f);
     Vec2 correction = collision.normal * (collision.depth / totalInvMass) * percent;

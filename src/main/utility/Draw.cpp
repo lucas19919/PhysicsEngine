@@ -3,6 +3,7 @@
 #include "main/components/Renderer.h"
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
+#include <cmath>
 
 void Render(GameObject *obj)
 {
@@ -36,6 +37,7 @@ void Render(GameObject *obj)
         );        
 
         Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
+        
         for (size_t i = 0; i < vertices.size(); i++) 
         {
             Vec2 p1 = vertices[i];
@@ -48,6 +50,7 @@ void Render(GameObject *obj)
     {
         Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
         int vertexCount = vertices.size();
+        
         if (vertexCount < 3) break; 
 
         std::vector<Vector2> raylibVerts(vertexCount);
@@ -56,7 +59,10 @@ void Render(GameObject *obj)
             raylibVerts[i] = { vertices[i].x, vertices[i].y }; 
         }
 
-        DrawTriangleFan(raylibVerts.data(), vertexCount, shape.color);
+        for (int i = 1; i < vertexCount - 1; i++) 
+        {
+            DrawTriangle(raylibVerts[0], raylibVerts[i + 1], raylibVerts[i], shape.color);
+        }
         
         for (int i = 0; i < vertexCount; i++) 
         {

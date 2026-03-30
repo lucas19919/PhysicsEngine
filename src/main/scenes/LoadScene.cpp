@@ -81,34 +81,6 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
                 }
             }
         }
-    }    {
-        for (const auto& generator : sceneData["generators"])
-        {
-            if (!generator.contains("grid") || !generator.contains("object")) continue;
-
-            int rows = generator["grid"]["rows"];
-            int cols = generator["grid"]["columns"];
-            float startX = generator["grid"]["startX"];
-            float startY = generator["grid"]["startY"];
-            float spacingX = generator["grid"]["spacingX"];
-            float spacingY = generator["grid"]["spacingY"];
-
-            json genObject = generator["object"];
-
-            for (int r = 0; r < rows; r++)
-            {
-                for (int c = 0; c < cols; c++)
-                {
-                    float posX = startX + (c * spacingX);
-                    float posY = startY + (r * spacingY);
-
-                    genObject["components"]["TransformComponent"]["position"]["x"] = posX;
-                    genObject["components"]["TransformComponent"]["position"]["y"] = posY;
-
-                    LoadObject(genObject, world);
-                }
-            }
-        }
     }
 }
 

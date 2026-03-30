@@ -9,18 +9,12 @@ RigidBody::RigidBody(Properties properties, LinearState linearState, AngularStat
     restitution = std::clamp(properties.restitution, 0.0f, 1.0f);
     friction = std::max(0.0f, properties.friction);
 
-    mass = properties.mass;
     invMass = (properties.mass > 0.0f) ? (1.0f / properties.mass) : 0.0f;
-    
-    restitution = properties.restitution;
-    friction = properties.friction;
+    invInertia = (properties.inertia > 0.0f) ? (1.0f / properties.inertia) : 0.0f;
 
     velocity = linearState.velocity;
     acceleration = linearState.acceleration;
     netForce = linearState.netForce;
-
-    inertia = properties.inertia;
-    invInertia = (properties.inertia > 0.0f) ? (1.0f / properties.inertia) : 0.0f;
 
     angularVelocity = angularState.angularVelocity;
     angularAcceleration = angularState.angularAcceleration;
@@ -29,6 +23,44 @@ RigidBody::RigidBody(Properties properties, LinearState linearState, AngularStat
 
 RigidBody::~RigidBody()
 {
+}
+
+void RigidBody::WakeUp()
+{
+    isSleeping = false;
+    sleepTimer = 0.0f;
+}
+
+void RigidBody::UpdateSleep(float dt)
+{
+    if (isSleeping) return;
+
+    if (velocity.MagSq() < sleepEpsilon && std::abs(angularVelocity) < sleepEpsilon)
+    {
+        sleepTimer += dt;
+        if (sleepTimer >= timeToSleep)
+        {
+            isSleeping = true;
+            velocity = Vec2(0, 0);
+            angularVelocity = 0.0f;
+        }
+    }
+    else
+    {
+        sleepTimer = 0.0f;
+    }    
+}
+
+void RigidBody::SetVelocity(Vec2 v)
+{
+    velocity = v;
+    if (velocity.MagSq() > sleepEpsilon) WakeUp();
+}
+
+void RigidBody::SetAngularVelocity(float w)
+{
+    angularVelocity = w;
+    if (std::abs(angularVelocity) > sleepEpsilon) WakeUp();
 }
 
 void RigidBody::SetMass(float m)

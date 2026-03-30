@@ -13,8 +13,8 @@ int main() {
     World world;
     InputHandler input;
 
-    //all levels under assets/( ... ).json
-    const std::string& filepath = "assets/gentest.json";
+    //all levels under ../assets/( ... ).json
+    const std::string& filepath = "../assets/gentest.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");
@@ -27,11 +27,10 @@ int main() {
         input.Update(world, filepath, screenWidth, screenHeight);
 
         float dt = GetFrameTime();
-        int subTicks = 6;
+        int subTicks = 8; 
         for (int i = 0; i < subTicks; i++)
         {
             world.Step(dt / subTicks);
-            world.CheckCollisions();
         }
 
         BeginDrawing();
@@ -40,10 +39,10 @@ int main() {
             {
                 Render(objPtr.get());
             }
-        EndDrawing();
 
-        if (FPS)
-            DrawFPS(10, 10);            
+            if (FPS)
+                DrawFPS(10, 10);    
+        EndDrawing();
     }
 
     CloseWindow();
