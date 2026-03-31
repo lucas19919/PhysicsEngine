@@ -14,7 +14,7 @@ int main() {
     InputHandler input;
 
     //all levels under ../assets/( ... ).json
-    const std::string& filepath = "../assets/catapult.json";
+    const std::string& filepath = "../assets/gentest.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");
@@ -23,25 +23,34 @@ int main() {
     //draw fps?
     bool FPS = true;
 
-    while (!WindowShouldClose()) {
-        input.Update(world, filepath, screenWidth, screenHeight);
+    int displaySleepCount = 0;
+    float uiTimer = 0.0f;
+    float uiUpdateInterval = 0.3f; 
 
+    while (!WindowShouldClose()) {
         float dt = GetFrameTime();
-        int subTicks = 8; 
-        for (int i = 0; i < subTicks; i++)
+        input.Update(world, filepath, screenWidth, screenHeight);
+        world.Step(dt);
+
+        uiTimer += dt;
+        if (uiTimer >= uiUpdateInterval) 
         {
-            world.Step(dt / subTicks);
+            displaySleepCount = world.sleepCounter;
+            uiTimer = 0.0f;
         }
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            for (const auto& objPtr : world.GetGameObjects())
+            for (const auto& objPtr : world.GetGameObjects()) 
             {
                 Render(objPtr.get());
             }
 
-            if (FPS)
+            if (FPS) 
                 DrawFPS(10, 10);    
+
+            DrawText("Sleeping Objects: ", 10, 40, 20, DARKGRAY);
+            DrawText(std::to_string(displaySleepCount).c_str(), 190, 40, 20, DARKGRAY);
         EndDrawing();
     }
 

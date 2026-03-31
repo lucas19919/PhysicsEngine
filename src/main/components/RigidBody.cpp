@@ -35,7 +35,11 @@ void RigidBody::UpdateSleep(float dt)
 {
     if (isSleeping) return;
 
-    if (velocity.MagSq() < sleepEpsilon && std::abs(angularVelocity) < sleepEpsilon)
+    float eKL = 0.5f * mass * velocity.MagSq();
+    float eKA = 0.5f * inertia * (angularVelocity * angularVelocity);
+    float eK = eKL + eKA;
+
+    if (eK < energyThreshold)
     {
         sleepTimer += dt;
         if (sleepTimer >= timeToSleep)

@@ -28,6 +28,8 @@ class World
         Vec2 gravity;
         bool isPaused = true;
 
+        int sleepCounter;
+
     private:
         void Integrate(float dt);
         void UpdateGrid();

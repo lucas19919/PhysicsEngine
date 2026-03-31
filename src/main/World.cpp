@@ -24,11 +24,17 @@ void World::Step(float dt)
     Integrate(dt);
     UpdateGrid();
     GenerateCollisionPairs();
-    ResolveCollisions();
+
+    int subTicks = 8;
+    for (int i = 0; i < subTicks; i++)
+    {
+        ResolveCollisions();
+    }
 }
 
 void World::Integrate(float dt)
 {
+    sleepCounter = 0;
     for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
@@ -37,10 +43,16 @@ void World::Integrate(float dt)
         if (!rb) continue;
         rb->UpdateSleep(dt);
 
-        if (rb->isSleeping) continue;
-
-        float iM = rb->GetInvMass();
+        if (rb->isSleeping) 
+        {
+            rb->SetVelocity(Vec2(0, 0));
+            rb->SetAngularVelocity(0.0f);
+            sleepCounter++;
+            continue;
+        }
+        
         float M = rb->GetMass();
+        float iM = rb->GetInvMass();
         float iI = rb->GetInvInertia();
 
         rb->ApplyForce(gravity * M);
@@ -79,7 +91,6 @@ void World::UpdateGrid()
             obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
             c->SetBounds(spatialHash.GetBounding(obj));
         }
-
         int minX = std::floor(c->GetBounds().min.x / spatialHash.GetCellSize());
         int maxX = std::floor(c->GetBounds().max.x / spatialHash.GetCellSize());
         int minY = std::floor(c->GetBounds().min.y / spatialHash.GetCellSize());
@@ -100,7 +111,7 @@ void World::GenerateCollisionPairs()
 {
     collisionPairs.clear();
     collisionPairs.reserve(gameObjects.size() * 2);
-    
+
     std::unordered_set<std::pair<GameObject*, GameObject*>, PairHash> seen;
 
     for (auto& pair : gridMap)
@@ -141,11 +152,23 @@ void World::ResolveCollisions()
         CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
         if (cm.Collision.isColliding)
         {
-            if (rb1 && rb1->isSleeping) rb1->WakeUp();
-            if (rb2&& rb2->isSleeping) rb2->WakeUp();
+            Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
+            Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
+            float relativeVel = (v2 - v1).Dot(cm.Collision.normal);
 
-            Resolve::ResolveImpulse(cm, obj1, obj2);
+            if (std::abs(relativeVel) > 10.0f) 
+            {
+                if (rb1 && rb1->isSleeping) rb1->WakeUp();
+                if (rb2 && rb2->isSleeping) rb2->WakeUp();
+            }
+
+            obj1->cachedVertices = SAT::GetVertices(obj1);
+            obj1->cachedNormals = SAT::GetNormals(obj1->cachedVertices);
+            obj2->cachedVertices = SAT::GetVertices(obj2);
+            obj2->cachedNormals = SAT::GetNormals(obj2->cachedVertices);
+
             Resolve::ResolvePosition(cm, obj1, obj2);
+            Resolve::ResolveImpulse(cm, obj1, obj2);
         }                
     }
 }

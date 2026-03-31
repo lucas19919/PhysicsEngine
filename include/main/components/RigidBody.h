@@ -33,7 +33,7 @@ class RigidBody
 
         bool isSleeping = false;
         float sleepTimer = 0.0f;
-        float sleepEpsilon = 1.0f; 
+        float energyThreshold = 15.0f; 
         float timeToSleep = 0.5f;
 
         void WakeUp();

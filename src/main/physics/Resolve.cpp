@@ -126,25 +126,25 @@ void Resolve::ResolvePosition(CollisionManifold manifold, GameObject* obj1, Game
     RigidBody* rb1 = obj1->GetRigidBody();
     RigidBody* rb2 = obj2->GetRigidBody();
 
-    float invMassA = rb1 ? rb1->GetInvMass() : 0.0f;
-    float invMassB = rb2 ? rb2->GetInvMass() : 0.0f;
+    float invMassA = (rb1 && !rb1->isSleeping) ? rb1->GetInvMass() : 0.0f;
+    float invMassB = (rb2 && !rb2->isSleeping) ? rb2->GetInvMass() : 0.0f;
 
     float totalInvMass = invMassA + invMassB;
     if (totalInvMass == 0.0f) return;
 
     Collision collision = manifold.Collision;
 
-    float slop = 0.05f;
-    float percent = 1.0f;
+    float slop = 0.1f;
+    float percent = 0.6f;
 
     float penetration = std::max(collision.depth - slop, 0.0f);
     Vec2 correction = collision.normal * (penetration / totalInvMass) * percent;   
 
-    if (rb1)
+    if (rb1 && !rb1->isSleeping)
     {
         obj1->transform.position = obj1->transform.position - (correction * invMassA);
     }
-    if (rb2)
+    if (rb2 && !rb2->isSleeping)
     {
         obj2->transform.position = obj2->transform.position + (correction * invMassB);
     }
