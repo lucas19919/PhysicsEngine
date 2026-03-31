@@ -3,7 +3,7 @@
 #include "main/utility/templates/Array.h"
 
 struct CollisionManifold {
-    Collision Collision;
+    Collision collision;
     Array<20> points;
 };
 

@@ -146,14 +146,14 @@ void World::ResolveCollisions()
         RigidBody* rb2 = obj2->GetRigidBody();
 
         CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
-        if (cm.Collision.isColliding)
+        if (cm.collision.isColliding)
         {
-            if (rb1) rb1->AddContact(cm.Collision.normal);
-            if (rb2) rb2->AddContact(Vec2(-cm.Collision.normal.x, -cm.Collision.normal.y));
+            if (rb1) rb1->AddContact(cm.collision.normal);
+            if (rb2) rb2->AddContact(Vec2(-cm.collision.normal.x, -cm.collision.normal.y));
 
             Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
             Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
-            float relativeVel = (v2 - v1).Dot(cm.Collision.normal);
+            float relativeVel = (v2 - v1).Dot(cm.collision.normal);
 
             if (std::abs(relativeVel) > 10.0f) 
             {

@@ -52,10 +52,10 @@ void Render(GameObject *obj)
 
         Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
         
-        for (size_t i = 0; i < vertices.size(); i++) 
+        for (size_t i = 0; i < vertices.Size(); i++) 
         {
             Vec2 p1 = vertices[i];
-            Vec2 p2 = vertices[(i + 1) % vertices.size()];
+            Vec2 p2 = vertices[(i + 1) % vertices.Size()];
             DrawLineEx({ p1.x, p1.y }, { p2.x, p2.y }, 2.0f, BLACK);
         }
         break;
@@ -63,7 +63,7 @@ void Render(GameObject *obj)
     case RenderShape::R_POLYGON:
     {
         Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
-        int vertexCount = vertices.size();
+        int vertexCount = vertices.Size();
         
         if (vertexCount < 3) break; 
 
