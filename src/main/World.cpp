@@ -42,6 +42,7 @@ void World::Integrate(float dt)
 
         if (!rb) continue;
         rb->UpdateSleep(dt);
+        rb->ResetContacts();
 
         if (rb->isSleeping) 
         {
@@ -152,6 +153,9 @@ void World::ResolveCollisions()
         CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
         if (cm.Collision.isColliding)
         {
+            if (rb1) rb1->AddContact(cm.Collision.normal);
+            if (rb2) rb2->AddContact(Vec2(-cm.Collision.normal.x, -cm.Collision.normal.y));
+            
             Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
             Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
             float relativeVel = (v2 - v1).Dot(cm.Collision.normal);

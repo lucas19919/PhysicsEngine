@@ -31,6 +31,10 @@ class RigidBody
         RigidBody(Properties properties, LinearState linearState, AngularState angularState);
         ~RigidBody();
 
+        void AddContact(Vec2 normal);
+        void ResetContacts();
+
+        bool isSurrounded = false;
         bool isSleeping = false;
         float sleepTimer = 0.0f;
         float energyThreshold = 15.0f; 
@@ -88,4 +92,7 @@ class RigidBody
         float angularVelocity;
         float angularAcceleration;  
         float torque;
+
+        Vec2 contactNormalSum;
+        int contactCount = 0;
 };

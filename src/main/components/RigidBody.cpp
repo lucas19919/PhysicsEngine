@@ -25,6 +25,18 @@ RigidBody::~RigidBody()
 {
 }
 
+void RigidBody::AddContact(Vec2 normal)
+{
+    contactNormalSum += normal;
+    contactCount++;
+}
+
+void RigidBody::ResetContacts()
+{
+    contactNormalSum = Vec2(0, 0);
+    contactCount = 0;
+}
+
 void RigidBody::WakeUp()
 {
     isSleeping = false;
@@ -34,25 +46,32 @@ void RigidBody::WakeUp()
 void RigidBody::UpdateSleep(float dt)
 {
     if (isSleeping) return;
+    isSurrounded = false;
 
-    float eKL = 0.5f * mass * velocity.MagSq();
-    float eKA = 0.5f * inertia * (angularVelocity * angularVelocity);
-    float eK = eKL + eKA;
+    if (contactCount >= 3)
+    {
+        if (contactNormalSum.MagSq() < 2.5f)
+        {
+            isSurrounded = true;
+            isSleeping = true;
+        }
+    }
 
+    float eK = 0.5f * mass * velocity.MagSq() + 0.5f * inertia * (angularVelocity * angularVelocity);
     if (eK < energyThreshold)
     {
         sleepTimer += dt;
         if (sleepTimer >= timeToSleep)
-        {
             isSleeping = true;
-            velocity = Vec2(0, 0);
-            angularVelocity = 0.0f;
-        }
     }
     else
-    {
         sleepTimer = 0.0f;
-    }    
+
+    if (isSleeping)
+    {
+        velocity = Vec2(0, 0);
+        angularVelocity = 0.0f;
+    }
 }
 
 void RigidBody::SetMass(float m)

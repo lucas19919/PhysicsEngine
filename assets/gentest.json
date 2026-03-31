@@ -1,10 +1,10 @@
 {
-  "name": "1000 Ball Grid Drop",
+  "name": "Gentest",
   "useWalls": true,
   "generators": [
     {
       "grid": {
-        "rows": 10,
+        "rows": 15,
         "columns": 40,
         "startX": 150.0,
         "startY": 250.0,
