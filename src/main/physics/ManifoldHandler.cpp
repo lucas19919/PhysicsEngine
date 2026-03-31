@@ -15,7 +15,7 @@ CollisionManifold ManifoldHandler::SortManifold(GameObject* obj1, GameObject* ob
     if (c1->GetType() > c2->GetType()) 
     {
         CollisionManifold col = SortManifold(obj2, obj1);
-        col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
+        col.collision.normal = Vec2(-col.collision.normal.x, -col.collision.normal.y);
         return col;
     }
 
@@ -30,14 +30,14 @@ CollisionManifold ManifoldHandler::SortManifold(GameObject* obj1, GameObject* ob
     if (t1 == ColliderType::CIRCLE && t2 == ColliderType::BOX) 
     {
         CollisionManifold col = Manifold::GenBoxCircle(obj2, obj1);
-        col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
+        col.collision.normal = Vec2(-col.collision.normal.x, -col.collision.normal.y);
         return col;
     }
 
     if (t1 == ColliderType::CIRCLE && t2 == ColliderType::POLYGON) 
     {
         CollisionManifold col = Manifold::GenPolyCircle(obj2, obj1);
-        col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
+        col.collision.normal = Vec2(-col.collision.normal.x, -col.collision.normal.y);
         return col;
     }
 
@@ -49,7 +49,7 @@ CollisionManifold ManifoldHandler::SortManifold(GameObject* obj1, GameObject* ob
     if (t1 == ColliderType::BOX && t2 == ColliderType::POLYGON) 
     {
         CollisionManifold col = Manifold::GenPolyBox(obj2, obj1);
-        col.Collision.normal = Vec2(-col.Collision.normal.x, -col.Collision.normal.y);
+        col.collision.normal = Vec2(-col.collision.normal.x, -col.collision.normal.y);
         return col;
     }
 

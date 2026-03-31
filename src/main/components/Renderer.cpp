@@ -9,10 +9,10 @@ Renderer::Renderer(Shape shape) : shape(shape)
         float x = std::get<Vec2>(shape.scale).x / 2.0f;
         float y = std::get<Vec2>(shape.scale).y / 2.0f;
         
-        localCoordinates.push_back(Vec2(-x, -y));
-        localCoordinates.push_back(Vec2(x, -y));
-        localCoordinates.push_back(Vec2(x, y));
-        localCoordinates.push_back(Vec2(-x, y));
+        localCoordinates.PushBack(Vec2(-x, -y));
+        localCoordinates.PushBack(Vec2(x, -y));
+        localCoordinates.PushBack(Vec2(x, y));
+        localCoordinates.PushBack(Vec2(-x, y));
     }
     else if (shape.form == RenderShape::R_POLYGON)
     {
@@ -20,7 +20,7 @@ Renderer::Renderer(Shape shape) : shape(shape)
     }
     else if (shape.form == RenderShape::R_CIRCLE)
     {
-        localCoordinates.push_back(Vec2());
+        localCoordinates.PushBack(Vec2());
     }
 }
 
@@ -54,12 +54,12 @@ Array<20> Renderer::UpdateWorldCoordinates(Vec2 position, float rotation)
     float cosR = std::cos(rotation);
     float sinR = std::sin(rotation);
 
-    for (size_t i = 0; i < localCoordinates.size(); i++)
+    for (size_t i = 0; i < localCoordinates.Size(); i++)
     {
         Vec2 vertex = localCoordinates[i];
         float x = vertex.x * cosR - vertex.y * sinR;
         float y = vertex.x * sinR + vertex.y * cosR;
-        worldCoordinates.push_back(Vec2(x + position.x, y + position.y));
+        worldCoordinates.PushBack(Vec2(x + position.x, y + position.y));
     }
 
     return worldCoordinates;

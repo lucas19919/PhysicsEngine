@@ -125,7 +125,7 @@ void LoadScene::LoadObject(const json& item, World& world)
             colType = ColliderType::POLYGON;
             for (const auto& v : components["Collider"]["vertices"])
             {
-                polyVerts.push_back(Vec2(v["x"], v["y"]));
+                polyVerts.PushBack(Vec2(v["x"], v["y"]));
             }
         }
     }
@@ -161,7 +161,7 @@ void LoadScene::LoadObject(const json& item, World& world)
 
             for (const auto& v : components["Renderer"]["scale"])
             {
-                vertices.push_back(Vec2(v["x"], v["y"]));
+                vertices.PushBack(Vec2(v["x"], v["y"]));
             }
 
             renderShape.scale = vertices;

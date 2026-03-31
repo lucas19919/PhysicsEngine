@@ -40,7 +40,7 @@ Collision SAT::BoxBox(GameObject *obj1, GameObject *obj2)
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
-    for (size_t i = 0; i < normals1.size(); i++)
+    for (size_t i = 0; i < normals1.Size(); i++)
     {
         Vec2 axis = normals1[i];
         Projection p1 = Project(vertices1, axis);
@@ -57,7 +57,7 @@ Collision SAT::BoxBox(GameObject *obj1, GameObject *obj2)
         }
     }
 
-    for (size_t i = 0; i < normals2.size(); i++)
+    for (size_t i = 0; i < normals2.Size(); i++)
     {
         Vec2 axis = normals2[i];
         Projection p1 = Project(vertices1, axis);
@@ -95,7 +95,7 @@ Collision SAT::BoxCircle(GameObject *obj1, GameObject *obj2)
 
     Vec2 distAxis = center - vertices[0];
     float dist = (center - vertices[0]).MagSq();
-    for (size_t i = 1; i < vertices.size(); i++)
+    for (size_t i = 1; i < vertices.Size(); i++)
     {
         float currentDistSq = (center - vertices[i]).MagSq();
         if (dist > currentDistSq) {
@@ -105,12 +105,12 @@ Collision SAT::BoxCircle(GameObject *obj1, GameObject *obj2)
     }
 
     if (dist > 0.0f) {
-        normals.push_back(distAxis.Norm());
+        normals.PushBack(distAxis.Norm());
     } else {
-        normals.push_back(Vec2(1.0f, 0.0f));
+        normals.PushBack(Vec2(1.0f, 0.0f));
     }
 
-    for (size_t i = 0; i < normals.size(); i++)
+    for (size_t i = 0; i < normals.Size(); i++)
     {
         Vec2 axis = normals[i];
         Projection p1 = Project(vertices, axis);
@@ -148,7 +148,7 @@ Collision SAT::PolygonCircle(GameObject *obj1, GameObject *obj2)
 
     Vec2 distAxis = center - vertices[0];
     float dist = (center - vertices[0]).MagSq();
-    for (size_t i = 1; i < vertices.size(); i++)
+    for (size_t i = 1; i < vertices.Size(); i++)
     {
         float currentDistSq = (center - vertices[i]).MagSq();
         if (dist > currentDistSq) {
@@ -158,12 +158,12 @@ Collision SAT::PolygonCircle(GameObject *obj1, GameObject *obj2)
     }
 
     if (dist > 0.0f) {
-        normals.push_back(distAxis.Norm());
+        normals.PushBack(distAxis.Norm());
     } else {
-        normals.push_back(Vec2(1.0f, 0.0f));
+        normals.PushBack(Vec2(1.0f, 0.0f));
     }
 
-    for (size_t i = 0; i < normals.size(); i++)
+    for (size_t i = 0; i < normals.Size(); i++)
     {
         Vec2 axis = normals[i];
         Projection p1 = Project(vertices, axis);
@@ -199,7 +199,7 @@ Collision SAT::PolygonBox(GameObject *obj1, GameObject *obj2)
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
-    for (size_t i = 0; i < normals1.size(); i++) 
+    for (size_t i = 0; i < normals1.Size(); i++) 
     {
         Vec2 axis = normals1[i];
         Projection p1 = Project(vertices1, axis);
@@ -216,7 +216,7 @@ Collision SAT::PolygonBox(GameObject *obj1, GameObject *obj2)
         }
     }
 
-    for (size_t i = 0; i < normals2.size(); i++)
+    for (size_t i = 0; i < normals2.Size(); i++)
     {
         Vec2 axis = normals2[i];
         Projection p1 = Project(vertices1, axis);
@@ -252,7 +252,7 @@ Collision SAT::PolygonPolygon(GameObject *obj1, GameObject *obj2)
     float minOverlap = INFINITY;
     Vec2 smallestAxis;
 
-    for (size_t i = 0; i < normals1.size(); i++) 
+    for (size_t i = 0; i < normals1.Size(); i++) 
     {
         Vec2 axis = normals1[i];
         Projection p1 = Project(vertices1, axis);
@@ -269,7 +269,7 @@ Collision SAT::PolygonPolygon(GameObject *obj1, GameObject *obj2)
         }
     }
 
-    for (size_t i = 0; i < normals2.size(); i++)
+    for (size_t i = 0; i < normals2.Size(); i++)
     {
         Vec2 axis = normals2[i];
         Projection p1 = Project(vertices1, axis);
@@ -313,7 +313,7 @@ SAT::Projection SAT::Project(const Array<20>& vertices, const Vec2 axis)
     project.min = axis.Dot(vertices[0]);
     project.max = project.min;
     
-    for (size_t i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.Size(); i++)
     {
         float dot = axis.Dot(vertices[i]);
         if (dot < project.min) project.min = dot;
@@ -339,10 +339,10 @@ Array<20> SAT::GetVertices(GameObject* obj1)
         float x = b->size.x / 2.0f;
         float y = b->size.y / 2.0f;
         
-        localVertices.push_back(Vec2(-x, -y));
-        localVertices.push_back(Vec2( x, -y));
-        localVertices.push_back(Vec2( x,  y));
-        localVertices.push_back(Vec2(-x,  y));
+        localVertices.PushBack(Vec2(-x, -y));
+        localVertices.PushBack(Vec2( x, -y));
+        localVertices.PushBack(Vec2( x,  y));
+        localVertices.PushBack(Vec2(-x,  y));
     } 
     else if (obj1->GetCollider()->GetType() == ColliderType::POLYGON) 
     {
@@ -357,12 +357,12 @@ Array<20> SAT::GetVertices(GameObject* obj1)
     float cos = std::cos(transform.rotation);
     float sin = std::sin(transform.rotation);
 
-    for (size_t i = 0; i < localVertices.size(); i++)
+    for (size_t i = 0; i < localVertices.Size(); i++)
     {
         float x = localVertices[i].x;
         float y = localVertices[i].y;
 
-        worldVertices.push_back(Vec2(
+        worldVertices.PushBack(Vec2(
             (x * cos) - (y * sin) + transform.position.x,
             (x * sin) + (y * cos) + transform.position.y
         ));
@@ -374,11 +374,11 @@ Array<20> SAT::GetVertices(GameObject* obj1)
 Array<20> SAT::GetNormals(const Array<20>& vertices)
 {
     Array<20> normals;
-    for (size_t i = 0; i < vertices.size(); i++)
+    for (size_t i = 0; i < vertices.Size(); i++)
     {
-        Vec2 line = vertices[(i + 1) % vertices.size()] - vertices[i];
+        Vec2 line = vertices[(i + 1) % vertices.Size()] - vertices[i];
         Vec2 pLine = Vec2(line.y, -line.x);
-        normals.push_back(pLine.Norm());
+        normals.PushBack(pLine.Norm());
     }
 
     return normals;

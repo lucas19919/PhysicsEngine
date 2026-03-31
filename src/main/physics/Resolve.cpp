@@ -15,7 +15,7 @@ CollisionManifold Resolve::ResolveManifold(GameObject* obj1, GameObject* obj2)
 
 void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameObject* obj2)
 {
-    if (manifold.points.size() == 0) return;
+    if (manifold.points.Size() == 0) return;
     
     RigidBody *rb1 = obj1->GetRigidBody();
     RigidBody *rb2 = obj2->GetRigidBody();
@@ -46,12 +46,12 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         f = rb2->GetFriction();
     }
     
-    for (size_t i = 0; i < manifold.points.size(); i++)
+    for (size_t i = 0; i < manifold.points.Size(); i++)
     {
         Vec2 contact = manifold.points[i];
         
         //j impulse
-        Vec2 normal = manifold.Collision.normal;
+        Vec2 normal = manifold.collision.normal;
 
         Vec2 r1 = contact - obj1->transform.position;
         Vec2 r2 = contact - obj2->transform.position;
@@ -73,7 +73,7 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         float cross2 = r2.Cross(normal);
 
         float j = (-(1 + e) * magnitude) / (invMass1 + invMass2 + (cross1 * cross1 * invInertia1) + (cross2 * cross2 * invInertia2));
-        j /= (float)manifold.points.size();
+        j /= (float)manifold.points.Size();
 
         Vec2 impulse = normal * j;
 
@@ -99,7 +99,7 @@ void Resolve::ResolveImpulse(CollisionManifold manifold, GameObject* obj1, GameO
         float crossT2 = r2.Cross(tangent);
 
         float jt = -relative.Dot(tangent) / (invMass1 + invMass2 + (crossT1 * crossT1 * invInertia1) + (crossT2 * crossT2 * invInertia2));
-        jt /= (float)manifold.points.size();
+        jt /= (float)manifold.points.Size();
 
         float jtMag = 0.0f;
         
@@ -134,7 +134,7 @@ void Resolve::ResolvePosition(CollisionManifold manifold, GameObject* obj1, Game
     float totalInvMass = invMassA + invMassB;
     if (totalInvMass == 0.0f) return;
 
-    Collision collision = manifold.Collision;
+    Collision collision = manifold.collision;
 
     float slop = Config().contactSlop;
     float percent = Config().positionCorrectionPercent;
