@@ -23,10 +23,12 @@ struct ContactConstraint
     int pointCount;
 
     float restitution;
+    float restitutionBias[2] = {0.0f, 0.0f};
+
     float friction;
 
-    float accumulatedNormalImpulse[2];
-    float accumulatedTangentImpulse[2];
+    float accumulatedNormalImpulse[20];
+    float accumulatedTangentImpulse[20];
 };
 
 class World
@@ -45,7 +47,7 @@ class World
 
     private:
         void PrepareFrame(float dt);
-        void IntegratePhysics(float dt);
+        void IntegrateVelocities(float dt);
 
         void UpdateBroadphase();
         void GeneratePairs();
@@ -53,6 +55,7 @@ class World
 
         void PrepareContacts();
         void SolveConstraints();
+        void IntegratePositions(float dt);
 
         void FinishFrame(float dt);
         void UpdateSleep(float dt);

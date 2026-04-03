@@ -35,12 +35,13 @@ void World::Step(float dt)
     if (isPaused) return;
 
     PrepareFrame(dt);
-    IntegratePhysics(dt);
+    IntegrateVelocities(dt);
     UpdateBroadphase();
     GeneratePairs();
     BuildContacts();
     PrepareContacts();
     SolveConstraints();
+    IntegratePositions(dt);
     FinishFrame(dt);
     UpdateSleep(dt);
 }
@@ -52,7 +53,7 @@ void World::PrepareFrame(float dt)
     candidatePairs.clear();
 }
 
-void World::IntegratePhysics(float dt)
+void World::IntegrateVelocities(float dt)
 {
     //loop through all gameobjects and update physics and positions
     for (const auto& objPtr : gameObjects)
@@ -72,12 +73,9 @@ void World::IntegratePhysics(float dt)
         rb->SetAcceleration(rb->GetForce() * invMass);
         rb->SetVelocity(rb->GetVelocity() + rb->GetAcceleration() * dt);
 
-        obj->transform.position += rb->GetVelocity() * dt;
-
+        //angular motion
         rb->SetAngularAcceleration(rb->GetTorque() * invInertia);
         rb->SetAngularVelocity(rb->GetAngularVelocity() + rb->GetAngularAcceleration() * dt);
-
-        obj->transform.rotation += rb->GetAngularVelocity() * dt;
 
         rb->ClearForces();
         rb->ClearTorque();
@@ -166,8 +164,9 @@ void World::BuildContacts()
         contactConstraint.obj2 = obj2;
 
         //consider better hash
-        //tbh maybe make a hash.cpp under utility
-        contactConstraint.key = std::hash<GameObject*>()(obj1   ) ^ std::hash<GameObject*>()(obj2);
+        uintptr_t a = reinterpret_cast<uintptr_t>(obj1);
+        uintptr_t b = reinterpret_cast<uintptr_t>(obj2);
+        contactConstraint.key = static_cast<unsigned int>(a * 73856093u ^ b * 19349669u);
 
         RigidBody* rb1 = obj1->GetRigidBody();
         RigidBody* rb2 = obj2->GetRigidBody();
@@ -225,7 +224,9 @@ void World::PrepareContacts()
                 contact.accumulatedTangentImpulse[i] = lastContact.accumulatedTangentImpulse[i];
             }
 
-            Solver::Warmstart(contact);
+            if (Config().warmStart)
+                Solver::Warmstart(contact);
+
             break;
         }
     }
@@ -234,7 +235,7 @@ void World::PrepareContacts()
 //solver iterations
 void World::SolveConstraints()
 {
-    for (int i = 0; i < Config().solverIterations; i++)
+    for (int i = 0; i < Config().impulseIterations; i++)
     {
         for (auto& contact : currentFrameContacts)
         {
@@ -242,9 +243,26 @@ void World::SolveConstraints()
         }
     }
 
-    for (auto& contact : currentFrameContacts)
+    for (int i = 0; i < Config().positionIterations; i++)
     {
-        Solver::ResolvePosition(contact);
+        for (auto& contact : currentFrameContacts)
+        {
+            Solver::ResolvePosition(contact);
+        }
+    }
+}
+
+void World::IntegratePositions(float dt)
+{
+    for (const auto& objPtr : gameObjects)
+    {
+        GameObject* obj = objPtr.get();
+        RigidBody* rb = obj->GetRigidBody();   
+
+        if (!rb) continue;
+
+        obj->transform.position += rb->GetVelocity() * dt;
+        obj->transform.rotation += rb->GetAngularVelocity() * dt;
     }
 }
 

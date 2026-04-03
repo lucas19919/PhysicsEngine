@@ -67,7 +67,7 @@
         "Collider": { "type": "BOX", "isActive": true, "size": { "x": 40.0, "y": 40.0 } },
         "Renderer": { "form": "R_BOX", "color": "RED", "scale": { "x": 40.0, "y": 40.0 } },
         "RigidBody": {
-          "properties": { "mass": 5.0, "restitution": 0.1, "friction": 0.9, "inertia": 1333.0 },
+          "properties": { "mass": 5.0, "restitution": 0.3, "friction": 0.9, "inertia": 1333.0 },
           "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
           "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
         }

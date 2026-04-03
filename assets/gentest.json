@@ -7,7 +7,7 @@
         "rows": 10,
         "columns": 40,
         "startX": 150.0,
-        "startY": 250.0,
+        "startY": 100.0,
         "spacingX": 25.0,
         "spacingY": 25.0
       },
