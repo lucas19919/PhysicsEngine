@@ -26,5 +26,5 @@ struct Config
     float generatorJitterRange = 4.0f; // LoadScene
 
     // Debug
-    bool debugSleepingStates = true; // Draw::Render, colors sleeping objects differently
+    
 };

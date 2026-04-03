@@ -3,7 +3,6 @@
 #include "main/physics/SAT.h"
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Config.h"
-#include "main/World.h"
 
 CollisionManifold Solver::ResolveManifold(GameObject* obj1, GameObject* obj2)
 {

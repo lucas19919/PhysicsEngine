@@ -4,7 +4,7 @@
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Solver.h"
 #include "main/physics/Config.h"
-#include <unordered_set>
+#include <cstdint>
 
 World::World() : spatialHash(Config().spatialHashCellSize)
 {
@@ -49,8 +49,12 @@ void World::Step(float dt)
 void World::PrepareFrame(float dt)
 {
     currentFrameContacts.clear();
-    gridMap.clear();
     candidatePairs.clear();
+
+    for (auto& cell : gridMap)
+    {
+        cell.second.clear();
+    }
 }
 
 void World::IntegrateVelocities(float dt)
@@ -187,7 +191,7 @@ void World::BuildContacts()
             contactConstraint.points[i] = cm.points[i];
         }
 
-        //restition and friction
+        //restitution and friction
         if (rb1 && rb2)
         {
             contactConstraint.restitution = std::min(rb1->GetRestitution(), rb2->GetRestitution());

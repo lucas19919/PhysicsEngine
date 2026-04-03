@@ -4,6 +4,7 @@
 #include "main/World.h"
 
 class GameObject;
+class ContactConstraint;
 
 class Solver
 {

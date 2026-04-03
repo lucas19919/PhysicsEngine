@@ -10,7 +10,6 @@ void Render(GameObject *obj)
 {
     if (obj->GetRenderer() == nullptr) return;
 
-    RigidBody* rb = obj->GetRigidBody();
     Renderer *r = obj->GetRenderer();
     Shape shape = r->GetShape();
 
