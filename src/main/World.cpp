@@ -2,102 +2,108 @@
 #include "main/GameObject.h"
 #include "math/Vec2.h"
 #include "main/physics/ManifoldHandler.h"
-#include "main/physics/Resolve.h"
+#include "main/physics/Solver.h"
 #include "main/physics/Config.h"
 #include <unordered_set>
 
 World::World() : spatialHash(Config().spatialHashCellSize)
 {
-    gravity = Config().gravity;
+}
+
+std::vector<std::unique_ptr<GameObject>>& World::GetGameObjects()
+{
+    return gameObjects;
+}
+
+void World::AddGameObject(std::unique_ptr<GameObject> obj)
+{
+    gameObjects.push_back(std::move(obj));
 }
 
 void World::Clear()
 {
     gameObjects.clear();
+    currentFrameContacts.clear();
+    lastFrameContacts.clear();
     gridMap.clear();
-    collisionPairs.clear();
+    candidatePairs.clear();
 }
 
+//step world forward by dt seconds
 void World::Step(float dt)
 {
     if (isPaused) return;
 
-    Integrate(dt);
-    UpdateGrid();
-    GenerateCollisionPairs();
-
-    int subTicks = Config().subSteps;
-    for (int i = 0; i < subTicks; i++)
-    {
-        ResolveCollisions();
-    }
+    PrepareFrame(dt);
+    IntegratePhysics(dt);
+    UpdateBroadphase();
+    GeneratePairs();
+    BuildContacts();
+    PrepareContacts();
+    SolveConstraints();
+    FinishFrame(dt);
+    UpdateSleep(dt);
 }
 
-void World::Integrate(float dt)
+void World::PrepareFrame(float dt)
 {
-    sleepCounter = 0;
+    currentFrameContacts.clear();
+    gridMap.clear();
+    candidatePairs.clear();
+}
+
+void World::IntegratePhysics(float dt)
+{
+    //loop through all gameobjects and update physics and positions
     for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
-        RigidBody* rb = obj->GetRigidBody();
+        RigidBody* rb = obj->GetRigidBody();   
 
         if (!rb) continue;
-        rb->UpdateSleep(dt);
-        rb->ResetContacts();
 
-        if (rb->isSleeping) 
-        {
-            rb->SetVelocity(Vec2(0, 0));
-            rb->SetAngularVelocity(0.0f);
-            sleepCounter++;
-            continue;
-        }
-        
-        float M = rb->GetMass();
-        float iM = rb->GetInvMass();
-        float iI = rb->GetInvInertia();
+        float mass = rb->GetMass();
+        float invMass = rb->GetInvMass();
+        float invInertia = rb->GetInvInertia();
 
-        rb->ApplyForce(gravity * M);
-        
-        rb->SetAcceleration(rb->GetForce() * iM);
+        //linear motion
+        rb->ApplyForce(Config().gravity * mass);
+
+        rb->SetAcceleration(rb->GetForce() * invMass);
         rb->SetVelocity(rb->GetVelocity() + rb->GetAcceleration() * dt);
 
         obj->transform.position += rb->GetVelocity() * dt;
 
-        rb->SetAngularAcceleration(rb->GetTorque() * iI);
+        rb->SetAngularAcceleration(rb->GetTorque() * invInertia);
         rb->SetAngularVelocity(rb->GetAngularVelocity() + rb->GetAngularAcceleration() * dt);
 
         obj->transform.rotation += rb->GetAngularVelocity() * dt;
 
-        rb->ClearTorque();
         rb->ClearForces();
+        rb->ClearTorque();
     }
 }
 
-void World::UpdateGrid()
+//update bounds and spatial hash grid
+void World::UpdateBroadphase()
 {
-    for (auto& pair : gridMap)  
-    {
-        pair.second.clear();
-    }
-
     for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
         Collider* c = obj->GetCollider();
-        RigidBody* rb = obj->GetRigidBody();
 
-        if (rb == nullptr || !rb->isSleeping)
-        {
-            obj->cachedVertices = SAT::GetVertices(obj);
-            obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
-            c->SetBounds(spatialHash.GetBounding(obj));
-        }
+        //update cached vertices/normals and bounds for spatial hash
+        obj->cachedVertices = SAT::GetVertices(obj);
+        obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
+        c->SetBounds(spatialHash.GetBounding(obj));
+
+        //determine which cells the object occupies and add to grid map
         int minX = std::floor(c->GetBounds().min.x / spatialHash.GetCellSize());
         int maxX = std::floor(c->GetBounds().max.x / spatialHash.GetCellSize());
         int minY = std::floor(c->GetBounds().min.y / spatialHash.GetCellSize());
         int maxY = std::floor(c->GetBounds().max.y / spatialHash.GetCellSize());
 
+        //loop through occupied cells and add object to grid map
         for (int x = minX; x <= maxX; x++)
         {
             for (int y = minY; y <= maxY; y++)
@@ -109,65 +115,147 @@ void World::UpdateGrid()
     }
 }
 
-void World::GenerateCollisionPairs()
+//generate candidate pairs from broadphase grid map
+void World::GeneratePairs()
 {
-    std::set<std::pair<GameObject*, GameObject*>> uniquePairs;
-
-    for (auto& pair : gridMap)
+    //for each cell, generate pairs if they overlap bounds
+    for (const auto& pair : gridMap)
     {
-        std::vector<GameObject*>& cell = pair.second;
-        if (cell.size() < 2) continue;     
+        const std::vector<GameObject*>& cell = pair.second;
+        if (cell.size() < 2) continue; //need at least 2 objects to form a pair
 
         for (size_t i = 0; i < cell.size(); i++)
         {
-            for (size_t j = i + 1; j < cell.size(); j++)    
+            for (size_t j = i + 1; j < cell.size(); j++)
             {
                 GameObject* obj1 = cell[i];
                 GameObject* obj2 = cell[j];
 
-                if (obj1 > obj2) std::swap(obj1, obj2);
+                //check if bounds overlap before adding pair
+                if (SAT::TestBounds(obj1, obj2))
+                {
+                    if (obj1 > obj2) std::swap(obj1, obj2); 
+                    if (candidatePairs.end() != std::find(candidatePairs.begin(), candidatePairs.end(), std::make_pair(obj1, obj2))) continue;
 
-                uniquePairs.insert({obj1, obj2});
+                    candidatePairs.emplace_back(obj1, obj2);
+                }
             }
         }
     }
-
-    collisionPairs.assign(uniquePairs.begin(), uniquePairs.end());
 }
 
-void World::ResolveCollisions()
+//fill contacts
+//ADD case rejection (both sleeping, etc.)
+void World::BuildContacts()
 {
-    for (const auto& collisionPair : collisionPairs)
+    //for each pair, build a contact constraint if they are colliding
+    for (const auto& pair : candidatePairs)
     {
-        GameObject* obj1 = collisionPair.first;
-        GameObject* obj2 = collisionPair.second;
+        //get manifold for pair
+        GameObject* obj1 = pair.first;
+        GameObject* obj2 = pair.second;
+
+        CollisionManifold cm = Solver::ResolveManifold(obj1, obj2);
+        
+        if (!cm.collision.isColliding) continue;
+
+        //create contact
+        ContactConstraint contactConstraint{};  
+
+        contactConstraint.obj1 = obj1;
+        contactConstraint.obj2 = obj2;
+
+        //consider better hash
+        //tbh maybe make a hash.cpp under utility
+        contactConstraint.key = std::hash<GameObject*>()(obj1   ) ^ std::hash<GameObject*>()(obj2);
 
         RigidBody* rb1 = obj1->GetRigidBody();
         RigidBody* rb2 = obj2->GetRigidBody();
 
-        CollisionManifold cm = Resolve::ResolveManifold(obj1, obj2);
-        if (cm.collision.isColliding)
+        //maybe increment contact counts for sleep logic here ???
+
+        contactConstraint.rb1 = rb1;
+        contactConstraint.rb2 = rb2;
+
+        //collision
+        contactConstraint.normal = cm.collision.normal;
+        contactConstraint.penetration = cm.collision.depth;
+
+        //contact points
+        contactConstraint.pointCount = cm.points.Size();
+        for (int i = 0; i < contactConstraint.pointCount; i++)
         {
-            if (rb1) rb1->AddContact(cm.collision.normal);
-            if (rb2) rb2->AddContact(Vec2(-cm.collision.normal.x, -cm.collision.normal.y));
+            contactConstraint.points[i] = cm.points[i];
+        }
 
-            Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
-            Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
-            float relativeVel = (v2 - v1).Dot(cm.collision.normal);
+        //restition and friction
+        if (rb1 && rb2)
+        {
+            contactConstraint.restitution = std::min(rb1->GetRestitution(), rb2->GetRestitution());
+            contactConstraint.friction = std::sqrt(rb1->GetFriction() * rb2->GetFriction());
+        }
+        else if (rb1)
+        {
+            contactConstraint.restitution = rb1->GetRestitution();
+            contactConstraint.friction = rb1->GetFriction();
+        }
+        else if (rb2)
+        {
+            contactConstraint.restitution = rb2->GetRestitution();
+            contactConstraint.friction = rb2->GetFriction();
+        }
 
-            if (std::abs(relativeVel) > 10.0f) 
+        currentFrameContacts.push_back(contactConstraint);
+    }
+}
+
+//warmstart
+void World::PrepareContacts()
+{
+    for (auto& contact : currentFrameContacts)
+    {
+        unsigned int key = contact.key;
+        for (auto& lastContact : lastFrameContacts)
+        {
+            if (lastContact.key != key) continue;
+
+            for (int i = 0; i < contact.pointCount; i++)
             {
-                if (rb1 && rb1->isSleeping) rb1->WakeUp();
-                if (rb2 && rb2->isSleeping) rb2->WakeUp();
+                contact.accumulatedNormalImpulse[i] = lastContact.accumulatedNormalImpulse[i];
+                contact.accumulatedTangentImpulse[i] = lastContact.accumulatedTangentImpulse[i];
             }
 
-            obj1->cachedVertices = SAT::GetVertices(obj1);
-            obj1->cachedNormals = SAT::GetNormals(obj1->cachedVertices);
-            obj2->cachedVertices = SAT::GetVertices(obj2);
-            obj2->cachedNormals = SAT::GetNormals(obj2->cachedVertices);
-
-            Resolve::ResolvePosition(cm, obj1, obj2);
-            Resolve::ResolveImpulse(cm, obj1, obj2);
-        }                
+            Solver::Warmstart(contact);
+            break;
+        }
     }
+}
+
+//solver iterations
+void World::SolveConstraints()
+{
+    for (int i = 0; i < Config().solverIterations; i++)
+    {
+        for (auto& contact : currentFrameContacts)
+        {
+            Solver::ResolveConstraints(contact);
+        }
+    }
+
+    for (auto& contact : currentFrameContacts)
+    {
+        Solver::ResolvePosition(contact);
+    }
+}
+
+//cleanup caches
+void World::FinishFrame(float dt)
+{
+    //cleanup
+    std::swap(lastFrameContacts, currentFrameContacts);
+}
+
+void World::UpdateSleep(float dt)
+{
+    //loop through rigidbodies and update sleep states based on energy thresholds and timers
 }

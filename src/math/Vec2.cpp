@@ -12,7 +12,9 @@ float Vec2::MagSq() const
 
 Vec2 Vec2::Norm() const
 {
-    return Vec2(x, y) * (1 / Vec2(x, y).Mag());
+    float m = Mag();
+    if (m <= 0) return Vec2(0, 0);
+    return Vec2(x, y) * (1 / m);
 }
 
 float Vec2::Dot(const Vec2& other) const

@@ -33,12 +33,12 @@ int main() {
         input.Update(world, filepath, screenWidth, screenHeight);
         world.Step(dt);
 
-        uiTimer += dt;
+        /*uiTimer += dt;
         if (uiTimer >= uiUpdateInterval) 
         {
             displaySleepCount = world.sleepCounter;
             uiTimer = 0.0f;
-        }
+        }*/
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
@@ -50,8 +50,8 @@ int main() {
             if (FPS) 
                 DrawFPS(10, 10);    
 
-            DrawText("Sleeping Objects: ", 10, 40, 20, DARKGRAY);
-            DrawText(std::to_string(displaySleepCount).c_str(), 190, 40, 20, DARKGRAY);
+            //DrawText("Sleeping Objects: ", 10, 40, 20, DARKGRAY);
+            //DrawText(std::to_string(displaySleepCount).c_str(), 190, 40, 20, DARKGRAY);
         EndDrawing();
     }
 

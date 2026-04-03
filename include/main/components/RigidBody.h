@@ -31,18 +31,6 @@ class RigidBody
         RigidBody(Properties properties, LinearState linearState, AngularState angularState);
         ~RigidBody();
 
-        void AddContact(Vec2 normal);
-        void ResetContacts();
-
-        bool isSurrounded = false;
-        bool isSleeping = false;
-        float sleepTimer = 0.0f;
-        float energyThreshold = 15.0f; 
-        float timeToSleep = 0.5f;
-
-        void WakeUp();
-        void UpdateSleep(float dt);
-
         void SetMass(float m);
         const float& GetMass() const { return mass; }
         const float& GetInvMass() const { return invMass; }

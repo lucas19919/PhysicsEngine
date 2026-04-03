@@ -4,7 +4,7 @@
   "generators": [
     {
       "grid": {
-        "rows": 20,
+        "rows": 10,
         "columns": 40,
         "startX": 150.0,
         "startY": 250.0,

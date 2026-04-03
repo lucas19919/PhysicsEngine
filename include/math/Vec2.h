@@ -35,3 +35,8 @@ struct Vec2 {
     float Dot(const Vec2& other) const;
     float Cross(const Vec2& other) const;
 };
+
+inline Vec2 operator*(float scalar, const Vec2& vec) 
+{
+    return vec * scalar; 
+}
