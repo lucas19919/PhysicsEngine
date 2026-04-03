@@ -216,7 +216,7 @@ Edge Manifold::GetSupportFace(const Array<20>& vertices, Vec2 normal)
     Vec2 v2 = (spear - next).Norm();
 
     if (std::abs(v1.Dot(normal)) <= std::abs(v2.Dot(normal)))
-        return { prev, spear, v1 };
+        return { prev, spear, (spear - prev).Norm() }; 
     else
         return { spear, next, (next - spear).Norm() };
 }

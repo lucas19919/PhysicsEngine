@@ -6,7 +6,7 @@ void InputHandler::Update(World& world, const std::string& filePath, int screenW
 {
     if (IsKeyPressed(KEY_SPACE))
     {
-        world.isPaused = world.isPaused ? false : true;
+        world.isPaused = !world.isPaused;
     }
     if (IsKeyPressed(KEY_R))
     {

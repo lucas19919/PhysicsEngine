@@ -136,16 +136,21 @@ Vec2 Solver::GetImpulse(ContactConstraint& contact, int index)
     Vec2 totalV1 = v1 + Vec2(-w1 * r1.y, w1 * r1.x);
     Vec2 totalV2 = v2 + Vec2(-w2 * r2.y, w2 * r2.x);
 
-    Vec2 relative = totalV2 - totalV1;
-    float magnitude = normal.Dot(relative);
-    
-    if (magnitude > 0.0f) return Vec2(); 
-
     float cross1 = r1.Cross(normal);
     float cross2 = r2.Cross(normal);
 
-    float jn = (-(1 + contact.restitution) * magnitude) / (invMass1 + invMass2 + (cross1 * cross1 * invInertia1) + (cross2 * cross2 * invInertia2));
-    jn /= (float)contact.pointCount;
+    Vec2 relative = totalV2 - totalV1;
+    float magnitude = normal.Dot(relative);
+
+    float bias = contact.restitutionBias[index];
+    float denominator = invMass1 + invMass2 + (cross1 * cross1 * invInertia1) + (cross2 * cross2 * invInertia2);
+    
+    float jn = 0.0f;
+    if (denominator > 0.0f)
+    {
+        jn = (bias - magnitude) / denominator;
+        jn /= (float)contact.pointCount;
+    }
 
     if (tangent.MagSq() > 0.0001f)
         tangent = tangent.Norm();
@@ -156,9 +161,6 @@ Vec2 Solver::GetImpulse(ContactConstraint& contact, int index)
 
     float jt = -relative.Dot(tangent) / (invMass1 + invMass2 + (crossT1 * crossT1 * invInertia1) + (crossT2 * crossT2 * invInertia2));
     jt /= (float)contact.pointCount;
-
-    if (!(std::abs(jt) <= jn * contact.friction))
-        jt = (jt > 0.0f ? 1.0f : -1.0f) * jn * contact.friction;
 
     return Vec2(jn, jt);
 }

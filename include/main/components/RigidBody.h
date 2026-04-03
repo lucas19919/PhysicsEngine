@@ -80,7 +80,4 @@ class RigidBody
         float angularVelocity;
         float angularAcceleration;  
         float torque;
-
-        Vec2 contactNormalSum;
-        int contactCount = 0;
 };

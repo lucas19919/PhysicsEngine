@@ -23,12 +23,12 @@ struct ContactConstraint
     int pointCount;
 
     float restitution;
-    float restitutionBias[2] = {0.0f, 0.0f};
+    float restitutionBias[20] = {};
 
     float friction;
 
-    float accumulatedNormalImpulse[20];
-    float accumulatedTangentImpulse[20];
+    float accumulatedNormalImpulse[20] = {};
+    float accumulatedTangentImpulse[20] = {};
 };
 
 class World

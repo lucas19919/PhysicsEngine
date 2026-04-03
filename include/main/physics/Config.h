@@ -3,28 +3,24 @@
 
 struct Config
 {
-    // Window / rendering
-    int screenWidth = 1280;          // src/main.cpp
-    int screenHeight = 960;          // src/main.cpp
-    int targetFPS = 60;              // src/main.cpp
+    int screenWidth = 1280;          
+    int screenHeight = 960;          
+    int targetFPS = 60;              
 
-    // World / physics
     Vec2 gravity = Vec2(0.0f, 600.0f);
     float spatialHashCellSize = 35.0f;
     
-    // Integration / stepping
-    int impulseIterations = 8;               // velocity solver iterations
-    int positionIterations = 3;              // position solver iterations
+    int impulseIterations = 20;               
+    int positionIterations = 8;              
 
-    bool warmStart = false;                 // warmstart solver
+    bool warmStart = true;                 
+    float restitutionThreshold = 15.0f;
 
-    // Collision resolution / position correction
-    float contactSlop = 0.05f;        
-    float positionCorrectionPercent = 0.2f; 
+    float contactSlop = 0.15f;        
+    float positionCorrectionPercent = 0.1f; 
 
-    // Scene loading / generators
-    float generatorJitterRange = 4.0f; // LoadScene
+    float generatorJitterRange = 4.0f;
 
-    // Debug
-    
+    float linearDamping = 0.99f;
+    float angularDamping = 0.98f;
 };
