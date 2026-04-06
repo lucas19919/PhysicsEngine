@@ -3,9 +3,11 @@
 #include "main/World.h"
 #include "main/physics/Config.h"
 
-PinConstraint::PinConstraint(const std::vector<PinAttachment>& attachments, bool fixedX, bool fixedY)
+PinConstraint::PinConstraint(const std::vector<PinAttachment>& attachments, Vec2 pos, bool fixedX, bool fixedY)
     : attachments(attachments), fixedX(fixedX), fixedY(fixedY)
-{ }
+{ 
+    this->position = pos;
+}
 
 ConstraintType PinConstraint::GetType() const
 {
@@ -14,6 +16,8 @@ ConstraintType PinConstraint::GetType() const
 
 void PinConstraint::Solve(float dt)
 {
+    if (staticallyDetermined) return;
+
     float biasConstraint = Config().biasConstraint;
 
     for (auto& att : attachments)
@@ -22,6 +26,7 @@ void PinConstraint::Solve(float dt)
         if (!rb) continue;
 
         float invMass = rb->GetInvMass();
+        float invInertia = rb->GetInvInertia();
         if (invMass == 0.0f) continue;
 
         float s = sinf(att.obj->transform.rotation);
@@ -34,34 +39,59 @@ void PinConstraint::Solve(float dt)
         Vec2 worldAnchor = att.obj->transform.position + rotatedAnchor;
         Vec2 delta = worldAnchor - position;
 
-        Vec2 vel = rb->GetVelocity();
+        Vec2 velocity = rb->GetVelocity();
+        float angularVelocity = rb->GetAngularVelocity();
 
-        if (fixedX)
-        {
-            float bias = (biasConstraint / dt) * delta.x;
-            float impulse = -(vel.x + bias) / invMass;
-            vel.x += impulse * invMass;
+        Vec2 pointVelocity = velocity + Vec2(-angularVelocity * rotatedAnchor.y, angularVelocity * rotatedAnchor.x);
+
+        // We'll accumulate impulses per direction for this attachment
+        Vec2 bias = (biasConstraint / dt) * delta;
+        Vec2 impulse(0.0f, 0.0f);
+
+        // Solve X constraint if enabled
+        if (fixedX) {
+            Vec2 n(1, 0); // X direction
+            float rn = rotatedAnchor.Cross(n);
+            float effMass = invMass + rn * rn * invInertia;
+            if (effMass > 0.0f) {
+                float velAlong = pointVelocity.x;
+                float lambda = -(velAlong + bias.x) / effMass;
+                impulse.x = lambda;
+            }
         }
 
-        if (fixedY)
-        {
-            float bias = (biasConstraint / dt) * delta.y;
-            float impulse = -(vel.y + bias) / invMass;
-            vel.y += impulse * invMass;
+        // Solve Y constraint if enabled
+        if (fixedY) {
+            Vec2 n(0, 1); // Y direction
+            float rn = rotatedAnchor.Cross(n);
+            float effMass = invMass + rn * rn * invInertia;
+            if (effMass > 0.0f) {
+                float velAlong = pointVelocity.y;
+                float lambda = -(velAlong + bias.y) / effMass;
+                impulse.y = lambda;
+            }
         }
 
-        rb->SetVelocity(vel);
+        // Apply the full impulse (x and/or y)
+        velocity += impulse * invMass;
+        angularVelocity += rotatedAnchor.Cross(impulse) * invInertia;
+
+        rb->SetVelocity(velocity);
+        rb->SetAngularVelocity(angularVelocity);
     }
 
+    // Update the pin position to "follow" the first attachment if not fixed
     if (!attachments.empty())
     {
         auto& first = attachments[0];
         float sin = sinf(first.obj->transform.rotation);
         float cos = cosf(first.obj->transform.rotation);
+
         Vec2 rotatedAnchor = Vec2(
             first.localAnchor.x * cos - first.localAnchor.y * sin,
             first.localAnchor.x * sin + first.localAnchor.y * cos
         );
+
         Vec2 worldAnchor = first.obj->transform.position + rotatedAnchor;
 
         if (!fixedX) position.x = worldAnchor.x;

@@ -1,0 +1,41 @@
+{
+    "useWalls": true,
+    "objects": [
+        { "id": 1, "components": { "TransformComponent": { "position": { "x": 300, "y": 480 }, "rotation": 0 },
+            "Collider": { "type": "CIRCLE", "radius": 25 },
+            "Renderer": { "form": "R_CIRCLE", "color": "RED", "scale": 25 },
+            "RigidBody": { "properties": { "mass": 3, "restitution": 0.5, "inertia": 200, "friction": 0.2 },
+                "linearState": { "velocity": { "x": 0, "y": -200 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+                "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
+                "gravityEnabled": true } } },
+
+        { "id": 2, "components": { "TransformComponent": { "position": { "x": 640, "y": 480 }, "rotation": 0 },
+            "Collider": { "type": "CIRCLE", "radius": 25 },
+            "Renderer": { "form": "R_CIRCLE", "color": "GREEN", "scale": 25 },
+            "RigidBody": { "properties": { "mass": 3, "restitution": 0.5, "inertia": 200, "friction": 0.2 },
+                "linearState": { "velocity": { "x": 200, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+                "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
+                "gravityEnabled": true } } },
+
+        { "id": 3, "components": { "TransformComponent": { "position": { "x": 980, "y": 480 }, "rotation": 0 },
+            "Collider": { "type": "CIRCLE", "radius": 25 },
+            "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 25 },
+            "RigidBody": { "properties": { "mass": 3, "restitution": 0.5, "inertia": 200, "friction": 0.2 },
+                "linearState": { "velocity": { "x": 150, "y": -150 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+                "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
+                "gravityEnabled": true } } }
+    ],
+    "constraints": [
+        { "type": "PIN", "attachments": [
+            { "id": 1, "localAnchor": { "x": 0, "y": 0 } }
+        ], "fixedX": true, "fixedY": false, "position": { "x": 300, "y": 480 } },
+
+        { "type": "PIN", "attachments": [
+            { "id": 2, "localAnchor": { "x": 0, "y": 0 } }
+        ], "fixedX": false, "fixedY": true, "position": { "x": 640, "y": 480 } },
+
+        { "type": "PIN", "attachments": [
+            { "id": 3, "localAnchor": { "x": 0, "y": 0 } }
+        ], "fixedX": true, "fixedY": true, "position": { "x": 980, "y": 480 } }
+    ]
+}

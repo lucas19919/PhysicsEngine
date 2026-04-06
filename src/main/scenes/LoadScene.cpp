@@ -239,12 +239,14 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
         else if (type == "PIN")
         {
             std::vector<PinAttachment> attachments;
+            Vec2 anchor = Vec2();
+
             for (const auto& att : item["attachments"])
             {
                 auto it = idMap.find(att["id"].get<int>());
                 if (it == idMap.end()) continue;
 
-                Vec2 anchor = att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2();
+                anchor = att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2();
                 attachments.push_back({ it->second, anchor });
             }
 
@@ -253,12 +255,8 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             bool fixedX = item.value("fixedX", true);
             bool fixedY = item.value("fixedY", true);
 
-            auto pin = std::make_unique<PinConstraint>(attachments, fixedX, fixedY);
-
-            if (item.contains("position"))
-                pin->position = ParseVec2(item["position"]);
-            else
-                pin->position = attachments[0].obj->transform.position;
+            Vec2 pinPos = item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position;
+            auto pin = std::make_unique<PinConstraint>(attachments, pinPos, fixedX, fixedY);
 
             world.AddConstraint(std::move(pin));
         }
@@ -278,5 +276,37 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
 
             world.AddConstraint(std::make_unique<JointConstraint>(attachments));
         }
+
+        //statically determined
+        for (const auto& c : world.GetConstraints())
+        {
+            if (c->GetType() == ConstraintType::PIN)
+            {
+                PinConstraint* pc = static_cast<PinConstraint*>(c.get());
+                if (pc->fixedX && pc->fixedY)
+                {
+                    GameObject* obj = pc->attachments[0].obj;
+                    int id = obj->GetID();
+                    for (const auto& c : world.GetConstraints())
+                    {
+                        if (c->GetType() == ConstraintType::PIN)
+                        {
+                            PinConstraint* pc = static_cast<PinConstraint*>(c.get());
+                            if (pc->attachments[0].obj->GetID() == id)
+                            {
+                                if (pc->fixedX || pc->fixedY)
+                                {
+                                    pc->staticallyDetermined = true;
+                                    obj->SetRigidBody(nullptr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //horrible code but it works for now
+        //generalize for constraints later
+
     }
 }

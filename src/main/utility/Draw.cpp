@@ -92,22 +92,49 @@ void Render(World& world)
 
             DrawLineEx({ pos1.x, pos1.y }, { pos2.x, pos2.y }, 2.0f, DARKGRAY);
         }
-        else if (c->GetType() == ConstraintType::PIN)
+        if (c->GetType() == ConstraintType::PIN)
         {
             PinConstraint* pc = static_cast<PinConstraint*>(c.get());
             for (const auto& att : pc->attachments)
             {
-                Vec2 pos = att.obj->transform.position;
-                DrawCircle(pos.x, pos.y, 5.0f, DARKGRAY);
+                Vec2 pos = pc->position;
+
+                bool fixedX = pc->fixedX;
+                bool fixedY = pc->fixedY;
+
+                if (fixedX && fixedY)
+                {
+                    DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
+
+                    for (int i = 0; i < 9; i++)
+                    {
+                        DrawLine(pos.x - 25.0f + i * 5.0f, pos.y + 30.0f, pos.x - 20.0f + i * 5.0f, pos.y + 25.0f, BLACK);
+                    }
+                
+                }
+                else if (fixedX)
+                {
+                    DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y - 25.0f }, { pos.x - 25.0f, pos.y + 25.0f }, BLACK);
+                    DrawLine(pos.x - 30.0f, pos.y - 25.0f, pos.x - 30.0f, pos.y + 25.0f, BLACK);
+                }
+                else if (fixedY)
+                {
+                    DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
+                    DrawLine(pos.x - 25.0f, pos.y + 30.0f, pos.x + 25.0f, pos.y + 30.0f, BLACK);
+                }
+
+                DrawCircle(pos.x, pos.y, 5.0f, BLACK);
+                DrawCircleLines(pos.x, pos.y, 5.0f, DARKGRAY);
             }
         }
-        else if (c->GetType() == ConstraintType::JOINT)
+        if (c->GetType() == ConstraintType::JOINT)
         {
             JointConstraint* jc = static_cast<JointConstraint*>(c.get());
             for (const auto& att : jc->attachments)
             {
                 Vec2 pos = att.obj->transform.position;
                 DrawCircle(pos.x, pos.y, 5.0f, DARKGRAY);
+                DrawCircleLines(pos.x, pos.y, 5.0f, BLACK);
             }
         }
     }
