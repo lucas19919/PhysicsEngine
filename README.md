@@ -3,13 +3,28 @@
 A custom 2D Physics Engine built in C++.
 
 # Plinko
-![](https://github.com/lucas19919/PhysicsEngine/blob/main/plinko.gif)
+![](https://github.com/lucas19919/PhysicsEngine/tree/main/gifs/plinko.gif)
+
+# Double Pendulum
+![](https://github.com/lucas19919/PhysicsEngine/tree/main/gif/pendulum.gif)
 
 **Using:**
  - Raylib for rendering,
  - SAT for collision detection
  - Sutherland-Hodgeman Polygon Clipping for contact points
+ - Spatial Hasing for optimization
  - nlohmann/json for JSON Parsing.
+
+ **Features:**
+ - Rigidbody Physics
+	- Linear
+	- Angular
+ - Circle, Box and Convex Polygons Colliders
+ - Sequential Impulse Solver
+ - Constraints
+	- Distance
+	- Fixed and Rolling Pins
+	- Joints (primitive)
 
 **Building the Project:**
 1. Clone the repository:
@@ -26,19 +41,34 @@ A custom 2D Physics Engine built in C++.
 
 To load a scene, please change the relative path in main.cpp, "../assets/(...).json", to the name of your file.
 
+To change any internal configuration varaibles, please edit "Config.h". 
+
 *Space* to pause, *R* to reset the level.
 
 # Engine and Architechture:
 
 Currently the engine includes circles, rectangles and convex polygons, and calculates both linear and rotational physics. The rigidbody includes forces, torque, mass, inertia and so on.
 
-Each physics body is instantiated as a GameObject. A GameObject can then hold the following components: TransformComponent, Rigidbody, Collider, Renderer. This was based on Unity's system of GameObjects and components.
+Each physics body is instantiated as a GameObject. A GameObject can hold the following components: TransformComponent, Rigidbody, Collider, Renderer. This was based on Unity's system of GameObjects and components. Each GameObject can then be given further constraints: Distance, Pin (fixed or rolling), Joint. Each of these constraints are assigned post instatantion of the GameObjects, and GameObjects are assigned via ID to them at launch. 
 
-To handle the physics, a World class is created containing base vectors such as gravity, and also a list of all GameObjects. For each frame, the world first steps, updating all rigidbodies by the delta time, and then checks for any occouring collisions.
+Scenes are loaded via a path in main to the assets folder using nlohmann/json as a json parser. Please see assets/demos/ ... for various demo's of the engine, and examples of how to create levels.
 
-The collision management is handled by the Resolve class including 3 methods, ResolveManifold, ResolveImpulse, and ResolvePosition. ResolveManifold is called first and checks for any 2 colliders, if a collision is occuring between them. If yes it returns a Manifold, containing collision data and a list of contact points. Following this, ResolveImpulse calculates the impulse introudced by said collisions between bodies, updating the states of each rigidbody. Lastly, the ResolvePosition method adjusts the position of overlapping bodies to prevent any overlap, by slightly moving them away from each other depending on their relative velocities.
-  
+Physics are handled within a World class, which is created at launch and contains all GameObjects and Constraints. The world is updated, via the World.step(dt) method, which handles physics via the following pipeline:  
+
+- Clear all caches
+- Update velocity from acceleration and external forces
+- Update the broadphase, updating the spatial hash grid to locate GameObjects
+- Generate candidate pairs from the grid, determined via checking AABB bounds
+- Build contact constraints and gather all rigidbody data
+- Warmstart all constraints
+- Solve all constraints iteratively via a impulse solver
+- Update positions from velocity
+- Update sleep conditions for rigidbodies
+- Cleanup
+
+The collision handling is done via SAT collision detection and with Sutherland Hogemann polygon clipping to find collision points. The solver class is first called to generate a collision manifold, sorting the collision by the collider types (ie circle circle, or box circle ...). Once sorted the manifold is calculated, containing contact points, collision normals, and penetration depths. This data is then collected in a contact constraint, which is then resolved by the solver. Based on the amount of collision and properties of the RigidBody, an impulse is then calculated. The impulse is then applied along the collision normal to each collision RigidBody.
+
 **To Do:**
-1. Constraints
-2. Sleep optimization (Rigidbodies)
+1. Pin Solver / Constraint Optimization
+2. Sleep
 3. Better Level Editor

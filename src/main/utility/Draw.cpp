@@ -97,13 +97,22 @@ void Render(World& world)
             PinConstraint* pc = static_cast<PinConstraint*>(c.get());
             for (const auto& att : pc->attachments)
             {
-                Vec2 pos = pc->position;
+                Vec2 localAnchor = att.localAnchor;
+                float s = sinf(att.obj->transform.rotation);
+                float c = cosf(att.obj->transform.rotation);
+                Vec2 rotatedAnchor = Vec2(
+                    localAnchor.x * c - localAnchor.y * s,
+                    localAnchor.x * s + localAnchor.y * c
+                );
+                
+                Vec2 pos = pc->attachments[0].obj->transform.position + rotatedAnchor;
 
                 bool fixedX = pc->fixedX;
                 bool fixedY = pc->fixedY;
 
                 if (fixedX && fixedY)
                 {
+                    pos = pc->position; //center of pin
                     DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
 
                     for (int i = 0; i < 9; i++)
@@ -132,7 +141,15 @@ void Render(World& world)
             JointConstraint* jc = static_cast<JointConstraint*>(c.get());
             for (const auto& att : jc->attachments)
             {
-                Vec2 pos = att.obj->transform.position;
+                Vec2 localAnchor = att.localAnchor;
+                float s = sinf(att.obj->transform.rotation);
+                float c = cosf(att.obj->transform.rotation);
+                Vec2 rotatedAnchor = Vec2(
+                    localAnchor.x * c - localAnchor.y * s,
+                    localAnchor.x * s + localAnchor.y * c
+                );
+
+                Vec2 pos = att.obj->transform.position + rotatedAnchor;
                 DrawCircle(pos.x, pos.y, 5.0f, DARKGRAY);
                 DrawCircleLines(pos.x, pos.y, 5.0f, BLACK);
             }

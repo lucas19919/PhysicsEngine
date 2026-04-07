@@ -53,7 +53,7 @@ void World::Step(float dt)
 
     IntegratePositions(dt);
 
-    //UpdateSleep(dt);
+    UpdateSleep(dt);
     FinishFrame(dt);
 }
 
@@ -198,23 +198,6 @@ void World::BuildContacts()
         bool rb2Sleeping = rb2 && rb2->IsSleeping();
 
         if (rb1Sleeping && rb2Sleeping) continue;
-
-        if (rb1Sleeping || rb2Sleeping)
-        {
-            Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2();
-            Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2();
-            float relVel = std::abs(cm.collision.normal.Dot(v2 - v1));
-
-            if (relVel > Config().velocitySleepThreshold)
-            {
-                if (rb1) rb1->WakeUp();
-                if (rb2) rb2->WakeUp();
-            }
-            else
-            {
-                if (rb1Sleeping && rb2Sleeping) continue;
-            }
-        }
 
         contactConstraint.rb1 = rb1;
         contactConstraint.rb2 = rb2;

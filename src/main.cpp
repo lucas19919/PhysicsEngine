@@ -15,14 +15,14 @@ int main() {
     InputHandler input;
 
     //all levels under ../assets/( ... ).json
-    const std::string& filepath = "../assets/constraints/wreckingBall.json";
+    const std::string& filepath = "../assets/demos/DoublePendulum.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Engine 1.0");
     SetTargetFPS(Config().targetFPS);    
 
     //draw fps?
-    bool FPS = true;
+    bool FPS = Config().drawFPS;
 
     int uiTimer = 0;
     int uiToggleDelay = 60;
@@ -43,7 +43,8 @@ int main() {
                 uiTimer = 0;
             }
 
-            DrawText(std::to_string(sleepingObjects).c_str(), 10, 50, 30, BLACK);
+            if (Config().debugSleep)
+                DrawText(std::to_string(sleepingObjects).c_str(), 10, 50, 30, BLACK);
 
             if (FPS)
                 DrawFPS(10, 10);

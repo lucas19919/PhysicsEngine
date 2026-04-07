@@ -23,7 +23,9 @@
             "RigidBody": { "properties": { "mass": 3, "restitution": 0.5, "inertia": 200, "friction": 0.2 },
                 "linearState": { "velocity": { "x": 150, "y": -150 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
                 "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
-                "gravityEnabled": true } } }
+                "gravityEnabled": true } } },
+
+        { "id": 4, "components": { "TransformComponent": { "position": { "x": 300, "y": 200 }, "rotation": 0 } } } 
     ],
     "constraints": [
         { "type": "PIN", "attachments": [
@@ -36,6 +38,8 @@
 
         { "type": "PIN", "attachments": [
             { "id": 3, "localAnchor": { "x": 0, "y": 0 } }
-        ], "fixedX": true, "fixedY": true, "position": { "x": 980, "y": 480 } }
+        ], "fixedX": true, "fixedY": true, "position": { "x": 980, "y": 480 } },
+
+        { "type": "DISTANCE", "anchor": 4, "attached": 1, "length": 600 }
     ]
 }

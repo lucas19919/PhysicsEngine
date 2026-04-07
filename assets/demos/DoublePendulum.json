@@ -15,7 +15,7 @@
             "Collider": { "type": "CIRCLE", "radius": 25 },
             "Renderer": { "form": "R_CIRCLE", "color": "RED", "scale": 25 },
             "RigidBody": { "properties": { "mass": 3, "restitution": 0.2, "inertia": 200, "friction": 0.3 },
-                "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+                "linearState": { "velocity": { "x": 0, "y": 200 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
                 "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
                 "gravityEnabled": true } } }
     ],

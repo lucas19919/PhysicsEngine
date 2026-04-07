@@ -6,29 +6,30 @@ struct Config
     
     int screenWidth = 1280;          
     int screenHeight = 960;          
-    int targetFPS = 60;              
+    int targetFPS = 60;      
+    
+    bool drawFPS = false;
 
     Vec2 gravity = Vec2(0.0f, 600.0f);
     float spatialHashCellSize = 50.0f;
     
-    int impulseIterations = 8;               
+    int impulseIterations = 20;               
     int positionIterations = 1;              
 
     bool warmStart = true;
 
     float restitutionThreshold = 15.0f; //10-15 best for now
 
-    float contactSlop = 0.15f;        
+    float contactSlop = 0.10f;        
     float positionCorrectionPercent = 0.1f; 
 
     //constraints
-    float biasConstraint = 0.2f; 
+    float biasConstraint = 0.1f; 
 
     //sleep
-    float energyThreshold = 15.0f;
-    float velocitySleepThreshold = 10.0f;
+    float energyThreshold = 25.0f;
     float sleepTime = 0.5f;
-    bool debugSleep = true; //different color for sleeping obj
+    bool debugSleep = false; //different color for sleeping obj
 
     float generatorJitterRange = 4.0f;
 };

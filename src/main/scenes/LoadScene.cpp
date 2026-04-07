@@ -277,36 +277,6 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             world.AddConstraint(std::make_unique<JointConstraint>(attachments));
         }
 
-        //statically determined
-        for (const auto& c : world.GetConstraints())
-        {
-            if (c->GetType() == ConstraintType::PIN)
-            {
-                PinConstraint* pc = static_cast<PinConstraint*>(c.get());
-                if (pc->fixedX && pc->fixedY)
-                {
-                    GameObject* obj = pc->attachments[0].obj;
-                    int id = obj->GetID();
-                    for (const auto& c : world.GetConstraints())
-                    {
-                        if (c->GetType() == ConstraintType::PIN)
-                        {
-                            PinConstraint* pc = static_cast<PinConstraint*>(c.get());
-                            if (pc->attachments[0].obj->GetID() == id)
-                            {
-                                if (pc->fixedX || pc->fixedY)
-                                {
-                                    pc->staticallyDetermined = true;
-                                    obj->SetRigidBody(nullptr);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        //horrible code but it works for now
-        //generalize for constraints later
-
+        //add some sort of smart solver for pins
     }
 }

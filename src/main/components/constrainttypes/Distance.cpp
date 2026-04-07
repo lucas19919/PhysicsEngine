@@ -22,30 +22,28 @@ void DistanceConstraint::Solve(float dt)
 
     if (invMass1 == 0.0f && invMass2 == 0.0f) return;
 
-    Vec2 delta = attached->transform.position - anchor->transform.position;
-    float currentLength = delta.Mag();
-    if (currentLength < 0.0001f) return;
-    
-    if (currentLength < length) return; 
+    Vec2 distVector = attached->transform.position - anchor->transform.position;
+    float distance = distVector.Mag();
+    if (distance < length) return; 
 
-    Vec2 axis = delta * (1.0f / currentLength);
-    float error = currentLength - length;
+    Vec2 axis = distVector * (1.0f / distance);
+    float error = distance - length;
 
     Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
     Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
-    float relative = axis.Dot(v2 - v1);
 
-    float totalInvMass = invMass1 + invMass2;
+    Vec2 relative = v2 - v1;
+    float magnitude = axis.Dot(relative);
 
     float bias = (Config().biasConstraint / dt) * error;
+    float totalInvMass = invMass1 + invMass2;
 
-    float lambda = -(relative + bias) / totalInvMass;
-    accumulatedImpulse += lambda;
+    if (totalInvMass == 0.0f) return;
 
-    Vec2 impulse = axis * lambda;
+    float j = -(magnitude + bias) / totalInvMass;
+
+    Vec2 impulse = axis * j;
 
     if (rb1) rb1->SetVelocity(rb1->GetVelocity() - impulse * invMass1);
     if (rb2) rb2->SetVelocity(rb2->GetVelocity() + impulse * invMass2);
-
-    position = (anchor->transform.position + attached->transform.position) * 0.5f;
 }

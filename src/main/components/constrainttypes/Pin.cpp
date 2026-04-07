@@ -44,11 +44,9 @@ void PinConstraint::Solve(float dt)
 
         Vec2 pointVelocity = velocity + Vec2(-angularVelocity * rotatedAnchor.y, angularVelocity * rotatedAnchor.x);
 
-        // We'll accumulate impulses per direction for this attachment
         Vec2 bias = (biasConstraint / dt) * delta;
         Vec2 impulse(0.0f, 0.0f);
 
-        // Solve X constraint if enabled
         if (fixedX) {
             Vec2 n(1, 0); // X direction
             float rn = rotatedAnchor.Cross(n);
@@ -60,7 +58,6 @@ void PinConstraint::Solve(float dt)
             }
         }
 
-        // Solve Y constraint if enabled
         if (fixedY) {
             Vec2 n(0, 1); // Y direction
             float rn = rotatedAnchor.Cross(n);
@@ -72,7 +69,6 @@ void PinConstraint::Solve(float dt)
             }
         }
 
-        // Apply the full impulse (x and/or y)
         velocity += impulse * invMass;
         angularVelocity += rotatedAnchor.Cross(impulse) * invInertia;
 
@@ -80,7 +76,6 @@ void PinConstraint::Solve(float dt)
         rb->SetAngularVelocity(angularVelocity);
     }
 
-    // Update the pin position to "follow" the first attachment if not fixed
     if (!attachments.empty())
     {
         auto& first = attachments[0];
