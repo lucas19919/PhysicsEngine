@@ -3,10 +3,10 @@
 A custom 2D Physics Engine built in C++.
 
 # Plinko
-![](https://github.com/lucas19919/PhysicsEngine/tree/main/gifs/plinko.gif)
+![](https://github.com/lucas19919/PhysicsEngine/blob/main/gifs/plinko.gif)
 
 # Double Pendulum
-![](https://github.com/lucas19919/PhysicsEngine/tree/main/gif/pendulum.gif)
+![](https://github.com/lucas19919/PhysicsEngine/blob/main/gifs/pendulum.gif)
 
 **Using:**
  - Raylib for rendering,
@@ -66,7 +66,7 @@ Physics are handled within a World class, which is created at launch and contain
 - Update sleep conditions for rigidbodies
 - Cleanup
 
-The collision handling is done via SAT collision detection and with Sutherland Hogemann polygon clipping to find collision points. The solver class is first called to generate a collision manifold, sorting the collision by the collider types (ie circle circle, or box circle ...). Once sorted the manifold is calculated, containing contact points, collision normals, and penetration depths. This data is then collected in a contact constraint, which is then resolved by the solver. Based on the amount of collision and properties of the RigidBody, an impulse is then calculated. The impulse is then applied along the collision normal to each collision RigidBody.
+The collision handling is done via SAT collision detection and with Sutherland Hogemann polygon clipping to find collision points. The solver class is first called to generate a collision manifold, sorting the collision by the collider types (ie circle circle, or box circle ...). Once sorted the manifold is calculated, containing contact points, collision normals, and penetration depths. This data is then collected in a contact constraint, which is then resolved by the solver. Based on the collision and properties of the RigidBody, an impulse is then calculated. The impulse is then applied along the collision normal to each collision RigidBody.
 
 **To Do:**
 1. Pin Solver / Constraint Optimization
