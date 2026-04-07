@@ -1,4 +1,4 @@
-# PhysicsEngine
+# Halliday2D
 
 A custom 2D Physics Engine built in C++.
 
