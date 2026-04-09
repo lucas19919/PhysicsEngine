@@ -89,8 +89,14 @@ void Render(World& world)
         if (c->GetType() == ConstraintType::DISTANCE)
         {
             DistanceConstraint* dc = static_cast<DistanceConstraint*>(c.get());
-            Vec2 pos1 = dc->anchor->transform.position;
-            Vec2 pos2 = dc->attached->transform.position;
+
+            RotMatrix rot1(dc->anchor->transform.rotation);
+            Vec2 rAnchorOffset = rot1.Rotate(dc->anchorOffset);
+            RotMatrix rot2(dc->attached->transform.rotation);
+            Vec2 rAttachedOffset = rot2.Rotate(dc->attachedOffset);
+
+            Vec2 pos1 = dc->anchor->transform.position + rAnchorOffset;
+            Vec2 pos2 = dc->attached->transform.position + rAttachedOffset;
 
             DrawLineEx({ pos1.x, pos1.y }, { pos2.x, pos2.y }, 2.0f, DARKGRAY);
         }
@@ -99,22 +105,13 @@ void Render(World& world)
             PinConstraint* pc = static_cast<PinConstraint*>(c.get());
             for (const auto& att : pc->attachments)
             {
-                Vec2 localAnchor = att.localAnchor;
-                float s = sinf(att.obj->transform.rotation);
-                float c = cosf(att.obj->transform.rotation);
-                Vec2 rotatedAnchor = Vec2(
-                    localAnchor.x * c - localAnchor.y * s,
-                    localAnchor.x * s + localAnchor.y * c
-                );
-                
-                Vec2 pos = pc->attachments[0].obj->transform.position + rotatedAnchor;
+                Vec2 pos = pc->position; //center of pin
 
                 bool fixedX = pc->fixedX;
                 bool fixedY = pc->fixedY;
 
                 if (fixedX && fixedY)
                 {
-                    pos = pc->position; //center of pin
                     DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
 
                     for (int i = 0; i < 9; i++)

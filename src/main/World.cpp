@@ -48,7 +48,7 @@ void World::Step(float dt)
     GeneratePairs();
 
     BuildContacts();
-    PrepareContacts();
+    PrepareContacts(dt);
     SolveConstraints(dt);
 
     IntegratePositions(dt);
@@ -259,7 +259,7 @@ void World::BuildContacts()
 }
 
 //warmstart
-void World::PrepareContacts()
+void World::PrepareContacts(float dt)
 {
     for (auto& contact : currentFrameContacts)
     {
@@ -304,7 +304,7 @@ void World::SolveConstraints(float dt)
         {
             Solver::ResolvePosition(contact);
         }
-    }
+    }   
 }
 
 void World::IntegratePositions(float dt)

@@ -22,4 +22,7 @@ class PinConstraint : public Constraint
         PinConstraint(const std::vector<PinAttachment>& attachments, Vec2 pos, bool fixedX, bool fixedY);
         ConstraintType GetType() const override;
         void Solve(float dt) override;
+
+        void SolveVelocity();
+        void SolvePosition();
 };

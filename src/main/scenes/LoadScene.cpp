@@ -228,13 +228,15 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             int anchorId = item["anchor"];
             int attachedId = item["attached"];
             float length = item["length"];
+            Vec2 anchorOffset = item.contains("anchorOffset") ? ParseVec2(item["anchorOffset"]) : Vec2();
+            Vec2 attachedOffset = item.contains("attachedOffset") ? ParseVec2(item["attachedOffset"]) : Vec2();
 
             auto itA = idMap.find(anchorId);
             auto itB = idMap.find(attachedId);
             if (itA == idMap.end() || itB == idMap.end()) continue;
 
             world.AddConstraint(std::make_unique<DistanceConstraint>(
-                itA->second, itB->second, length
+                itA->second, itB->second, length, anchorOffset, attachedOffset
             ));
         }
         else if (type == "PIN")

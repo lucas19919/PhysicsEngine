@@ -24,7 +24,7 @@ struct Config
     float positionCorrectionPercent = 0.1f; 
 
     //constraints
-    float biasConstraint = 0.2f; 
+    float biasConstraint = 2.0f; 
 
     //sleep
     float energyThreshold = 25.0f;

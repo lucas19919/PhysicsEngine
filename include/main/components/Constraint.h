@@ -15,10 +15,8 @@ class Constraint
 {
     public: 
         Vec2 position;
-        float accumulatedImpulse;
 
         virtual ~Constraint() = default;
         virtual ConstraintType GetType() const = 0;
         virtual void Solve(float dt) = 0;
-
 };

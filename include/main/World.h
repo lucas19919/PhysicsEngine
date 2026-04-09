@@ -59,7 +59,7 @@ class World
         void GeneratePairs();
 
         void BuildContacts();
-        void PrepareContacts();
+        void PrepareContacts(float dt);
         void SolveConstraints(float dt);
 
         void IntegratePositions(float dt);

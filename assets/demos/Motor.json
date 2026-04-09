@@ -19,7 +19,7 @@
         }
     ],
     "constraints": [
-        { "type": "MOTOR", "rotor": 1, "localPosition": { "x": 100, "y": 0 }, "torque": 5000.0 },
+        { "type": "MOTOR", "rotor": 1, "localPosition": { "x": 100, "y": 0 }, "torque": 50000.0 },
         { "type": "PIN", "attachments": [{ "id": 1, "localAnchor": { "x": 100, "y": 0 } } ], "fixedX": true, "fixedY": true, "position": { "x": 600, "y": 500 } }
     ]
 }

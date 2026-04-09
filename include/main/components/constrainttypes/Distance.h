@@ -9,9 +9,13 @@ class DistanceConstraint : public Constraint
     public:
         GameObject* anchor;
         GameObject* attached;
+
+        Vec2 anchorOffset;
+        Vec2 attachedOffset;
+
         float length;
 
-        DistanceConstraint(GameObject* anchor, GameObject* attached, float length);
+        DistanceConstraint(GameObject* anchor, GameObject* attached, float length, Vec2 anchorOffset, Vec2 attachedOffset);
         ConstraintType GetType() const override;
         void Solve(float dt) override;
 };

@@ -2,9 +2,11 @@
 #include "main/components/Constraint.h"
 #include "main/World.h"
 #include "main/physics/Config.h"
+#include "math/RotationMatrix.h"
 
 
-DistanceConstraint::DistanceConstraint(GameObject* anchor, GameObject* attached, float length) : anchor(anchor), attached(attached), length(length)
+DistanceConstraint::DistanceConstraint(GameObject* anchor, GameObject* attached, float length, Vec2 anchorOffset, Vec2 attachedOffset) 
+: anchor(anchor), attached(attached), length(length), anchorOffset(anchorOffset), attachedOffset(attachedOffset)
 { }
 
 ConstraintType DistanceConstraint::GetType() const
@@ -22,7 +24,12 @@ void DistanceConstraint::Solve(float dt)
 
     if (invMass1 == 0.0f && invMass2 == 0.0f) return;
 
-    Vec2 distVector = attached->transform.position - anchor->transform.position;
+    RotMatrix rot1(anchor->transform.rotation);
+    Vec2 rAnchorOffset = rot1.Rotate(anchorOffset);
+    RotMatrix rot2(attached->transform.rotation);
+    Vec2 rAttachedOffset = rot2.Rotate(attachedOffset);
+
+    Vec2 distVector = (attached->transform.position + rAttachedOffset) - (anchor->transform.position + rAnchorOffset);
     float distance = distVector.Mag();
     if (distance < length) return; 
 
