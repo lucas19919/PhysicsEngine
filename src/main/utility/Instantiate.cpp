@@ -47,8 +47,9 @@ Instantiate& Instantiate::WithTransform(Vec2 position, float rotation)
     return *this;
 }
 
-GameObject* Instantiate::Create(World& world)
+GameObject* Instantiate::Create(World& world, size_t id)
 {
+    obj->SetID(id);
     world.AddGameObject(std::unique_ptr<GameObject>(obj));
     return obj;
 }

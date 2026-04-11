@@ -4,6 +4,8 @@
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Solver.h"
 #include "main/physics/Config.h"
+#include <vector>
+#include <algorithm>
 #include <cstdint>
 
 World::World() : spatialHash(Config::spatialHashCellSize)
@@ -149,6 +151,13 @@ void World::GeneratePairs()
             {
                 GameObject* obj1 = cell[i];
                 GameObject* obj2 = cell[j];
+
+                size_t obj1ID = obj1->GetID();
+                size_t obj2ID = obj2->GetID();
+
+                if (std::find(obj1->GetIgnoredIDs().begin(), obj1->GetIgnoredIDs().end(), obj2ID) != obj1->GetIgnoredIDs().end() ||
+                    std::find(obj2->GetIgnoredIDs().begin(), obj2->GetIgnoredIDs().end(), obj1ID) != obj2->GetIgnoredIDs().end())
+                    continue;
 
                 RigidBody* rb1 = obj1->GetRigidBody();
                 RigidBody* rb2 = obj2->GetRigidBody();

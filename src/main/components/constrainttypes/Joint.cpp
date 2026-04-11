@@ -2,10 +2,14 @@
 #include "main/components/Constraint.h"
 #include "main/World.h"
 #include "main/physics/Config.h"
+#include "math/RotationMatrix.h"
+#include "math/Matrix2x2.h"
 
-JointConstraint::JointConstraint(const std::vector<JointAttachment>& attachments)
-    : attachments(attachments)
-{ }
+JointConstraint::JointConstraint(std::vector<JointAttachment> attachments, Vec2 position, bool collisions)
+    : attachments(attachments), collisions(collisions)
+{ 
+    this->position = position;
+}
 
 ConstraintType JointConstraint::GetType() const
 {
@@ -14,56 +18,65 @@ ConstraintType JointConstraint::GetType() const
 
 void JointConstraint::Solve(float dt)
 {
-    float biasConstraint = Config::biasConstraint;
+    if (attachments.size() < 2) return;
 
-    Vec2 target;
-    int count = 0;
+    GameObject* obj1 = attachments[0].obj;
+    GameObject* obj2 = attachments[1].obj;
 
-    for (auto& att : attachments)
+    RigidBody* rb1 = obj1->GetRigidBody();
+    RigidBody* rb2 = obj2->GetRigidBody();
+
+    float invMass1 = (rb1) ? rb1->GetInvMass() : 0.0f;
+    float invMass2 = (rb2) ? rb2->GetInvMass() : 0.0f;
+    float invInertia1 = (rb1) ? rb1->GetInvInertia() : 0.0f;
+    float invInertia2 = (rb2) ? rb2->GetInvInertia() : 0.0f;
+
+    if (invMass1 == 0.0f && invMass2 == 0.0f) return;
+
+    RotMatrix rot1(obj1->transform.rotation);
+    Vec2 r1 = rot1.Rotate(attachments[0].localAnchor);
+
+    RotMatrix rot2(obj2->transform.rotation);
+    Vec2 r2 = rot2.Rotate(attachments[1].localAnchor);
+
+    Vec2 p1 = obj1->transform.position + r1;
+    Vec2 p2 = obj2->transform.position + r2;
+
+    Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
+    float w1 = rb1 ? rb1->GetAngularVelocity() : 0.0f;
+
+    Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
+    float w2 = rb2 ? rb2->GetAngularVelocity() : 0.0f;
+
+    Vec2 vp1(v1.x - w1 * r1.y, v1.y + w1 * r1.x);
+    Vec2 vp2(v2.x - w2 * r2.y, v2.y + w2 * r2.x);
+    Vec2 relative = vp2 - vp1;
+
+    Vec2 distVector = p2 - p1;
+    Vec2 biasVelocity = distVector * (Config::biasConstraint / dt);
+
+    float k11 = invMass1 + invMass2 + (r1.y * r1.y * invInertia1) + (r2.y * r2.y * invInertia2);
+    float k12 = -r1.x * r1.y * invInertia1 - r2.x * r2.y * invInertia2;
+    float k21 = k12;
+    float k22 = invMass1 + invMass2 + (r1.x * r1.x * invInertia1) + (r2.x * r2.x * invInertia2);
+
+    Matrix2x2 K(k11, k12, k21, k22);
+    Matrix2x2 K_inv = K.Inverse();
+
+    Vec2 targetVelocity = relative + biasVelocity;
+    Vec2 impulse = (K_inv * targetVelocity) * -1.0f;
+
+    if (rb1)
     {
-        float sin = sinf(att.obj->transform.rotation);
-        float cos = cosf(att.obj->transform.rotation);
-
-        Vec2 worldAnchor = att.obj->transform.position + Vec2(
-            att.localAnchor.x * cos - att.localAnchor.y * sin,
-            att.localAnchor.x * sin + att.localAnchor.y * cos
-        );
-
-        target += worldAnchor;
-        count++;
+        rb1->SetVelocity(v1 - impulse * invMass1);
+        rb1->SetAngularVelocity(w1 - (r1.Cross(impulse) * invInertia1));
     }
 
-    if (count == 0) return;
-    target = target * (1.0f / count);
-
-    for (auto& att : attachments)
+    if (rb2)
     {
-        RigidBody* rb = att.obj->GetRigidBody();
-        if (!rb) continue;
-
-        float invMass = rb->GetInvMass();
-        if (invMass == 0.0f) continue;
-
-        float sin = sinf(att.obj->transform.rotation);
-        float cos = cosf(att.obj->transform.rotation);
-        Vec2 worldAnchor = att.obj->transform.position + Vec2(
-            att.localAnchor.x * cos - att.localAnchor.y * sin,
-            att.localAnchor.x * sin + att.localAnchor.y * cos
-        );
-
-        Vec2 delta = worldAnchor - target;
-        Vec2 vel = rb->GetVelocity();
-
-        float biasX = (biasConstraint / dt) * delta.x;
-        float lambdaX = -(vel.x + biasX) / invMass;
-        vel.x += lambdaX * invMass;
-
-        float biasY = (biasConstraint / dt) * delta.y;
-        float lambdaY = -(vel.y + biasY) / invMass;
-        vel.y += lambdaY * invMass;
-
-        rb->SetVelocity(vel);
+        rb2->SetVelocity(v2 + impulse * invMass2);
+        rb2->SetAngularVelocity(w2 + (r2.Cross(impulse) * invInertia2));
     }
 
-    position = target;
+    position = (p1 + p2) * 0.5f;
 }

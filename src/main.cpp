@@ -8,21 +8,21 @@
 #include <string>
 
 int main() {
-    const int screenWidth = Config().screenWidth;
-    const int screenHeight = Config().screenHeight;
+    const int screenWidth = Config::screenWidth;
+    const int screenHeight = Config::screenHeight;
 
     World world;
     InputHandler input;
 
     //all levels under ../assets/( ... ).json
-    const std::string& filepath = "../assets/demos/Motor.json";
+    const std::string& filepath = "../assets/demos/Joints.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Halliday2D");
-    SetTargetFPS(Config().targetFPS);    
+    SetTargetFPS(Config::targetFPS);    
 
     //draw fps?
-    bool FPS = Config().drawFPS;
+    bool FPS = Config::drawFPS;
 
     const float dt = 1.0f / 60.0f;
     while (!WindowShouldClose()) {

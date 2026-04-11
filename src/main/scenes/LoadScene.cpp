@@ -50,22 +50,22 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
         Instantiate()
             .WithTransform(Vec2(screenWidth / 2.0f, screenHeight + 100.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(screenWidth, 200.0f))
-            .Create(world);
+            .Create(world, -1);
 
         Instantiate()
             .WithTransform(Vec2(screenWidth / 2.0f, -100.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(screenWidth, 200.0f))
-            .Create(world);
+            .Create(world, -1);
 
         Instantiate()
             .WithTransform(Vec2(-100.0f, screenHeight / 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(200.0f, screenHeight))
-            .Create(world);
+            .Create(world, -1);
 
         Instantiate()
             .WithTransform(Vec2(screenWidth + 100.0f, screenHeight / 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(200.0f, screenHeight))
-            .Create(world);
+            .Create(world, -1);
     }
 
     std::unordered_map<int, GameObject*> idMap;
@@ -75,6 +75,7 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
         GameObject* obj = LoadObject(item, world);
         if (obj && item.contains("id"))
         {
+            obj->SetID(item["id"].get<int>());
             idMap[item["id"].get<int>()] = obj;
         }
     }
@@ -214,7 +215,7 @@ GameObject* LoadScene::LoadObject(const json& item, World& world)
         );
     }
 
-    return builder.Create(world);
+    return builder.Create(world, -1);
 }
 
 void LoadScene::LoadConstraints(const json& constraints, World& world, const std::unordered_map<int, GameObject*>& idMap)
@@ -274,12 +275,24 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
                 if (it == idMap.end()) continue;
 
                 Vec2 anchor = att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2();
-                attachments.push_back({ it->second, anchor });
+                attachments.push_back(JointAttachment{ it->second, anchor });
             }
 
             if (attachments.size() < 2) continue;
 
-            world.AddConstraint(std::make_unique<JointConstraint>(attachments));
+            //ignore ids
+            for (size_t i = 0; i < attachments.size(); i++)
+            {
+                for (size_t j = i + 1; j < attachments.size(); j++)
+                {
+                    attachments[i].obj->AddIgnored(attachments[j].obj->GetID());
+                    attachments[j].obj->AddIgnored(attachments[i].obj->GetID());
+                }
+            }
+
+            Vec2 position = item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position;
+
+            world.AddConstraint(std::make_unique<JointConstraint>(attachments, position, item.value("collisions", false)));
         }
         else if (type == "MOTOR")
         {
