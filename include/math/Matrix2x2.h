@@ -32,6 +32,12 @@ struct Matrix2x2
         return Matrix2x2(m00 + other.m00, m01 + other.m01, m10 + other.m10, m11 + other.m11);
     }
 
+    Matrix2x2 operator+=(const Matrix2x2& other)
+    {
+        *this = *this + other;
+        return *this;
+    }
+
     float Determinant() const
     {
         return m00 * m11 - m01 * m10;

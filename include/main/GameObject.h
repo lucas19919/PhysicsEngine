@@ -4,6 +4,7 @@
 #include "components/Renderer.h"
 #include "components/Collider.h"
 #include "components/Constraint.h"
+#include <vector>
 #include <memory>
 
 class GameObject
@@ -27,6 +28,10 @@ class GameObject
         void SetRigidBody(std::unique_ptr<RigidBody> rb);
         void SetCollider(std::unique_ptr<Collider> c);
         void SetRenderer(std::unique_ptr<Renderer> r);
+
+        void AddIgnored(int id);
+        void RemoveIgnored(int id);
+        const std::vector<int>& GetIgnoredIDs() const { return ignoredIDs; }
         
     private:
         std::unique_ptr<RigidBody> rigidBody;
@@ -34,4 +39,6 @@ class GameObject
         std::unique_ptr<Renderer> renderer;
 
         size_t id;
+
+        std::vector<int> ignoredIDs;
 };

@@ -1,0 +1,60 @@
+{
+  "name": "Optimization Stress Test",
+  "useWalls": true,
+  "objects": [
+    {
+      "id": 500,
+      "name": "Static_V_Left",
+      "components": {
+        "TransformComponent": { "position": { "x": 340, "y": 800 }, "rotation": 0.4 },
+        "Collider": { "type": "BOX", "size": { "x": 600, "y": 40 } },
+        "Renderer": { "form": "R_BOX", "color": "DARKGRAY", "scale": { "x": 600, "y": 40 } }
+      }
+    },
+    {
+      "id": 501,
+      "name": "Static_V_Right",
+      "components": {
+        "TransformComponent": { "position": { "x": 940, "y": 800 }, "rotation": -0.4 },
+        "Collider": { "type": "BOX", "size": { "x": 600, "y": 40 } },
+        "Renderer": { "form": "R_BOX", "color": "DARKGRAY", "scale": { "x": 600, "y": 40 } }
+      }
+    }
+  ],
+  "generators": [
+    {
+      "comment": "Dense Circle Rain",
+      "grid": { "rows": 12, "columns": 28, "startX": 100.0, "startY": 10.0, "spacingX": 40.0, "spacingY": 40.0 },
+      "object": {
+        "components": {
+          "TransformComponent": { "position": { "x": 0.0, "y": 0.0 }, "rotation": 0.0 },
+          "Collider": { "type": "CIRCLE", "radius": 15.0 },
+          "Renderer": { "form": "R_CIRCLE", "color": "CYAN", "scale": 15.0 },
+          "RigidBody": {
+            "gravityEnabled": true,
+            "properties": { "mass": 1.0, "restitution": 0.2, "friction": 0.4, "inertia": 200.0 },
+            "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+            "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+          }
+        }
+      }
+    },
+    {
+      "comment": "Dense Box Rain",
+      "grid": { "rows": 4, "columns": 20, "startX": 200.0, "startY": 500.0, "spacingX": 45.0, "spacingY": 45.0 },
+      "object": {
+        "components": {
+          "TransformComponent": { "position": { "x": 0.0, "y": 0.0 }, "rotation": 0.0 },
+          "Collider": { "type": "BOX", "size": { "x": 25, "y": 25 } },
+          "Renderer": { "form": "R_BOX", "color": "PURPLE", "scale": { "x": 25, "y": 25 } },
+          "RigidBody": {
+            "gravityEnabled": true,
+            "properties": { "mass": 1.5, "restitution": 0.1, "friction": 0.6, "inertia": 500.0 },
+            "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+            "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+          }
+        }
+      }
+    }
+  ]
+}

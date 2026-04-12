@@ -33,7 +33,7 @@ void PinConstraint::Solve(float dt)
         float w = rb->GetAngularVelocity();
         
         Vec2 pointVelocity(v.x - w * r.y, v.y + w * r.x);
-        Vec2 biasVelocity = delta * (Config().biasConstraint / dt);
+        Vec2 biasVelocity = delta * (Config::biasConstraint / dt);
         Vec2 targetVelocity = biasVelocity - pointVelocity;
         
         //k
@@ -43,7 +43,7 @@ void PinConstraint::Solve(float dt)
         if (fixedX && fixedY)
         {
             Matrix2x2 K(
-                iM + (r.y * r.y) * iI, 
+                iM + (r.y * r.y) * iI,
                 -r.x * r.y * iI,
                 -r.x * r.y * iI,       
                 iM + (r.x * r.x) * iI

@@ -38,16 +38,6 @@ void RigidBody::ApplyForce(Vec2 force)
     netForce += force;
 }
 
-void RigidBody::ApplyForceAtPoint(Vec2 f, Vec2 point, Vec2 objPos)
-{
-
-}
-
-void RigidBody::ApplyTorqueAtPoint(float t, Vec2 point, Vec2 objPos)
-{
-
-}
-
 void RigidBody::ClearForces() 
 {
     netForce = Vec2();

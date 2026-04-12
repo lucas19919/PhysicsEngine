@@ -47,8 +47,8 @@ void Solver::ResolvePosition(ContactConstraint& contact)
     float totalInvMass = invMass1 + invMass2;
     if (totalInvMass == 0.0f) return;
 
-    float slop = Config().contactSlop;
-    float percent = Config().positionCorrectionPercent;
+    float slop = Config::contactSlop;
+    float percent = Config::positionCorrectionPercent;
 
     float penetration = std::max(contact.penetration - slop, 0.0f);
     Vec2 correction = contact.normal * (penetration / totalInvMass) * percent;   

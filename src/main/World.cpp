@@ -4,9 +4,11 @@
 #include "main/physics/ManifoldHandler.h"
 #include "main/physics/Solver.h"
 #include "main/physics/Config.h"
+#include <vector>
+#include <algorithm>
 #include <cstdint>
 
-World::World() : spatialHash(Config().spatialHashCellSize)
+World::World() : spatialHash(Config::spatialHashCellSize)
 {
 }
 
@@ -41,20 +43,24 @@ void World::Step(float dt)
 {
     if (isPaused) return;
 
-    PrepareFrame(dt);
-    IntegrateVelocities(dt);
+    int subTicks = Config::pipelineSubTicks;
+    float subDt = dt / subTicks;
+    for (int i = 0; i < subTicks; i++)
+    {
+        PrepareFrame(subDt);
+        IntegrateVelocities(subDt);
 
-    UpdateBroadphase();
-    GeneratePairs();
+        UpdateBroadphase(); 
+        GeneratePairs();
 
-    BuildContacts();
-    PrepareContacts(dt);
-    SolveConstraints(dt);
+        BuildContacts();
+        PrepareContacts(subDt);
+        SolveConstraints(subDt);
 
-    IntegratePositions(dt);
+        IntegratePositions(subDt);
 
-    UpdateSleep(dt);
-    FinishFrame(dt);
+        FinishFrame(subDt);        
+    }
 }
 
 void World::PrepareFrame(float dt)
@@ -78,7 +84,6 @@ void World::IntegrateVelocities(float dt)
         RigidBody* rb = obj->GetRigidBody();   
 
         if (!rb) continue;
-        if (rb->IsSleeping()) continue;
 
         float mass = rb->GetMass();
         float invMass = rb->GetInvMass();
@@ -86,7 +91,7 @@ void World::IntegrateVelocities(float dt)
 
         //linear motion
         if (rb->IsGravityEnabled())
-            rb->ApplyForce(Config().gravity * mass);
+            rb->ApplyForce(Config::gravity * mass);
 
         rb->SetAcceleration(rb->GetForce() * invMass);
         rb->SetVelocity(rb->GetVelocity() + rb->GetAcceleration() * dt);
@@ -111,21 +116,15 @@ void World::UpdateBroadphase()
 
         if (!c) continue;
 
-        //update cached vertices/normals and bounds for spatial hash
-        if (!rb || !rb->IsSleeping())
-        {
-            obj->cachedVertices = SAT::GetVertices(obj);
-            obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
-            c->SetBounds(spatialHash.GetBounding(obj));
-        }
+        obj->cachedVertices = SAT::GetVertices(obj);
+        obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
+        c->SetBounds(spatialHash.GetBounding(obj));
 
-        //determine which cells the object occupies and add to grid map
         int minX = std::floor(c->GetBounds().min.x / spatialHash.GetCellSize());
         int maxX = std::floor(c->GetBounds().max.x / spatialHash.GetCellSize());
         int minY = std::floor(c->GetBounds().min.y / spatialHash.GetCellSize());
         int maxY = std::floor(c->GetBounds().max.y / spatialHash.GetCellSize());
 
-        //loop through occupied cells and add object to grid map
         for (int x = minX; x <= maxX; x++)
         {
             for (int y = minY; y <= maxY; y++)
@@ -152,6 +151,13 @@ void World::GeneratePairs()
             {
                 GameObject* obj1 = cell[i];
                 GameObject* obj2 = cell[j];
+
+                size_t obj1ID = obj1->GetID();
+                size_t obj2ID = obj2->GetID();
+
+                if (std::find(obj1->GetIgnoredIDs().begin(), obj1->GetIgnoredIDs().end(), obj2ID) != obj1->GetIgnoredIDs().end() ||
+                    std::find(obj2->GetIgnoredIDs().begin(), obj2->GetIgnoredIDs().end(), obj1ID) != obj2->GetIgnoredIDs().end())
+                    continue;
 
                 RigidBody* rb1 = obj1->GetRigidBody();
                 RigidBody* rb2 = obj2->GetRigidBody();
@@ -194,10 +200,6 @@ void World::BuildContacts()
         RigidBody* rb1 = obj1->GetRigidBody();
         RigidBody* rb2 = obj2->GetRigidBody();
 
-        bool rb1Sleeping = rb1 && rb1->IsSleeping();
-        bool rb2Sleeping = rb2 && rb2->IsSleeping();
-
-        if (rb1Sleeping && rb2Sleeping) continue;
 
         contactConstraint.rb1 = rb1;
         contactConstraint.rb2 = rb2;
@@ -243,7 +245,7 @@ void World::BuildContacts()
             
             float relativeVelocity = contactConstraint.normal.Dot(v2 - v1);
 
-            float restitutionThreshold = Config().restitutionThreshold;
+            float restitutionThreshold = Config::restitutionThreshold;
             if (relativeVelocity < -restitutionThreshold)
             {
                 contactConstraint.restitutionBias[i] = -contactConstraint.restitution * relativeVelocity;
@@ -274,7 +276,7 @@ void World::PrepareContacts(float dt)
                 contact.accumulatedTangentImpulse[i] = lastContact.accumulatedTangentImpulse[i];
             }
 
-            if (Config().warmStart)
+            if (Config::warmStart)
                 Solver::Warmstart(contact);
 
             break;
@@ -285,7 +287,7 @@ void World::PrepareContacts(float dt)
 //solver iterations
 void World::SolveConstraints(float dt)
 {
-    for (int i = 0; i < Config().impulseIterations; i++)
+    for (int i = 0; i < Config::impulseIterations; i++)
     {
         for (auto& contact : currentFrameContacts)
         {
@@ -294,11 +296,11 @@ void World::SolveConstraints(float dt)
 
         for (auto& constraint : constraints)
         {
-            constraint->Solve(dt);
+            constraint->Solve(dt / (float)Config::impulseIterations);
         }
     }
 
-    for (int i = 0; i < Config().positionIterations; i++)
+    for (int i = 0; i < Config::positionIterations; i++)
     {
         for (auto& contact : currentFrameContacts)
         {
@@ -315,54 +317,9 @@ void World::IntegratePositions(float dt)
         RigidBody* rb = obj->GetRigidBody();   
 
         if (!rb) continue;
-        if (rb->IsSleeping()) continue;
 
         obj->transform.position += rb->GetVelocity() * dt;
         obj->transform.rotation += rb->GetAngularVelocity() * dt;
-    }
-}
-
-void World::UpdateSleep(float dt)
-{
-    sleepCounter = 0;
-    for (const auto& objPtr : gameObjects)
-    {
-        GameObject* obj = objPtr.get();
-        RigidBody* rb = obj->GetRigidBody();
-
-        if (!rb) continue;
-
-        float m = rb->GetMass();
-        float i = rb->GetInertia();
-
-        float vSq = rb->GetVelocity().MagSq();
-        float aV = rb->GetAngularVelocity();
-
-        float kE = 0.5 * ((m * vSq) + (i * aV * aV));
-
-        if (kE <= Config().energyThreshold)
-        {
-            rb->SetSleepTimer(rb->GetSleepTimer() + dt);
-            if (rb->GetSleepTimer() >= Config().sleepTime)
-            {
-                rb->SetSleeping(true);
-                sleepCounter++;
-            }     
-        }
-        else
-        {
-            rb->SetSleepTimer(0.0f);
-            rb->SetSleeping(false);
-        }
-
-         //DEBUG:
-        if (Config().debugSleep)
-        {
-            if (rb->IsSleeping())
-                obj->GetRenderer()->SetColor({ 100, 100, 255, 255 });
-            else
-                obj->GetRenderer()->SetColor({ 255, 100, 100, 255 });
-        }
     }
 }
 

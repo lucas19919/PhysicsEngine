@@ -49,7 +49,6 @@ class World
 
         //abstract stuff like this later ???
         bool isPaused = true;
-        int sleepCounter = 0;
 
     private:
         void PrepareFrame(float dt);
@@ -64,7 +63,6 @@ class World
 
         void IntegratePositions(float dt);
 
-        void UpdateSleep(float dt);
         void FinishFrame(float dt);
 
     private:

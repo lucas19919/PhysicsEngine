@@ -15,7 +15,7 @@ class Instantiate
         Instantiate& WithRenderer(Shape shape);
         Instantiate& WithCollider(ColliderType type, std::variant<Vec2, float, Array<20>> bounds);
         Instantiate& WithTransform(Vec2 position, float rotation);
-        GameObject* Create(World& world);
+        GameObject* Create(World& world, size_t id);
     private:
         GameObject* obj;
 };

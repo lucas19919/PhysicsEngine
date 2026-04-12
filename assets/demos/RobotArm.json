@@ -1,0 +1,162 @@
+{
+  "name": "Robot Arm",
+  "useWalls": true,
+  "objects": [
+    {
+      "id": 1,
+      "name": "Base",
+      "components": {
+        "TransformComponent": { "position": { "x": 640.0, "y": 880.0 }, "rotation": 0.0 },
+        "Renderer": { "form": "R_BOX", "color": "DARKGRAY", "scale": { "x": 120.0, "y": 160.0 } }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Upper Arm",
+      "components": {
+        "TransformComponent": { "position": { "x": 640.0, "y": 650.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "size": { "x": 60.0, "y": 300.0 } },
+        "Renderer": { "form": "R_BOX", "color": "ORANGE", "scale": { "x": 60.0, "y": 300.0 } },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": { "mass": 10.0, "restitution": 0.1, "friction": 0.5, "inertia": 75000.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "name": "Forearm",
+      "components": {
+        "TransformComponent": { "position": { "x": 640.0, "y": 400.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "size": { "x": 40.0, "y": 200.0 } },
+        "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 40.0, "y": 200.0 } },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": { "mass": 5.0, "restitution": 0.1, "friction": 0.5, "inertia": 16000.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "Hand Base",
+      "components": {
+        "TransformComponent": { "position": { "x": 640.0, "y": 280.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "size": { "x": 80.0, "y": 40.0 } },
+        "Renderer": { "form": "R_BOX", "color": "DARKGRAY", "scale": { "x": 80.0, "y": 40.0 } },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": { "mass": 2.0, "restitution": 0.1, "friction": 0.5, "inertia": 1000.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "name": "Left Finger",
+      "components": {
+        "TransformComponent": { "position": { "x": 610.0, "y": 210.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "size": { "x": 10.0, "y": 100.0 } },
+        "Renderer": { "form": "R_BOX", "color": "RED", "scale": { "x": 10.0, "y": 100.0 } },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": { "mass": 0.5, "restitution": 0.1, "friction": 0.8, "inertia": 400.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "name": "Right Finger",
+      "components": {
+        "TransformComponent": { "position": { "x": 670.0, "y": 210.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "size": { "x": 10.0, "y": 100.0 } },
+        "Renderer": { "form": "R_BOX", "color": "RED", "scale": { "x": 10.0, "y": 100.0 } },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": { "mass": 0.5, "restitution": 0.1, "friction": 0.8, "inertia": 400.0 },
+          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        }
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "type": "PIN",
+      "attachments": [
+        { "id": 2, "localAnchor": { "x": 0.0, "y": 150.0 } }
+      ],
+      "fixedX": true,
+      "fixedY": true,
+      "position": { "x": 640.0, "y": 800.0 }
+    },
+    {
+      "type": "MOTOR",
+      "rotor": 2,
+      "localPosition": { "x": 0.0, "y": 150.0 },
+      "torque": 2500000.0
+    },
+    {
+      "type": "JOINT",
+      "attachments": [
+        { "id": 2, "localAnchor": { "x": 0.0, "y": -150.0 } },
+        { "id": 3, "localAnchor": { "x": 0.0, "y": 100.0 } }
+      ],
+      "position": { "x": 640.0, "y": 500.0 }
+    },
+    {
+      "type": "MOTOR",
+      "rotor": 3,
+      "localPosition": { "x": 0.0, "y": 100.0 },
+      "torque": 1000000.0
+    },
+    {
+      "type": "JOINT",
+      "attachments": [
+        { "id": 3, "localAnchor": { "x": 0.0, "y": -100.0 } },
+        { "id": 4, "localAnchor": { "x": 0.0, "y": 20.0 } }
+      ],
+      "position": { "x": 640.0, "y": 300.0 }
+    },
+    {
+      "type": "MOTOR",
+      "rotor": 4,
+      "localPosition": { "x": 0.0, "y": 20.0 },
+      "torque": 200000.0
+    },
+    {
+      "type": "JOINT",
+      "attachments": [
+        { "id": 4, "localAnchor": { "x": -30.0, "y": -20.0 } },
+        { "id": 5, "localAnchor": { "x": 0.0, "y": 50.0 } }
+      ],
+      "position": { "x": 610.0, "y": 260.0 }
+    },
+    {
+      "type": "MOTOR",
+      "rotor": 5,
+      "localPosition": { "x": 0.0, "y": 50.0 },
+      "torque": 50000.0
+    },
+    {
+      "type": "JOINT",
+      "attachments": [
+        { "id": 4, "localAnchor": { "x": 30.0, "y": -20.0 } },
+        { "id": 6, "localAnchor": { "x": 0.0, "y": 50.0 } }
+      ],
+      "position": { "x": 670.0, "y": 260.0 }
+    },
+    {
+      "type": "MOTOR",
+      "rotor": 6,
+      "localPosition": { "x": 0.0, "y": 50.0 },
+      "torque": 50000.0
+    }
+  ]
+}

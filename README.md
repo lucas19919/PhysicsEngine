@@ -24,8 +24,9 @@ A custom 2D Physics Engine built in C++.
  - Constraints
 	- Distance
 	- Fixed and Rolling Pins
-	- Joints (primitive)
+	- Joints
 	- Motor
+ - JSON Level Loading
 
 **Building the Project:**
 1. Clone the repository:
@@ -69,13 +70,8 @@ Physics are handled within a World class, which is created at launch and contain
 
 The collision handling is done via SAT collision detection and with Sutherland Hogemann polygon clipping to find collision points. The solver class is first called to generate a collision manifold, sorting the collision by the collider types (ie circle circle, or box circle ...). Once sorted the manifold is calculated, containing contact points, collision normals, and penetration depths. This data is then collected in a contact constraint, which is then resolved by the solver. Based on the collision and properties of the RigidBody, an impulse is then calculated. The impulse is then applied along the collision normal to each collision RigidBody.
 
-# Bugs
-- Collisions involving pins
-- Joints
-
-
 **To Do:**
-1. Constraint Collison Fixes
-2. Gravity Rework (pixel to meter)
-3. Rework constraint solver to seperate position/velocity
+1. Gravity Rework (pixel to meter)
+2. Rework constraint solver to seperate position/velocity
+3. Motor controller (for robotic arms etc)
 4. Better Level Editor

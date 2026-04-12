@@ -36,13 +36,6 @@ class RigidBody
         RigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings);
         ~RigidBody();
 
-        void SetSleeping(bool enabled) { isSleeping = enabled; }
-        const bool& IsSleeping() const { return isSleeping; }
-        void WakeUp() { isSleeping = false; sleepTimer = 0.0f; }
-
-        void SetSleepTimer(float t) { sleepTimer = t; }
-        const float& GetSleepTimer() const { return sleepTimer; }
-
         void SetGravity(bool enabled) { gravityEnabled = enabled; }
         const bool& IsGravityEnabled() const { return gravityEnabled; }
 
@@ -67,7 +60,6 @@ class RigidBody
         void SetAcceleration(Vec2 a) { acceleration = a; }
 
         void ApplyForce(Vec2 force);
-        void ApplyForceAtPoint(Vec2 f, Vec2 point, Vec2 objPos);
         const Vec2& GetForce() const { return netForce; }   
         void ClearForces();
         
@@ -78,7 +70,6 @@ class RigidBody
         void SetAngularAcceleration(float a) { angularAcceleration = a; }
 
         void ApplyTorque(float t) { torque += t; }
-        void ApplyTorqueAtPoint(float t, Vec2 point, Vec2 objPos);
         const float& GetTorque() const { return torque; }
         void ClearTorque();
         
@@ -97,9 +88,6 @@ class RigidBody
         float angularVelocity;
         float angularAcceleration;  
         float torque;
-
-        bool isSleeping = false;
-        float sleepTimer = 0.0f;
 
         bool gravityEnabled;
 };

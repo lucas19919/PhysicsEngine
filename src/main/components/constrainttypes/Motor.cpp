@@ -23,7 +23,7 @@ void MotorConstraint::Solve(float dt)
 
     if (!rb)
     {
-        float angleChange = (torque / (float)Config().impulseIterations) * dt;
+        float angleChange = (torque / (float)Config::impulseIterations) * dt;
         rotor->transform.rotation += angleChange;
 
         RotMatrix rot(rotor->transform.rotation);
@@ -33,7 +33,7 @@ void MotorConstraint::Solve(float dt)
     }
     else
     {
-        float iterationImpulse = (torque * dt) / (float)Config().impulseIterations;
+        float iterationImpulse = (torque * dt) / (float)Config::impulseIterations;
         
         float newAngularVel = rb->GetAngularVelocity() + (iterationImpulse * rb->GetInvInertia());
         rb->SetAngularVelocity(newAngularVel);

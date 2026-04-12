@@ -1,0 +1,41 @@
+{
+  "name": "Polygon Funnel",
+  "useWalls": true,
+  "objects": [
+    {
+      "id": 1, "name": "Left_Funnel",
+      "components": {
+        "TransformComponent": { "position": { "x": 300, "y": 300 }, "rotation": 0.5 },
+        "Collider": { "type": "POLYGON", "vertices": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] },
+        "Renderer": { "form": "R_POLYGON", "color": "DARKGRAY", "scale": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] }
+      }
+    },
+    {
+      "id": 2, "name": "Right_Funnel",
+      "components": {
+        "TransformComponent": { "position": { "x": 980, "y": 300 }, "rotation": -0.5 },
+        "Collider": { "type": "POLYGON", "vertices": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] },
+        "Renderer": { "form": "R_POLYGON", "color": "DARKGRAY", "scale": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] }
+      }
+    }
+  ],
+  "generators": [
+    {
+      "comment": "Wide Irregular Shapes Rain",
+      "grid": { "rows": 6, "columns": 15, "startX": 300, "startY": 25, "spacingX": 45, "spacingY": 45 },
+      "object": {
+        "components": {
+            "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0 },
+            "Collider": { "type": "POLYGON", "vertices": [ { "x": 0, "y": -25 }, { "x": 20, "y": 20 }, { "x": -20, "y": 20 } ] },
+            "Renderer": { "form": "R_POLYGON", "color": "ORANGE", "scale": [ { "x": 0, "y": -25 }, { "x": 20, "y": 20 }, { "x": -20, "y": 20 } ] },
+            "RigidBody": { 
+              "gravityEnabled": true, 
+              "properties": { "mass": 5, "restitution": 0.2, "friction": 0.5, "inertia": 1000 },
+              "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+              "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+            }
+        }
+      }
+    }
+  ]
+}

@@ -31,7 +31,8 @@ void DistanceConstraint::Solve(float dt)
 
     Vec2 distVector = (attached->transform.position + rAttachedOffset) - (anchor->transform.position + rAnchorOffset);
     float distance = distVector.Mag();
-    if (distance < length) return; 
+
+    if (distance < length) return;
 
     Vec2 axis = distVector * (1.0f / distance);
     float error = distance - length;
@@ -42,7 +43,7 @@ void DistanceConstraint::Solve(float dt)
     Vec2 relative = v2 - v1;
     float magnitude = axis.Dot(relative);
 
-    float bias = (Config().biasConstraint / dt) * error;
+    float bias = (Config::biasConstraint / dt) * error;
     float totalInvMass = invMass1 + invMass2;
 
     if (totalInvMass == 0.0f) return;

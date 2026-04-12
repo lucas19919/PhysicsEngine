@@ -1,0 +1,88 @@
+{
+  "name": "Newton's Cradle",
+  "useWalls": true,
+  "objects": [
+    { "id": 1, "components": { "TransformComponent": { "position": { "x": 440, "y": 200 }, "rotation": 0 } } },
+    { "id": 2, "components": { "TransformComponent": { "position": { "x": 540, "y": 200 }, "rotation": 0 } } },
+    { "id": 3, "components": { "TransformComponent": { "position": { "x": 640, "y": 200 }, "rotation": 0 } } },
+    { "id": 4, "components": { "TransformComponent": { "position": { "x": 740, "y": 200 }, "rotation": 0 } } },
+    { "id": 5, "components": { "TransformComponent": { "position": { "x": 840, "y": 200 }, "rotation": 0 } } },
+    {
+      "id": 6, "name": "Striker",
+      "components": {
+        "TransformComponent": { "position": { "x": 140, "y": 200 }, "rotation": 0 },
+        "Collider": { "type": "CIRCLE", "radius": 49 },
+        "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 49 },
+        "RigidBody": { 
+          "gravityEnabled": true, 
+          "properties": { "mass": 10, "restitution": 1.0, "friction": 0.0, "inertia": 1000 }, 
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+        }
+      }
+    },
+    { 
+      "id": 7, 
+      "components": { 
+        "TransformComponent": { "position": { "x": 540, "y": 500 }, "rotation": 0 }, 
+        "Collider": { "type": "CIRCLE", "radius": 49 }, 
+        "Renderer": { "form": "R_CIRCLE", "color": "GRAY", "scale": 49 }, 
+        "RigidBody": { 
+          "gravityEnabled": true,
+          "properties": { "mass": 10, "restitution": 1.0, "friction": 0.0, "inertia": 1000 }, 
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } 
+        } 
+      } 
+    },
+    { 
+      "id": 8, 
+      "components": { 
+        "TransformComponent": { "position": { "x": 640, "y": 500 }, "rotation": 0 }, 
+        "Collider": { "type": "CIRCLE", "radius": 49 }, 
+        "Renderer": { "form": "R_CIRCLE", "color": "GRAY", "scale": 49 }, 
+        "RigidBody": { 
+          "gravityEnabled": true,
+          "properties": { "mass": 10, "restitution": 1.0, "friction": 0.0, "inertia": 1000 }, 
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } 
+        } 
+      } 
+    },
+    { 
+      "id": 9, 
+      "components": { 
+        "TransformComponent": { "position": { "x": 740, "y": 500 }, "rotation": 0 }, 
+        "Collider": { "type": "CIRCLE", "radius": 49 }, 
+        "Renderer": { "form": "R_CIRCLE", "color": "GRAY", "scale": 49 }, 
+        "RigidBody": { 
+          "gravityEnabled": true,
+          "properties": { "mass": 10, "restitution": 1.0, "friction": 0.0, "inertia": 1000 }, 
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } 
+        } 
+      } 
+    },
+    { 
+      "id": 10, 
+      "components": { 
+        "TransformComponent": { "position": { "x": 840, "y": 500 }, "rotation": 0 }, 
+        "Collider": { "type": "CIRCLE", "radius": 49 }, 
+        "Renderer": { "form": "R_CIRCLE", "color": "GRAY", "scale": 49 }, 
+        "RigidBody": { 
+          "gravityEnabled": true,
+          "properties": { "mass": 10, "restitution": 1.0, "friction": 0.0, "inertia": 1000 }, 
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } 
+        } 
+      } 
+    }
+  ],
+  "constraints": [
+    { "type": "DISTANCE", "anchor": 1, "attached": 6, "length": 300 },
+    { "type": "DISTANCE", "anchor": 2, "attached": 7, "length": 300 },
+    { "type": "DISTANCE", "anchor": 3, "attached": 8, "length": 300 },
+    { "type": "DISTANCE", "anchor": 4, "attached": 9, "length": 300 },
+    { "type": "DISTANCE", "anchor": 5, "attached": 10, "length": 300 }
+  ]
+}
