@@ -36,6 +36,7 @@ void World::Clear()
     candidatePairs.clear();
     candidatePairKeys.clear();
     constraints.clear();
+    controllers.clear();
 }
 
 //step world forward by dt seconds

@@ -1,9 +1,17 @@
 #pragma once
-#include "math/Vec2.h"
+#include "main/components/Controller.h"
+#include "main/components/constrainttypes/Motor.h"
 
-class MotorController
+class GameObject;
+
+class MotorController : public Controller
 {
     public:
-        MotorController();
-        void Update(float dt);
+        MotorController(bool active, std::vector<MotorConstraint*> motors, float torqueMax); 
+        ControllerType GetType() const override;
+        void Update(float dt) override;
+
+    private:
+        std::vector<MotorConstraint*> motors;
+        float torqueMax;
 };

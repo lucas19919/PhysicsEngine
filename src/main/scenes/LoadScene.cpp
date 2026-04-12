@@ -13,6 +13,8 @@
 #include "main/components/constrainttypes/Pin.h"
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/constrainttypes/Motor.h"
+#include "main/components/controllertypes/MotorController.h"
+
 
 using json = nlohmann::json;
 
@@ -120,6 +122,11 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     {
         LoadConstraints(sceneData["constraints"], world, idMap);
     }
+
+    if (sceneData.contains("controllers"))
+    {
+        LoadControllers(sceneData["controllers"], world);
+    }
 }
 
 GameObject* LoadScene::LoadObject(const json& item, World& world)
@@ -222,6 +229,7 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
 {
     for (const auto& item : constraints)
     {
+        int ID = item.value("id", -1);
         std::string type = item["type"];
 
         if (type == "DISTANCE")
@@ -236,9 +244,9 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             auto itB = idMap.find(attachedId);
             if (itA == idMap.end() || itB == idMap.end()) continue;
 
-            world.AddConstraint(std::make_unique<DistanceConstraint>(
-                itA->second, itB->second, length, anchorOffset, attachedOffset
-            ));
+            auto distance = std::make_unique<DistanceConstraint>(itA->second, itB->second, length, anchorOffset, attachedOffset);
+            if (ID != -1) distance->SetID(ID);
+            world.AddConstraint(std::move(distance));
         }
         else if (type == "PIN")
         {
@@ -263,7 +271,7 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
 
             Vec2 pinPos = item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position;
             auto pin = std::make_unique<PinConstraint>(attachments, pinPos, fixedX, fixedY);
-
+            if (ID != -1) pin->SetID(ID);
             world.AddConstraint(std::move(pin));
         }
         else if (type == "JOINT")
@@ -280,7 +288,6 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
 
             if (attachments.size() < 2) continue;
 
-            //ignore ids
             for (size_t i = 0; i < attachments.size(); i++)
             {
                 for (size_t j = i + 1; j < attachments.size(); j++)
@@ -292,7 +299,9 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
 
             Vec2 position = item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position;
 
-            world.AddConstraint(std::make_unique<JointConstraint>(attachments, position, item.value("collisions", false)));
+            auto joint = std::make_unique<JointConstraint>(attachments, position, item.value("collisions", false));
+            if (ID != -1) joint->SetID(ID);
+            world.AddConstraint(std::move(joint));
         }
         else if (type == "MOTOR")
         {
@@ -304,8 +313,54 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             if (it == idMap.end()) continue;
 
             auto motor = std::make_unique<MotorConstraint>(it->second, localPosition, torque);
-
+            if (ID != -1) motor->SetID(ID);
             world.AddConstraint(std::move(motor));
+        }
+    }
+}
+
+void LoadScene::LoadControllers(const json& controllers, World& world)
+{
+    for (const auto& item : controllers)
+    {
+        std::string type = item["type"];
+
+        if (type == "MOTOR")
+        {
+            bool active = item.value("active", true);
+            std::vector<MotorConstraint*> motors;
+
+            if (item.contains("constraints"))
+            {
+                for (const auto& cId : item["constraints"])
+                {
+                    int idToFind = cId.get<int>();
+                    Constraint* targetConstraint = nullptr;
+                    
+                    for (const auto& c : world.GetConstraints())
+                    {
+                        if (c->GetID() == idToFind)
+                        {
+                            targetConstraint = c.get();
+                            break;
+                        }
+                    }
+                    
+                    if (targetConstraint)
+                    {
+                        MotorConstraint* motor = dynamic_cast<MotorConstraint*>(targetConstraint);
+                        if (motor)
+                        {
+                            motors.push_back(motor);
+                        }
+                    }
+                }
+            }
+
+            float torqueMax = item.value("torqueMax", 100.0f);
+
+            auto controller = std::make_unique<MotorController>(active, motors, torqueMax);
+            world.AddController(std::move(controller));
         }
     }
 }

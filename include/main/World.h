@@ -1,5 +1,8 @@
 #pragma once
 #include "main/GameObject.h"
+#include "main/physics/SpatialHash.h"
+#include "main/components/Constraint.h"
+#include "main/components/Controller.h"
 #include <vector>
 #include <algorithm>
 #include <memory>
@@ -7,7 +10,6 @@
 #include <unordered_set>
 #include <set>
 #include <cstdint>
-#include "main/physics/SpatialHash.h"
 
 struct ContactConstraint
 {
@@ -47,6 +49,9 @@ class World
         void AddConstraint(std::unique_ptr<Constraint> c);
         const std::vector<std::unique_ptr<Constraint>>& GetConstraints() const { return constraints; }
 
+        void AddController(std::unique_ptr<Controller> c) { controllers.push_back(std::move(c)); }
+        const std::vector<std::unique_ptr<Controller>>& GetControllers() const { return controllers; }
+
         //abstract stuff like this later ???
         bool isPaused = true;
 
@@ -78,4 +83,6 @@ class World
         std::vector<ContactConstraint> lastFrameContacts;
 
         std::vector<std::unique_ptr<Constraint>> constraints;
+        
+        std::vector<std::unique_ptr<Controller>> controllers;
 };

@@ -26,7 +26,7 @@ int main() {
 
     const float dt = 1.0f / 60.0f;
     while (!WindowShouldClose()) {
-        input.Update(world, filepath, screenWidth, screenHeight);
+        input.Update(world, filepath, screenWidth, screenHeight, dt);
         world.Step(dt);
 
         BeginDrawing();
