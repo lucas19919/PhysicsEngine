@@ -32,6 +32,8 @@ void DistanceConstraint::Solve(float dt)
     Vec2 distVector = (attached->transform.position + rAttachedOffset) - (anchor->transform.position + rAnchorOffset);
     float distance = distVector.Mag();
 
+    if (distance < length) return;
+
     Vec2 axis = distVector * (1.0f / distance);
     float error = distance - length;
 

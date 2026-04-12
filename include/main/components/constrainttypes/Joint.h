@@ -20,4 +20,8 @@ class JointConstraint : public Constraint
         JointConstraint(std::vector<JointAttachment> attachments, Vec2 position, bool collisions);
         ConstraintType GetType() const override;
         void Solve(float dt) override;
+
+    private:
+        void SingleJoint(float dt);
+        void ComplexJoint(float dt);
 };

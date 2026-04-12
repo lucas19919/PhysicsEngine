@@ -16,11 +16,19 @@ ConstraintType JointConstraint::GetType() const
     return ConstraintType::JOINT;
 }
 
-//solver needs to be changed to compare all to each other ie solve a matrix problem
-//else the joints arent equal and the weird shaking happens 
 void JointConstraint::Solve(float dt)
 {
-if (attachments.size() < 2) return;
+    if (attachments.size() < 2) 
+        return;
+    else if (attachments.size() == 2)
+        SingleJoint(dt);
+    else
+        ComplexJoint(dt);
+}
+
+void JointConstraint::SingleJoint(float dt)
+{
+    if (attachments.size() < 2) return;
 
     GameObject* obj1 = attachments[0].obj;
     RigidBody* rb1 = obj1->GetRigidBody();
@@ -66,10 +74,10 @@ if (attachments.size() < 2) return;
         float k22 = invMass1 + invMass2 + (r1.x * r1.x * invInertia1) + (r2.x * r2.x * invInertia2);
 
         Matrix2x2 K(k11, k12, k21, k22);
-        Matrix2x2 invK = K.Inverse();
+        Matrix2x2 K_inv = K.Inverse();
 
         Vec2 targetVelocity = relative + biasVelocity;
-        Vec2 impulse = (invK * targetVelocity) * -1.0f;
+        Vec2 impulse = (K_inv * targetVelocity) * -1.0f;
 
         if (rb1)
         {
@@ -84,5 +92,75 @@ if (attachments.size() < 2) return;
         }
 
         position = (p1 + p2) * 0.5f;
+    }
+}
+
+void JointConstraint::ComplexJoint(float dt)
+{
+    Vec2 centerPos = Vec2();
+    Vec2 centerVel = Vec2();
+    float totalMass = 0.0f;
+
+    for (JointAttachment& attachment : attachments) {
+        GameObject* obj = attachment.obj;
+        RigidBody* rb = obj->GetRigidBody();
+
+        if (!rb) continue;
+
+        float mass = rb->GetMass(); 
+        totalMass += mass;
+
+        RotMatrix rot(obj->transform.rotation);
+        Vec2 r = rot.Rotate(attachment.localAnchor);
+        Vec2 p = obj->transform.position + r;
+
+        Vec2 v = rb->GetVelocity();
+        float w = rb->GetAngularVelocity();
+        Vec2 anchorVel(v.x - w * r.y, v.y + w * r.x);
+
+        centerPos += p * mass;
+        centerVel += anchorVel * mass;
+    }
+
+    if (totalMass > 0.0f) {
+        centerPos /= totalMass;
+        centerVel /= totalMass;
+    }
+    
+    this->position = centerPos; 
+
+    for (JointAttachment& attachment : attachments) {
+        GameObject* obj = attachment.obj;
+        RigidBody* rb = obj->GetRigidBody();
+        if (!rb) continue;
+
+        float invMass = rb->GetInvMass();
+        float invInertia = rb->GetInvInertia();
+
+        RotMatrix rot(obj->transform.rotation);
+        Vec2 r = rot.Rotate(attachment.localAnchor);
+        Vec2 p = obj->transform.position + r;
+
+        Vec2 v = rb->GetVelocity();
+        float w = rb->GetAngularVelocity();
+        Vec2 anchorVel(v.x - w * r.y, v.y + w * r.x);
+
+        Vec2 velError = anchorVel - centerVel;        
+        Vec2 posError = p - centerPos;
+        Vec2 biasVelocity = posError * (Config::biasConstraint / dt);
+
+        Vec2 totalError = velError + biasVelocity;
+
+        float k00 = invMass + (r.y * r.y * invInertia);
+        float k01 = -r.x * r.y * invInertia;
+        float k11 = invMass + (r.x * r.x * invInertia);
+
+        Matrix2x2 K(k00, k01, k01, k11);
+        Matrix2x2 iK = K.Inverse();
+
+        Vec2 lambda = (iK * totalError) * -1.0f;
+
+        rb->SetVelocity(rb->GetVelocity() + lambda * invMass);
+        rb->SetAngularVelocity(rb->GetAngularVelocity() + r.Cross(lambda) * invInertia);
     }
 }

@@ -15,7 +15,7 @@ int main() {
     InputHandler input;
 
     //all levels under ../assets/( ... ).json
-    const std::string& filepath = "../assets/examples/TrussBridge.json";
+    const std::string& filepath = "../assets/examples/Suspension.json";
     LoadScene::Load(filepath, world, screenWidth, screenHeight);
     
     InitWindow(screenWidth, screenHeight, "Halliday2D");

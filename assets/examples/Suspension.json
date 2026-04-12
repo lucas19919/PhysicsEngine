@@ -1,0 +1,193 @@
+{
+  "name": "Wide Suspension Bridge",
+  "useWalls": true,
+  "objects": [
+    {
+      "id": 20,
+      "name": "Tower_L",
+      "components": {
+        "TransformComponent": { "position": { "x": 310, "y": 450 }, "rotation": 0 },
+        "Renderer": { "form": "R_BOX", "color": "GRAY", "scale": { "x": 40, "y": 500 } },
+        "RigidBody": {
+          "gravityEnabled": false,
+          "properties": { "mass": 0, "restitution": 0.1, "friction": 0.5, "inertia": 0 },
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+        }
+      }
+    },
+    {
+      "id": 21,
+      "name": "Tower_R",
+      "components": {
+        "TransformComponent": { "position": { "x": 970, "y": 450 }, "rotation": 0 },
+        "Renderer": { "form": "R_BOX", "color": "GRAY", "scale": { "x": 40, "y": 500 } },
+        "RigidBody": {
+          "gravityEnabled": false,
+          "properties": { "mass": 0, "restitution": 0.1, "friction": 0.5, "inertia": 0 },
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+        }
+      }
+    },
+    {
+      "id": 30,
+      "name": "Anchor_L",
+      "components": {
+        "TransformComponent": { "position": { "x": 310, "y": 200 }, "rotation": 0 },
+        "Collider": { "type": "CIRCLE", "radius": 15 },
+        "Renderer": { "form": "R_CIRCLE", "color": "BLACK", "scale": 15 },
+        "RigidBody": {
+          "gravityEnabled": false,
+          "properties": { "mass": 0, "restitution": 0.1, "friction": 0.5, "inertia": 0 },
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+        }
+      }
+    },
+    {
+      "id": 31,
+      "name": "Anchor_R",
+      "components": {
+        "TransformComponent": { "position": { "x": 970, "y": 200 }, "rotation": 0 },
+        "Collider": { "type": "CIRCLE", "radius": 15 },
+        "Renderer": { "form": "R_CIRCLE", "color": "BLACK", "scale": 15 },
+        "RigidBody": {
+          "gravityEnabled": false,
+          "properties": { "mass": 0, "restitution": 0.1, "friction": 0.5, "inertia": 0 },
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+        }
+      }
+    },
+    {
+      "id": 101,
+      "components": {
+        "TransformComponent": { "position": { "x": 145, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 102,
+      "components": {
+        "TransformComponent": { "position": { "x": 255, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 103,
+      "components": {
+        "TransformComponent": { "position": { "x": 365, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 104,
+      "components": {
+        "TransformComponent": { "position": { "x": 475, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 105,
+      "components": {
+        "TransformComponent": { "position": { "x": 585, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 106,
+      "components": {
+        "TransformComponent": { "position": { "x": 695, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 107,
+      "components": {
+        "TransformComponent": { "position": { "x": 805, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 108,
+      "components": {
+        "TransformComponent": { "position": { "x": 915, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 109,
+      "components": {
+        "TransformComponent": { "position": { "x": 1025, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 110,
+      "components": {
+        "TransformComponent": { "position": { "x": 1135, "y": 700 }, "rotation": 0 },
+        "Collider": { "type": "BOX", "size": { "x": 110, "y": 20 } },
+        "Renderer": { "form": "R_BOX", "color": "BROWN", "scale": { "x": 110, "y": 20 } },
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 10, "restitution": 0.1, "friction": 0.5, "inertia": 5000 }, "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } }, "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 } }
+      }
+    },
+    {
+      "id": 400,
+      "name": "Test_Weight",
+      "components": {
+        "TransformComponent": { "position": { "x": 640, "y": 100 }, "rotation": 0 },
+        "Collider": { "type": "CIRCLE", "radius": 50 },
+        "Renderer": { "form": "R_CIRCLE", "color": "RED", "scale": 50 },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": { "mass": 500, "restitution": 0.2, "friction": 0.8, "inertia": 25000 },
+          "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
+          "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+        }
+      }
+    }
+  ],
+  "constraints": [
+    { "type": "PIN", "attachments": [ { "id": 101, "localAnchor": { "x": -55, "y": 0 } } ], "fixedX": true, "fixedY": true, "position": { "x": 90, "y": 700 } },
+    { "type": "PIN", "attachments": [ { "id": 110, "localAnchor": { "x": 55, "y": 0 } } ], "fixedX": true, "fixedY": true, "position": { "x": 1190, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 101, "localAnchor": { "x": 55, "y": 0 } }, { "id": 102, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 200, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 102, "localAnchor": { "x": 55, "y": 0 } }, { "id": 103, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 310, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 103, "localAnchor": { "x": 55, "y": 0 } }, { "id": 104, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 420, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 104, "localAnchor": { "x": 55, "y": 0 } }, { "id": 105, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 530, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 105, "localAnchor": { "x": 55, "y": 0 } }, { "id": 106, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 640, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 106, "localAnchor": { "x": 55, "y": 0 } }, { "id": 107, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 750, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 107, "localAnchor": { "x": 55, "y": 0 } }, { "id": 108, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 860, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 108, "localAnchor": { "x": 55, "y": 0 } }, { "id": 109, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 970, "y": 700 } },
+    { "type": "JOINT", "attachments": [ { "id": 109, "localAnchor": { "x": 55, "y": 0 } }, { "id": 110, "localAnchor": { "x": -55, "y": 0 } } ], "position": { "x": 1080, "y": 700 } },
+    { "type": "DISTANCE", "anchor": 30, "attached": 101, "length": 527 },
+    { "type": "DISTANCE", "anchor": 30, "attached": 102, "length": 503 },
+    { "type": "DISTANCE", "anchor": 30, "attached": 103, "length": 503 },
+    { "type": "DISTANCE", "anchor": 30, "attached": 104, "length": 527 },
+    { "type": "DISTANCE", "anchor": 30, "attached": 105, "length": 571 },
+    { "type": "DISTANCE", "anchor": 31, "attached": 106, "length": 571 },
+    { "type": "DISTANCE", "anchor": 31, "attached": 107, "length": 527 },
+    { "type": "DISTANCE", "anchor": 31, "attached": 108, "length": 503 },
+    { "type": "DISTANCE", "anchor": 31, "attached": 109, "length": 503 },
+    { "type": "DISTANCE", "anchor": 31, "attached": 110, "length": 527 }
+  ],
+  "generators": []
+}
