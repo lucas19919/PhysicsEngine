@@ -14,6 +14,7 @@ A custom 2D Physics Engine built in C++.
  - Sutherland-Hodgeman Polygon Clipping for contact points
  - Spatial Hasing for optimization
  - nlohmann/json for JSON Parsing.
+ - IMGUI for UI
 
  **Features:**
  - Rigidbody Physics
@@ -26,6 +27,8 @@ A custom 2D Physics Engine built in C++.
 	- Fixed and Rolling Pins
 	- Joints
 	- Motor
+ - Controllers
+	- Motor Controller
  - JSON Level Loading
 
 **Building the Project:**
@@ -41,7 +44,7 @@ A custom 2D Physics Engine built in C++.
 
 # Usage:
 
-To load a scene, please change the relative path in main.cpp, "../assets/(...).json", to the name of your file.
+To load a scene, please add the relative path into the UI textbox, "../assets/examples/(...).json", to the name of your file. 
 
 To change any internal configuration varaibles, please edit "Config.h". 
 

@@ -1,39 +1,15 @@
 #pragma once
+
 #include "main/GameObject.h"
-#include "main/physics/SpatialHash.h"
 #include "main/components/Constraint.h"
 #include "main/components/Controller.h"
+
+#include "main/physics/pipeline/Broadphase.h"
+#include "main/physics/pipeline/Integrate.h"
+#include "main/physics/pipeline/ContactManager.h"
+
 #include <vector>
-#include <algorithm>
 #include <memory>
-#include <unordered_map>
-#include <unordered_set>
-#include <set>
-#include <cstdint>
-
-struct ContactConstraint
-{
-    unsigned int key;
-
-    GameObject* obj1;
-    GameObject* obj2;
-    RigidBody* rb1;
-    RigidBody* rb2;
-
-    Vec2 normal;
-    float penetration;
-
-    Array<20> points;
-    int pointCount;
-
-    float restitution;
-    float restitutionBias[20] = {};
-
-    float friction;
-
-    float accumulatedNormalImpulse[20] = {};
-    float accumulatedTangentImpulse[20] = {};
-};
 
 class World
 {
@@ -56,33 +32,11 @@ class World
         bool isPaused = true;
 
     private:
-        void PrepareFrame(float dt);
-        void IntegrateVelocities(float dt);
-
-        void UpdateBroadphase();
-        void GeneratePairs();
-
-        void BuildContacts();
-        void PrepareContacts(float dt);
-        void SolveConstraints(float dt);
-
-        void IntegratePositions(float dt);
-
-        void FinishFrame(float dt);
-
-    private:
-        SpatialHash spatialHash;
-        std::unordered_map<unsigned int, std::vector<GameObject*>> gridMap;
-
-        std::vector<std::pair<GameObject*, GameObject*>> candidatePairs;
-        std::unordered_set<uint64_t> candidatePairKeys;
+        std::unique_ptr<Integrate> integrate;
+        std::unique_ptr<Broadphase> broadphase;
+        std::unique_ptr<ContactManager> contactManager;
 
         std::vector<std::unique_ptr<GameObject>> gameObjects;
-
-        std::vector<ContactConstraint> currentFrameContacts;
-        std::vector<ContactConstraint> lastFrameContacts;
-
         std::vector<std::unique_ptr<Constraint>> constraints;
-        
         std::vector<std::unique_ptr<Controller>> controllers;
 };
