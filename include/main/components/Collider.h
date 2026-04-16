@@ -1,10 +1,11 @@
 #pragma once
 #include "math/Vec2.h"
+#include "main/components/Component.h"
 
 class GameObject;
 
 enum ColliderType { 
-    CIRCLE, 
+    CIRCLE,  
     BOX,
     POLYGON
 };
@@ -14,7 +15,7 @@ struct BBox {
     Vec2 max;
 };
 
-class Collider
+class Collider : public Component
 {
     public:
         virtual ~Collider() = default;

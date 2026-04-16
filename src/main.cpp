@@ -21,7 +21,7 @@ int main() {
     World world;
     InputHandler input;
 
-    std::string selectedFile = "../assets/examples/Car.json";
+    std::string selectedFile = "../assets/examples/PrattTruss.json";
     char filePathBuffer[256] = "../assets/examples/";
 
     LoadScene::Load(selectedFile, world, screenWidth, screenHeight);

@@ -14,7 +14,7 @@ unsigned int SpatialHash::GetHash(Vec2 position) const
 
 BBox SpatialHash::GetBounding(GameObject* obj)
 {
-    Collider* c = obj->GetCollider();
+    Collider* c = obj->GetComponent<Collider>();
 
     if (c->GetType() == ColliderType::CIRCLE)
     {

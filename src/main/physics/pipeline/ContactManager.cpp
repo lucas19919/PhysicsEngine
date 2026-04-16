@@ -37,8 +37,8 @@ void ContactManager::BuildContacts(std::vector<std::pair<GameObject*, GameObject
         uintptr_t b = reinterpret_cast<uintptr_t>(obj2);
         contactConstraint.key = static_cast<unsigned int>(a * 73856093u ^ b * 19349669u);
 
-        RigidBody* rb1 = obj1->GetRigidBody();
-        RigidBody* rb2 = obj2->GetRigidBody();
+        RigidBody* rb1 = obj1->GetComponent<RigidBody>();
+        RigidBody* rb2 = obj2->GetComponent<RigidBody>();
 
 
         contactConstraint.rb1 = rb1;

@@ -15,9 +15,9 @@ void Render(World& world)
     for (const auto& objPtr : world.GetGameObjects())
     {
         GameObject* obj = objPtr.get();
-        if (obj->GetRenderer() == nullptr) continue;
+        if (obj->GetComponent<Renderer>() == nullptr) continue;
 
-        Renderer *r = obj->GetRenderer();
+        Renderer *r = obj->GetComponent<Renderer>();
         Shape shape = r->GetShape();
 
         switch (shape.form)

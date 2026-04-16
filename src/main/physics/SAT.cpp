@@ -5,8 +5,8 @@
 
 bool SAT::TestBounds(GameObject* obj1, GameObject* obj2)
 {
-    BBox bounds1 = obj1->GetCollider()->GetBounds();
-    BBox bounds2 = obj2->GetCollider()->GetBounds();
+    BBox bounds1 = obj1->GetComponent<Collider>()->GetBounds();
+    BBox bounds2 = obj2->GetComponent<Collider>()->GetBounds();
 
     return !(bounds1.max.x < bounds2.min.x || bounds2.max.x < bounds1.min.x || bounds1.max.y < bounds2.min.y || bounds2.max.y < bounds1.min.y);
 }
@@ -14,7 +14,7 @@ bool SAT::TestBounds(GameObject* obj1, GameObject* obj2)
 Collision SAT::CircleCircle(GameObject *obj1, GameObject *obj2)
 {
     float distanceSq = (obj1->transform.position - obj2->transform.position).MagSq();
-    float radiusSum = static_cast<CircleCollider*>(obj1->GetCollider())->radius + static_cast<CircleCollider*>(obj2->GetCollider())->radius;
+    float radiusSum = static_cast<CircleCollider*>(obj1->GetComponent<Collider>())->radius + static_cast<CircleCollider*>(obj2->GetComponent<Collider>())->radius;
 
     if (distanceSq <= radiusSum * radiusSum) {
         if (distanceSq == 0.0f) {
@@ -299,7 +299,7 @@ SAT::Projection SAT::CircleProject(GameObject* obj, const Vec2 axis)
 {
     float centerDot = obj->transform.position.Dot(axis);
     
-    CircleCollider* c = static_cast<CircleCollider*>(obj->GetCollider());
+    CircleCollider* c = static_cast<CircleCollider*>(obj->GetComponent<Collider>());
     return { 
         centerDot - c->radius, 
         centerDot + c->radius
@@ -326,15 +326,15 @@ Array<20> SAT::GetVertices(GameObject* obj1)
 {
     Array<20> worldVertices;
 
-    if (obj1 == nullptr || obj1->GetCollider() == nullptr) 
+    if (obj1 == nullptr || obj1->GetComponent<Collider>() == nullptr) 
         return worldVertices; 
 
     TransformComponent transform = obj1->transform;
     Array<20> localVertices;
 
-    if (obj1->GetCollider()->GetType() == ColliderType::BOX) 
+    if (obj1->GetComponent<Collider>()->GetType() == ColliderType::BOX) 
     {
-        BoxCollider* b = static_cast<BoxCollider*>(obj1->GetCollider());
+        BoxCollider* b = static_cast<BoxCollider*>(obj1->GetComponent<Collider>());
         float x = b->size.x / 2.0f;
         float y = b->size.y / 2.0f;
         
@@ -343,9 +343,9 @@ Array<20> SAT::GetVertices(GameObject* obj1)
         localVertices.PushBack(Vec2( x,  y));
         localVertices.PushBack(Vec2(-x,  y));
     } 
-    else if (obj1->GetCollider()->GetType() == ColliderType::POLYGON) 
+    else if (obj1->GetComponent<Collider>()->GetType() == ColliderType::POLYGON) 
     {
-        PolygonCollider* p = static_cast<PolygonCollider*>(obj1->GetCollider());
+        PolygonCollider* p = static_cast<PolygonCollider*>(obj1->GetComponent<Collider>());
         localVertices = p->vertices;
     }
     else 

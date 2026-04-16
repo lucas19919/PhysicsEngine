@@ -10,7 +10,7 @@ CollisionManifold Manifold::GenCircleCircle(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    CircleCollider *circle1 = static_cast<CircleCollider*>(obj1->GetCollider());
+    CircleCollider *circle1 = static_cast<CircleCollider*>(obj1->GetComponent<CircleCollider>());
     Vec2 point = obj1->transform.position + (collision.normal * circle1->radius);
     cm.points.PushBack(point);
 

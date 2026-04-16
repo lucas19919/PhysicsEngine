@@ -1,5 +1,6 @@
 #include "main/physics/pipeline/Broadphase.h"
 #include "main/physics/SAT.h"
+#include "main/components/RigidBody.h"
 #include <algorithm>
 
 void Broadphase::Clear()
@@ -20,8 +21,8 @@ void Broadphase::UpdateBroadphase(std::vector<std::unique_ptr<GameObject>>& game
     for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
-        RigidBody* rb = obj->GetRigidBody();
-        Collider* c = obj->GetCollider();
+        RigidBody* rb = obj->GetComponent<RigidBody>();
+        Collider* c = obj->GetComponent<Collider>();
 
         if (!c) continue;
 
@@ -69,8 +70,8 @@ std::vector<std::pair<GameObject*, GameObject*>> Broadphase::GeneratePairs()
                     std::find(obj2->GetIgnoredIDs().begin(), obj2->GetIgnoredIDs().end(), obj1ID) != obj2->GetIgnoredIDs().end())
                     continue;
 
-                RigidBody* rb1 = obj1->GetRigidBody();
-                RigidBody* rb2 = obj2->GetRigidBody();
+                RigidBody* rb1 = obj1->GetComponent<RigidBody>();
+                RigidBody* rb2 = obj2->GetComponent<RigidBody>();
 
                 //check if bounds overlap before adding pair
                 if (SAT::TestBounds(obj1, obj2))

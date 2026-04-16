@@ -4,6 +4,7 @@
 #include "math/Vec2.h"
 #include "main/utility/templates/Array.h"
 #include <variant>
+#include "main/components/Component.h"
 
 class GameObject;
 
@@ -19,7 +20,7 @@ typedef struct {
     std::variant<Vec2, float, Array<20>> scale; 
 } Shape;
 
-class Renderer
+class Renderer : public Component
 {
     public:
         Renderer(Shape shape);

@@ -1,13 +1,13 @@
 #include "main/physics/pipeline/Integrate.h"
+#include "main/components/RigidBody.h"
 #include "main/physics/Config.h"
-
 
 void Integrate::IntegrateVelocity(std::vector<std::unique_ptr<GameObject>>& gameObjects, float dt)
 {
 for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
-        RigidBody* rb = obj->GetRigidBody();   
+        RigidBody* rb = obj->GetComponent<RigidBody>();   
 
         if (!rb) continue;
 
@@ -36,7 +36,7 @@ void Integrate::IntegratePosition(std::vector<std::unique_ptr<GameObject>>& game
     for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
-        RigidBody* rb = obj->GetRigidBody();   
+        RigidBody* rb = obj->GetComponent<RigidBody>();   
 
         if (!rb) continue;
 

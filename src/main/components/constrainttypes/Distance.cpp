@@ -16,8 +16,8 @@ ConstraintType DistanceConstraint::GetType() const
 
 void DistanceConstraint::Solve(float dt)
 {
-    RigidBody* rb1 = anchor->GetRigidBody();
-    RigidBody* rb2 = attached->GetRigidBody();
+    RigidBody* rb1 = anchor->GetComponent<RigidBody>();
+    RigidBody* rb2 = attached->GetComponent<RigidBody>();
 
     float invMass1 = (rb1) ? rb1->GetInvMass() : 0.0f;
     float invMass2 = (rb2) ? rb2->GetInvMass() : 0.0f;
@@ -32,7 +32,7 @@ void DistanceConstraint::Solve(float dt)
     Vec2 distVector = (attached->transform.position + rAttachedOffset) - (anchor->transform.position + rAnchorOffset);
     float distance = distVector.Mag();
 
-    if (distance < length) return;
+    if (distance == length) return;
 
     Vec2 axis = distVector * (1.0f / distance);
     float error = distance - length;

@@ -1,5 +1,6 @@
 #pragma once
 #include "math/Vec2.h"
+#include "main/components/Component.h"
 
 class GameObject;
 
@@ -30,7 +31,7 @@ struct Settings
     bool gravityEnabled;
 };
 
-class RigidBody 
+class RigidBody : public Component 
 {
     public: 
         RigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings);

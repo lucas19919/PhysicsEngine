@@ -8,6 +8,10 @@
 #include <vector>
 #include <random>
 #include <unordered_map>
+#include "main/components/Collider.h"
+#include "main/components/Renderer.h"
+#include "main/components/RigidBody.h"
+#include "main/components/TransformComponent.h"
 #include "main/components/constrainttypes/Distance.h"
 #include "main/components/constrainttypes/Pin.h"
 #include "main/components/constrainttypes/Joint.h"
@@ -142,7 +146,8 @@ GameObject* LoadScene::LoadObject(const json& item, World& world)
         rotation = components["TransformComponent"]["rotation"];
     }
 
-    Instantiate builder = Instantiate().WithTransform(Vec2(posX, posY), rotation);
+    Instantiate builder;
+    builder.WithTransform(Vec2(posX, posY), rotation);
 
     if (components.contains("Collider"))
     {

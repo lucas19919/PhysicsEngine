@@ -4,8 +4,8 @@
 
 CollisionManifold ManifoldHandler::SortManifold(GameObject* obj1, GameObject* obj2)
 {
-    Collider* c1 = obj1->GetCollider();
-    Collider* c2 = obj2->GetCollider();
+    Collider* c1 = obj1->GetComponent<Collider>();
+    Collider* c2 = obj2->GetComponent<Collider>();
 
     if (!c1 || !c2) 
     {

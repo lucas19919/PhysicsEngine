@@ -13,7 +13,7 @@ struct Config
     static inline Vec2 gravity = Vec2(0.0f, 600.0f);
     static inline float spatialHashCellSize = 24.0f;
     
-    static inline int pipelineSubTicks = 4; //subticks for pipeline (broadphase, solver etc)
+    static inline int pipelineSubTicks = 8; //subticks for pipeline (broadphase, solver etc)
     static inline int impulseIterations = 4; //iterations for impulse collision solver                
     static inline int positionIterations = 1; //iterations for position correction
 
