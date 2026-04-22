@@ -1,5 +1,6 @@
 #include "main/physics/pipeline/Broadphase.h"
 #include "main/physics/SAT.h"
+#include "main/components/RigidBody.h"
 #include <algorithm>
 
 void Broadphase::Clear()
@@ -20,14 +21,16 @@ void Broadphase::UpdateBroadphase(std::vector<std::unique_ptr<GameObject>>& game
     for (const auto& objPtr : gameObjects)
     {
         GameObject* obj = objPtr.get();
-        RigidBody* rb = obj->GetRigidBody();
-        Collider* c = obj->GetCollider();
+        RigidBody* rb = obj->rb;
+        Collider* c = obj->c;
 
         if (!c) continue;
 
-        obj->cachedVertices = SAT::GetVertices(obj);
-        obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
-        c->SetBounds(spatialHash.GetBounding(obj));
+        if (obj->transform.isDirty) {
+            c->UpdateCache(obj->transform);
+            c->SetBounds(spatialHash.GetBounding(obj));
+            obj->transform.isDirty = false;
+        }
 
         int minX = std::floor(c->GetBounds().min.x / spatialHash.GetCellSize());
         int maxX = std::floor(c->GetBounds().max.x / spatialHash.GetCellSize());
@@ -69,8 +72,8 @@ std::vector<std::pair<GameObject*, GameObject*>> Broadphase::GeneratePairs()
                     std::find(obj2->GetIgnoredIDs().begin(), obj2->GetIgnoredIDs().end(), obj1ID) != obj2->GetIgnoredIDs().end())
                     continue;
 
-                RigidBody* rb1 = obj1->GetRigidBody();
-                RigidBody* rb2 = obj2->GetRigidBody();
+                RigidBody* rb1 = obj1->rb;
+                RigidBody* rb2 = obj2->rb;
 
                 //check if bounds overlap before adding pair
                 if (SAT::TestBounds(obj1, obj2))

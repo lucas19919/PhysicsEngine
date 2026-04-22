@@ -1,5 +1,6 @@
 #pragma once
 #include "math/Vec2.h"
+#include "main/components/Component.h"
 
 class GameObject;
 
@@ -11,7 +12,7 @@ enum ConstraintType
     MOTOR
 };
 
-class Constraint
+class Constraint : public Component
 {
     public: 
         Vec2 position;

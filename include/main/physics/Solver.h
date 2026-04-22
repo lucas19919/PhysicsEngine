@@ -13,7 +13,4 @@ class Solver
         static void ResolveConstraints(ContactConstraint& contact);
         static void ResolvePosition(ContactConstraint& contact);
         static void Warmstart(ContactConstraint& contact);
-    private:
-        static void ApplyImpulse(ContactConstraint& contact, int index, float jn, float jt);
-        static Vec2 GetImpulse(ContactConstraint& contact, int index);
 };

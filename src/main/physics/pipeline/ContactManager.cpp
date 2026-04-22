@@ -9,13 +9,25 @@ void ContactManager::PrepareFrame()
 
 void ContactManager::FinishFrame()
 {
-    std::swap(lastFrameContacts, currentFrameContacts);
+    impulseCache.clear();
+    for (const auto& contact : currentFrameContacts)
+    {
+        ImpulseCache cache;
+        cache.pointCount = contact.pointCount;
+        for (int i = 0; i < contact.pointCount; i++)
+        {
+            cache.normalImpulse[i] = contact.accumulatedNormalImpulse[i];
+            cache.tangentImpulse[i] = contact.accumulatedTangentImpulse[i];
+        }
+        impulseCache[contact.key] = cache;
+    }
 }
 
 void ContactManager::Clear()
 {
     currentFrameContacts.clear(); 
     lastFrameContacts.clear(); 
+    impulseCache.clear();
 }
 
 void ContactManager::BuildContacts(std::vector<std::pair<GameObject*, GameObject*>> candidatePairs)
@@ -37,8 +49,8 @@ void ContactManager::BuildContacts(std::vector<std::pair<GameObject*, GameObject
         uintptr_t b = reinterpret_cast<uintptr_t>(obj2);
         contactConstraint.key = static_cast<unsigned int>(a * 73856093u ^ b * 19349669u);
 
-        RigidBody* rb1 = obj1->GetRigidBody();
-        RigidBody* rb2 = obj2->GetRigidBody();
+        RigidBody* rb1 = obj1->rb;
+        RigidBody* rb2 = obj2->rb;
 
 
         contactConstraint.rb1 = rb1;
@@ -74,11 +86,33 @@ void ContactManager::BuildContacts(std::vector<std::pair<GameObject*, GameObject
             contactConstraint.points[i] = cm.points[i];
         }
 
+        float invMass1 = rb1 ? rb1->GetInvMass() : 0.0f;
+        float invMass2 = rb2 ? rb2->GetInvMass() : 0.0f;
+        float invInertia1 = rb1 ? rb1->GetInvInertia() : 0.0f;
+        float invInertia2 = rb2 ? rb2->GetInvInertia() : 0.0f;
+
+        Vec2 normal = contactConstraint.normal;
+        Vec2 tangent = Vec2(-normal.y, normal.x);
+
         for (int i = 0; i < contactConstraint.pointCount; i++)
         {
             Vec2 p = contactConstraint.points[i];
             Vec2 r1 = p - obj1->transform.position;
             Vec2 r2 = p - obj2->transform.position;
+            contactConstraint.r1[i] = r1;
+            contactConstraint.r2[i] = r2;
+
+            //normal mass
+            float rn1 = r1.Cross(normal);
+            float rn2 = r2.Cross(normal);
+            float kNormal = invMass1 + invMass2 + (rn1 * rn1 * invInertia1) + (rn2 * rn2 * invInertia2);
+            contactConstraint.normalMass[i] = kNormal > 0.0f ? 1.0f / kNormal : 0.0f;
+
+            //tangent mass
+            float rt1 = r1.Cross(tangent);
+            float rt2 = r2.Cross(tangent);
+            float kTangent = invMass1 + invMass2 + (rt1 * rt1 * invInertia1) + (rt2 * rt2 * invInertia2);
+            contactConstraint.tangentMass[i] = kTangent > 0.0f ? 1.0f / kTangent : 0.0f;
 
             Vec2 v1 = rb1 ? rb1->GetVelocity() + Vec2(-rb1->GetAngularVelocity() * r1.y, rb1->GetAngularVelocity() * r1.x) : Vec2(0,0);
             Vec2 v2 = rb2 ? rb2->GetVelocity() + Vec2(-rb2->GetAngularVelocity() * r2.y, rb2->GetAngularVelocity() * r2.x) : Vec2(0,0);
@@ -104,21 +138,19 @@ void ContactManager::PrepareContacts(float dt)
 {
     for (auto& contact : currentFrameContacts)
     {
-        unsigned int key = contact.key;
-        for (auto& lastContact : lastFrameContacts)
+        auto it = impulseCache.find(contact.key);
+        if (it != impulseCache.end())
         {
-            if (lastContact.key != key) continue;
-
-            for (int i = 0; i < contact.pointCount; i++)
+            const ImpulseCache& cache = it->second;
+            int count = std::min(contact.pointCount, cache.pointCount);
+            for (int i = 0; i < count; i++)
             {
-                contact.accumulatedNormalImpulse[i] = lastContact.accumulatedNormalImpulse[i];
-                contact.accumulatedTangentImpulse[i] = lastContact.accumulatedTangentImpulse[i];
+                contact.accumulatedNormalImpulse[i] = cache.normalImpulse[i];
+                contact.accumulatedTangentImpulse[i] = cache.tangentImpulse[i];
             }
 
             if (Config::warmStart)
                 Solver::Warmstart(contact);
-
-            break;
         }
     }
 }

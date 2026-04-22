@@ -4,7 +4,7 @@
 
 struct CollisionManifold {
     Collision collision;
-    Array<20> points;
+    Array<4> points;
 };
 
 struct Edge {
@@ -27,6 +27,6 @@ class Manifold
         static Array<20> GetVertices(GameObject* obj);
         static Edge GetSupportFace(const Array<20>& vertices, Vec2 normal);
 
-        static Array<20> GetPolygonContacts(const Array<20>& vertices1, const Array<20>& vertices2, Vec2 normal);
-        static Array<20> GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 center);
+        static Array<4> GetPolygonContacts(const Array<20>& vertices1, const Array<20>& vertices2, Vec2 normal);
+        static Array<4> GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 center);
 };

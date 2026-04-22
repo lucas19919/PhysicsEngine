@@ -47,19 +47,19 @@ Array<20> Renderer::GetWorldCoordinates(Vec2 position) const
     return {};
 }
 
+#include "math/RotationMatrix.h"
+
 Array<20> Renderer::UpdateWorldCoordinates(Vec2 position, float rotation)
 {
     worldCoordinates = Array<20>();
 
-    float cosR = std::cos(rotation);
-    float sinR = std::sin(rotation);
+    RotMatrix rot(rotation);
 
     for (size_t i = 0; i < localCoordinates.Size(); i++)
     {
         Vec2 vertex = localCoordinates[i];
-        float x = vertex.x * cosR - vertex.y * sinR;
-        float y = vertex.x * sinR + vertex.y * cosR;
-        worldCoordinates.PushBack(Vec2(x + position.x, y + position.y));
+        Vec2 rotated = rot.Rotate(vertex);
+        worldCoordinates.PushBack(Vec2(rotated.x + position.x, rotated.y + position.y));
     }
 
     return worldCoordinates;

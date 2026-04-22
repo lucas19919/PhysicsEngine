@@ -31,7 +31,7 @@ void JointConstraint::SingleJoint(float dt)
     if (attachments.size() < 2) return;
 
     GameObject* obj1 = attachments[0].obj;
-    RigidBody* rb1 = obj1->GetRigidBody();
+    RigidBody* rb1 = obj1->rb;
     
     float invMass1 = (rb1) ? rb1->GetInvMass() : 0.0f;
     float invInertia1 = (rb1) ? rb1->GetInvInertia() : 0.0f;
@@ -39,7 +39,7 @@ void JointConstraint::SingleJoint(float dt)
     for (size_t i = 1; i < attachments.size(); ++i)
     {
         GameObject* obj2 = attachments[i].obj;
-        RigidBody* rb2 = obj2->GetRigidBody();
+        RigidBody* rb2 = obj2->rb;
 
         float invMass2 = (rb2) ? rb2->GetInvMass() : 0.0f;
         float invInertia2 = (rb2) ? rb2->GetInvInertia() : 0.0f;
@@ -103,7 +103,7 @@ void JointConstraint::ComplexJoint(float dt)
 
     for (JointAttachment& attachment : attachments) {
         GameObject* obj = attachment.obj;
-        RigidBody* rb = obj->GetRigidBody();
+        RigidBody* rb = obj->rb;
 
         if (!rb) continue;
 
@@ -131,7 +131,7 @@ void JointConstraint::ComplexJoint(float dt)
 
     for (JointAttachment& attachment : attachments) {
         GameObject* obj = attachment.obj;
-        RigidBody* rb = obj->GetRigidBody();
+        RigidBody* rb = obj->rb;
         if (!rb) continue;
 
         float invMass = rb->GetInvMass();

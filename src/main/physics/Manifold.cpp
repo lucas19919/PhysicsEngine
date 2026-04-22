@@ -10,7 +10,7 @@ CollisionManifold Manifold::GenCircleCircle(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    CircleCollider *circle1 = static_cast<CircleCollider*>(obj1->GetCollider());
+    CircleCollider *circle1 = static_cast<CircleCollider*>(obj1->c);
     Vec2 point = obj1->transform.position + (collision.normal * circle1->radius);
     cm.points.PushBack(point);
 
@@ -25,7 +25,9 @@ CollisionManifold Manifold::GenBoxCircle(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices = obj1->cachedVertices;
+    Collider* c1 = obj1->c;
+    Array<20> vertices = c1->GetVertices();
+
     Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
@@ -40,8 +42,12 @@ CollisionManifold Manifold::GenBoxBox(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices1 = obj1->cachedVertices;
-    Array<20> vertices2 = obj2->cachedVertices;
+    Collider* c1 = obj1->c;
+    Collider* c2 = obj2->c;
+
+    Array<20> vertices1 = c1->GetVertices();
+    Array<20> vertices2 = c2->GetVertices();
+
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -55,7 +61,9 @@ CollisionManifold Manifold::GenPolyCircle(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices = obj1->cachedVertices;
+    Collider* c1 = obj1->c;
+    Array<20> vertices = c1->GetVertices();
+
     Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
@@ -70,8 +78,12 @@ CollisionManifold Manifold::GenPolyBox(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices1 = obj1->cachedVertices;
-    Array<20> vertices2 = obj2->cachedVertices;
+    Collider *c1 = obj1->c;
+    Collider *c2 = obj2->c;
+
+    Array<20> vertices1 = c1->GetVertices();
+    Array<20> vertices2 = c2->GetVertices();
+    
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -85,16 +97,20 @@ CollisionManifold Manifold::GenPolyPoly(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices1 = obj1->cachedVertices;
-    Array<20> vertices2 = obj2->cachedVertices;
+    Collider *c1 = obj1->c;
+    Collider *c2 = obj2->c;
+
+    Array<20> vertices1 = c1->GetVertices();
+    Array<20> vertices2 = c2->GetVertices();
+    
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
 }
 
-Array<20> Manifold::GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 center)
+Array<4> Manifold::GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 center)
 {
-    Array<20> points;
+    Array<4> points;
     
     float minDistSq = INFINITY;
     Vec2 closestPoint;
@@ -126,9 +142,9 @@ Array<20> Manifold::GetPolygonCircleContacts(const Array<20>& vertices1, Vec2 ce
     return points;
 }
 
-Array<20> Manifold::GetPolygonContacts(const Array<20>& vertices1, const Array<20>& vertices2, Vec2 normal)
+Array<4> Manifold::GetPolygonContacts(const Array<20>& vertices1, const Array<20>& vertices2, Vec2 normal)
 {
-    Array<20> points;
+    Array<4> points;
     
     Edge edge1 = GetSupportFace(vertices1, normal);
     Edge edge2 = GetSupportFace(vertices2, normal * -1.0f); 

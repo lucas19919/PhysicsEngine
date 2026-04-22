@@ -134,7 +134,7 @@
         "TransformComponent": { "position": { "x": 600.0, "y": 800.0 }, "rotation": 0.0 },
         "Collider": { "type": "CIRCLE", "radius": 45.0 },
         "Renderer": { "form": "R_CIRCLE", "color": "RED", "scale": 45.0 },
-        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 200.0, "restitution": 0.2, "friction": 0.8, "inertia": 10000.0 }, "linearState": { "velocity": { "x": 300.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } }, "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 } }
+        "RigidBody": { "gravityEnabled": true, "properties": { "mass": 1000.0, "restitution": 0.2, "friction": 0.8, "inertia": 10000.0 }, "linearState": { "velocity": { "x": 300.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } }, "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 } }
       }
     }
   ],

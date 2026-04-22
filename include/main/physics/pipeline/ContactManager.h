@@ -7,6 +7,14 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
+
+struct ImpulseCache
+{
+    float normalImpulse[4];
+    float tangentImpulse[4];
+    int pointCount;
+};
 
 struct ContactConstraint
 {
@@ -20,16 +28,21 @@ struct ContactConstraint
     Vec2 normal;
     float penetration;
 
-    Array<20> points;
+    Array<4> points;
     int pointCount;
 
+    Vec2 r1[4];
+    Vec2 r2[4];
+    float normalMass[4];
+    float tangentMass[4];
+
     float restitution;
-    float restitutionBias[20] = {};
+    float restitutionBias[4] = {};
 
     float friction;
 
-    float accumulatedNormalImpulse[20] = {};
-    float accumulatedTangentImpulse[20] = {};
+    float accumulatedNormalImpulse[4] = {};
+    float accumulatedTangentImpulse[4] = {};
 };
 
 class ContactManager
@@ -46,4 +59,6 @@ class ContactManager
     private:
         std::vector<ContactConstraint> currentFrameContacts;
         std::vector<ContactConstraint> lastFrameContacts;
+
+        std::unordered_map<unsigned int, ImpulseCache> impulseCache;
 };

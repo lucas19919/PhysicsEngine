@@ -1,10 +1,12 @@
 #pragma once
 #include "components/TransformComponent.h"
+#include "components/Component.h"
+#include "utility/templates/Array.h"
 #include "components/RigidBody.h"
-#include "components/Renderer.h"
 #include "components/Collider.h"
 #include <vector>
 #include <memory>
+#include <utility>
 
 class GameObject
 {
@@ -12,32 +14,47 @@ class GameObject
         GameObject();
         ~GameObject();
 
-        void SetID(size_t newID) { id = newID; }
-        const size_t& GetID() const { return id; }
-
-        Array<20> cachedVertices;
-        Array<20> cachedNormals;
-
         TransformComponent transform;
 
-        RigidBody* GetRigidBody() { return rigidBody.get(); }
-        Collider* GetCollider() { return collider.get(); }
-        Renderer* GetRenderer() { return renderer.get(); }
+        //cached common components
+        RigidBody* rb = nullptr;
+        Collider* c = nullptr;
 
-        void SetRigidBody(std::unique_ptr<RigidBody> rb);
-        void SetCollider(std::unique_ptr<Collider> c);
-        void SetRenderer(std::unique_ptr<Renderer> r);
+        template <typename T>
+        T* GetComponent() {
+            for (auto& component : components)
+            {
+                T* target = dynamic_cast<T*>(component.get());
+                if (target) return target;
+            }
+            return nullptr;
+        }
+
+        template <typename T>
+        T& AddComponent(std::unique_ptr<T> component) {
+            component->owner = this;
+            T& ref = *component;
+            components.push_back(std::move(component));
+
+            if constexpr (std::is_base_of_v<RigidBody, T>) {
+                rb = static_cast<RigidBody*>(&ref);
+            } else if constexpr (std::is_base_of_v<Collider, T>) {
+                c = static_cast<Collider*>(&ref);
+            }
+
+            return ref;
+        }
+
+        void SetID(size_t newID) { id = newID; }
+        const size_t& GetID() const { return id; }
 
         void AddIgnored(int id);
         void RemoveIgnored(int id);
         const std::vector<int>& GetIgnoredIDs() const { return ignoredIDs; }
         
     private:
-        std::unique_ptr<RigidBody> rigidBody;
-        std::unique_ptr<Collider> collider;
-        std::unique_ptr<Renderer> renderer;
+        std::vector<std::unique_ptr<Component>> components;
 
         size_t id;
-
         std::vector<int> ignoredIDs;
 };

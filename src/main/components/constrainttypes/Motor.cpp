@@ -19,21 +19,19 @@ ConstraintType MotorConstraint::GetType() const
 //NOTE: this means that if you dont have a rigidbody, bodies will rotate through other objects 
 void MotorConstraint::Solve(float dt)
 {
-    RigidBody* rb = rotor->GetRigidBody();
+    RigidBody* rb = rotor->rb;
 
     if (!rb)
     {
-        float angleChange = (torque / (float)Config::impulseIterations) * dt;
+        float angleChange = torque * dt;
         rotor->transform.rotation += angleChange;
 
         RotMatrix rot(rotor->transform.rotation);
-        rot.Rotate(localPosition);
-
-        rotor->transform.position = this->position + rot.Rotate(localPosition);
+        rotor->transform.position = this->position - rot.Rotate(localPosition);
     }
     else
     {
-        float iterationImpulse = (torque * dt) / (float)Config::impulseIterations;
+        float iterationImpulse = torque * dt;
         
         float newAngularVel = rb->GetAngularVelocity() + (iterationImpulse * rb->GetInvInertia());
         rb->SetAngularVelocity(newAngularVel);

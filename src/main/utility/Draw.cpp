@@ -1,6 +1,7 @@
 #include "main/utility/Draw.h"
 #include "main/components/Collider.h"
 #include "main/components/Renderer.h"
+#include "main/physics/Config.h"
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/constrainttypes/Distance.h"
@@ -15,9 +16,9 @@ void Render(World& world)
     for (const auto& objPtr : world.GetGameObjects())
     {
         GameObject* obj = objPtr.get();
-        if (obj->GetRenderer() == nullptr) continue;
+        if (obj->GetComponent<Renderer>() == nullptr) continue;
 
-        Renderer *r = obj->GetRenderer();
+        Renderer *r = obj->GetComponent<Renderer>();
         Shape shape = r->GetShape();
 
         switch (shape.form)

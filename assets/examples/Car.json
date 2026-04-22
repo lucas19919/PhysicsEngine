@@ -145,7 +145,7 @@
           "Renderer": { "form": "R_BOX", "color": "YELLOW", "scale": { "x": 40.0, "y": 40.0 } },
           "RigidBody": {
             "gravityEnabled": true,
-            "properties": { "mass": 2.0, "restitution": 0.1, "friction": 0.8, "inertia": 800.0 },
+            "properties": { "mass": 10.0, "restitution": 0.1, "friction": 0.8, "inertia": 800.0 },
             "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
             "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
           }
@@ -159,7 +159,7 @@
       "type": "MOTOR",
       "active": true,
       "constraints": [100, 101],
-      "torqueMax": 2000000.0
+      "torqueMax": 400000.0
     }
   ]
 }

@@ -2,6 +2,7 @@
 #include "main/GameObject.h"
 #include "main/World.h"
 #include "main/utility/templates/Array.h"
+#include "main/components/Renderer.h"
 #include <vector>
 #include <variant>
 
@@ -17,5 +18,5 @@ class Instantiate
         Instantiate& WithTransform(Vec2 position, float rotation);
         GameObject* Create(World& world, size_t id);
     private:
-        GameObject* obj;
+        std::unique_ptr<GameObject> obj;
 };

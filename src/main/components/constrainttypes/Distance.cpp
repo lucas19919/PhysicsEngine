@@ -16,42 +16,62 @@ ConstraintType DistanceConstraint::GetType() const
 
 void DistanceConstraint::Solve(float dt)
 {
-    RigidBody* rb1 = anchor->GetRigidBody();
-    RigidBody* rb2 = attached->GetRigidBody();
+    RigidBody* rb1 = anchor->rb;
+    RigidBody* rb2 = attached->rb;
 
     float invMass1 = (rb1) ? rb1->GetInvMass() : 0.0f;
     float invMass2 = (rb2) ? rb2->GetInvMass() : 0.0f;
+    float invInertia1 = (rb1) ? rb1->GetInvInertia() : 0.0f;
+    float invInertia2 = (rb2) ? rb2->GetInvInertia() : 0.0f;
 
-    if (invMass1 == 0.0f && invMass2 == 0.0f) return;
+    if (invMass1 == 0.0f && invMass2 == 0.0f && invInertia1 == 0.0f && invInertia2 == 0.0f) return;
 
     RotMatrix rot1(anchor->transform.rotation);
-    Vec2 rAnchorOffset = rot1.Rotate(anchorOffset);
+    Vec2 r1 = rot1.Rotate(anchorOffset);
     RotMatrix rot2(attached->transform.rotation);
-    Vec2 rAttachedOffset = rot2.Rotate(attachedOffset);
+    Vec2 r2 = rot2.Rotate(attachedOffset);
 
-    Vec2 distVector = (attached->transform.position + rAttachedOffset) - (anchor->transform.position + rAnchorOffset);
+    Vec2 p1 = anchor->transform.position + r1;
+    Vec2 p2 = attached->transform.position + r2;
+
+    Vec2 distVector = p2 - p1;
     float distance = distVector.Mag();
 
-    if (distance < length) return;
+    if (distance < 0.0001f) return; //avoid division by zero
 
     Vec2 axis = distVector * (1.0f / distance);
     float error = distance - length;
 
     Vec2 v1 = rb1 ? rb1->GetVelocity() : Vec2(0,0);
+    float w1 = rb1 ? rb1->GetAngularVelocity() : 0.0f;
     Vec2 v2 = rb2 ? rb2->GetVelocity() : Vec2(0,0);
+    float w2 = rb2 ? rb2->GetAngularVelocity() : 0.0f;
 
-    Vec2 relative = v2 - v1;
+    Vec2 vp1 = v1 + Vec2(-w1 * r1.y, w1 * r1.x);
+    Vec2 vp2 = v2 + Vec2(-w2 * r2.y, w2 * r2.x);
+
+    Vec2 relative = vp2 - vp1;
     float magnitude = axis.Dot(relative);
 
     float bias = (Config::biasConstraint / dt) * error;
-    float totalInvMass = invMass1 + invMass2;
 
-    if (totalInvMass == 0.0f) return;
+    float r1c = r1.Cross(axis);
+    float r2c = r2.Cross(axis);
+    float denominator = invMass1 + invMass2 + (r1c * r1c * invInertia1) + (r2c * r2c * invInertia2);
 
-    float j = -(magnitude + bias) / totalInvMass;
+    if (denominator <= 0.0f) return;
 
+    float j = -(magnitude + bias) / denominator;
     Vec2 impulse = axis * j;
 
-    if (rb1) rb1->SetVelocity(rb1->GetVelocity() - impulse * invMass1);
-    if (rb2) rb2->SetVelocity(rb2->GetVelocity() + impulse * invMass2);
+    if (rb1) 
+    {
+        rb1->SetVelocity(v1 - impulse * invMass1);
+        rb1->SetAngularVelocity(w1 - (r1.Cross(impulse) * invInertia1));
+    }
+    if (rb2) 
+    {
+        rb2->SetVelocity(v2 + impulse * invMass2);
+        rb2->SetAngularVelocity(w2 + (r2.Cross(impulse) * invInertia2));
+    }
 }

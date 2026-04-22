@@ -21,7 +21,7 @@ void PinConstraint::Solve(float dt)
     for (PinAttachment att : attachments)
     {
         GameObject* obj = att.obj;
-        RigidBody* rb = obj->GetRigidBody();
+        RigidBody* rb = obj->rb;
         if (!rb) continue;
 
         Vec2 r = RotMatrix(obj->transform.rotation).Rotate(att.localAnchor);
