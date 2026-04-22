@@ -34,7 +34,7 @@ class Collider : public Component
         bool isActive = true;
         void Toggle();
 
-    private:
+    protected:
         Array<20> cachedVertices;
         Array<20> cachedNormals;
         BBox bounds;
