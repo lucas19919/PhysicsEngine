@@ -42,5 +42,6 @@ void Integrate::IntegratePosition(std::vector<std::unique_ptr<GameObject>>& game
 
         obj->transform.position += rb->GetVelocity() * dt;
         obj->transform.rotation += rb->GetAngularVelocity() * dt;
+        obj->transform.isDirty = true;
     }
 }

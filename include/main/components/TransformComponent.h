@@ -11,4 +11,8 @@ class TransformComponent : public Component
 
         Vec2 position;
         float rotation;
+        bool isDirty = true;
+
+        void SetPosition(const Vec2& newPos) { position = newPos; isDirty = true; }
+        void SetRotation(float newRot) { rotation = newRot; isDirty = true; }
 };

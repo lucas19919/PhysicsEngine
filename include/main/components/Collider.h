@@ -1,6 +1,8 @@
 #pragma once
 #include "math/Vec2.h"
 #include "main/components/Component.h"
+#include "main/utility/templates/Array.h"
+#include "main/components/TransformComponent.h"
 
 class GameObject;
 
@@ -21,13 +23,19 @@ class Collider : public Component
         virtual ~Collider() = default;
         virtual ColliderType GetType() const = 0;
 
+        const Array<20>& GetVertices() const { return cachedVertices; }
+        const Array<20>& GetNormals() const { return cachedNormals; }
+
+        virtual void UpdateCache(const TransformComponent& transform) = 0;
+
         BBox GetBounds() const { return bounds; }
         void SetBounds(const BBox& newBounds) { bounds = newBounds; }
 
         bool isActive = true;
         void Toggle();
-    
-    private:
-            BBox bounds;
 
-    };
+    private:
+        Array<20> cachedVertices;
+        Array<20> cachedNormals;
+        BBox bounds;
+};

@@ -28,7 +28,7 @@ BBox SpatialHash::GetBounding(GameObject* obj)
         };
     }
 
-    Array<20> vertices = obj->cachedVertices;
+    Array<20> vertices = obj->GetComponent<Collider>()->GetVertices();
 
     SAT::Projection xProj = SAT::Project(vertices, Vec2(1, 0));
     SAT::Projection yProj = SAT::Project(vertices, Vec2(0, 1));

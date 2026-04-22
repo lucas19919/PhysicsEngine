@@ -25,7 +25,9 @@ CollisionManifold Manifold::GenBoxCircle(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices = obj1->cachedVertices;
+    Collider* c1 = obj1->GetComponent<Collider>();
+    Array<20> vertices = c1->GetVertices();
+
     Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
@@ -40,8 +42,12 @@ CollisionManifold Manifold::GenBoxBox(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices1 = obj1->cachedVertices;
-    Array<20> vertices2 = obj2->cachedVertices;
+    Collider* c1 = obj1->GetComponent<Collider>();
+    Collider* c2 = obj2->GetComponent<Collider>();
+
+    Array<20> vertices1 = c1->GetVertices();
+    Array<20> vertices2 = c2->GetVertices();
+
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -55,7 +61,9 @@ CollisionManifold Manifold::GenPolyCircle(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices = obj1->cachedVertices;
+    Collider* c1 = obj1->GetComponent<Collider>();
+    Array<20> vertices = c1->GetVertices();
+
     Vec2 center = obj2->transform.position;
     cm.points = GetPolygonCircleContacts(vertices, center);
 
@@ -70,8 +78,12 @@ CollisionManifold Manifold::GenPolyBox(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices1 = obj1->cachedVertices;
-    Array<20> vertices2 = obj2->cachedVertices;
+    Collider *c1 = obj1->GetComponent<Collider>();
+    Collider *c2 = obj2->GetComponent<Collider>();
+
+    Array<20> vertices1 = c1->GetVertices();
+    Array<20> vertices2 = c2->GetVertices();
+    
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;
@@ -85,8 +97,12 @@ CollisionManifold Manifold::GenPolyPoly(GameObject* obj1, GameObject* obj2)
 
     if (!collision.isColliding) return cm;
 
-    Array<20> vertices1 = obj1->cachedVertices;
-    Array<20> vertices2 = obj2->cachedVertices;
+    Collider *c1 = obj1->GetComponent<Collider>();
+    Collider *c2 = obj2->GetComponent<Collider>();
+
+    Array<20> vertices1 = c1->GetVertices();
+    Array<20> vertices2 = c2->GetVertices();
+    
     cm.points = GetPolygonContacts(vertices1, vertices2, collision.normal);
 
     return cm;

@@ -14,9 +14,6 @@ class GameObject
 
         TransformComponent transform;
 
-        Array<20> cachedVertices;
-        Array<20> cachedNormals;
-
         template <typename T>
         T* GetComponent() {
             for (auto& component : components)

@@ -26,9 +26,11 @@ void Broadphase::UpdateBroadphase(std::vector<std::unique_ptr<GameObject>>& game
 
         if (!c) continue;
 
-        obj->cachedVertices = SAT::GetVertices(obj);
-        obj->cachedNormals = SAT::GetNormals(obj->cachedVertices);
-        c->SetBounds(spatialHash.GetBounding(obj));
+        if (obj->transform.isDirty) {
+            c->UpdateCache(obj->transform);
+            c->SetBounds(spatialHash.GetBounding(obj));
+            obj->transform.isDirty = false;
+        }
 
         int minX = std::floor(c->GetBounds().min.x / spatialHash.GetCellSize());
         int maxX = std::floor(c->GetBounds().max.x / spatialHash.GetCellSize());

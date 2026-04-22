@@ -57,10 +57,12 @@ void Solver::ResolvePosition(ContactConstraint& contact)
     if (rb1)
     {
         contact.obj1->transform.position = contact.obj1->transform.position - (correction * invMass1);
+        contact.obj1->transform.isDirty = true;
     }
     if (rb2)
     {
         contact.obj2->transform.position = contact.obj2->transform.position + (correction * invMass2);
+        contact.obj2->transform.isDirty = true;
     }
 }
 
@@ -125,8 +127,12 @@ Vec2 Solver::GetImpulse(ContactConstraint& contact, int index)
     float crossT1 = r1.Cross(tangent);
     float crossT2 = r2.Cross(tangent);
 
-    float jt = -relative.Dot(tangent) / (invMass1 + invMass2 + (crossT1 * crossT1 * invInertia1) + (crossT2 * crossT2 * invInertia2));
-    jt /= (float)contact.pointCount;
+    float jt = 0.0f;
+    if (denominator > 0.0f)
+    {
+        jt = -relative.Dot(tangent) / (invMass1 + invMass2 + (crossT1 * crossT1 * invInertia1) + (crossT2 * crossT2 * invInertia2));
+        jt /= (float)contact.pointCount;
+    }
 
     return Vec2(jn, jt);
 }
