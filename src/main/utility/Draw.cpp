@@ -11,6 +11,8 @@
 #include "main/utility/EditorState.h"
 #include <cmath>
 #include "math/RotationMatrix.h"
+#include "raymath.h"
+#include "external/imgui/imgui.h"
 
 inline Vector2 ToScreen(Vec2 pos) { return { pos.x * Config::MeterToPixel, pos.y * Config::MeterToPixel }; }
 inline float ToScreen(float val) { return val * Config::MeterToPixel; }
@@ -19,9 +21,8 @@ void Render(World& world, const EditorCamera& camera)
 {
     GameObject* selected = EditorState::Get().GetSelected();
     float zoom = camera.GetRaylibCamera().zoom;
-    float thickness = 4.0f / zoom; // 4 screen pixels thick
+    float thickness = 4.0f / zoom; 
 
-    // Draw World Area
     Vec2 worldSize = world.GetWorldSize();
     Vector2 screenWorldSize = ToScreen(worldSize);
     DrawRectangleV({ -screenWorldSize.x / 2.0f, -screenWorldSize.y / 2.0f }, screenWorldSize, WHITE);
@@ -33,8 +34,6 @@ void Render(World& world, const EditorCamera& camera)
 
         Renderer *r = obj->GetComponent<Renderer>();
         Shape shape = r->GetShape();
-
-        // If selected, draw a highlight first or after. Let's draw after for clarity.
 
         switch (shape.form)
         {
@@ -174,6 +173,13 @@ void Render(World& world, const EditorCamera& camera)
     // Draw selection highlight at the very end to ensure it is on top
     if (selected && selected->c)
     {
+        // Ensure collider cache is up to date for the highlight even if physics is paused
+        if (selected->transform.isDirty)
+        {
+            selected->c->UpdateCache(selected->transform);
+            // Note: we don't clear isDirty here as the broadphase needs to see it too
+        }
+
         if (selected->c->GetType() == ColliderType::CIRCLE)
         {
             float radius = ToScreen(static_cast<CircleCollider*>(selected->c)->radius);
@@ -190,6 +196,153 @@ void Render(World& world, const EditorCamera& camera)
                 Vector2 p2 = ToScreen(vertices[(i + 1) % vertices.Size()]);
                 // Dynamic thickness for lines
                 DrawLineEx(p1, p2, thickness, ORANGE);
+            }
+        }
+    }
+}
+
+void GizmoRender(const EditorCamera& camera)
+{
+    EditorState& state = EditorState::Get();
+    GameObject* selected = state.GetSelected();
+    if (!selected) return;
+
+    Vector2 origin = camera.WorldToScreenPixels(selected->transform.position);
+    GizmoType type = state.GetGizmoType();
+    GizmoAxis hovered = state.GetHoveredAxis();
+    GizmoAxis active = state.GetActiveAxis();
+
+    float handleLength = 100.0f;
+    float thickness = 4.0f;
+
+    if (type == GizmoType::TRANSLATE)
+    {
+        Color colorX = (hovered == GizmoAxis::X || active == GizmoAxis::X) ? YELLOW : RED;
+        Color colorY = (hovered == GizmoAxis::Y || active == GizmoAxis::Y) ? YELLOW : GREEN;
+        Color colorBoth = (hovered == GizmoAxis::BOTH || active == GizmoAxis::BOTH) ? YELLOW : BLUE;
+
+        // X Axis
+        DrawLineEx(origin, { origin.x + handleLength, origin.y }, thickness, colorX);
+        DrawTriangle({ origin.x + handleLength + 15, origin.y }, 
+                     { origin.x + handleLength, origin.y - 7 }, 
+                     { origin.x + handleLength, origin.y + 7 }, colorX);
+
+        // Y Axis
+        DrawLineEx(origin, { origin.x, origin.y + handleLength }, thickness, colorY);
+        DrawTriangle({ origin.x, origin.y + handleLength + 15 }, 
+                     { origin.x + 7, origin.y + handleLength }, 
+                     { origin.x - 7, origin.y + handleLength }, colorY);
+
+        // Center handle
+        DrawRectangleV({ origin.x - 8, origin.y - 8 }, { 16, 16 }, colorBoth);
+        DrawRectangleLinesEx({ origin.x - 8, origin.y - 8, 16, 16 }, 1.0f, BLACK);
+    }
+    else if (type == GizmoType::ROTATE)
+    {
+        float radius = 80.0f;
+        Color colorBoth = (hovered == GizmoAxis::BOTH || active == GizmoAxis::BOTH) ? YELLOW : BLUE;
+        DrawCircleLinesV(origin, radius, colorBoth);
+        DrawCircleV(origin, 5.0f, colorBoth);
+        
+        // Draw a line to current mouse if active
+        if (active == GizmoAxis::BOTH)
+        {
+            DrawLineV(origin, GetMousePosition(), LIGHTGRAY);
+        }
+    }
+}
+
+void GizmoUpdate(const EditorCamera& camera)
+{
+    if (ImGui::GetCurrentContext() != nullptr && ImGui::GetIO().WantCaptureMouse) return;
+
+    EditorState& state = EditorState::Get();
+    GameObject* selected = state.GetSelected();
+    if (!selected)
+    {
+        state.SetActiveAxis(GizmoAxis::NONE);
+        return;
+    }
+
+    Vector2 mousePos = GetMousePosition();
+    Vector2 origin = camera.WorldToScreenPixels(selected->transform.position);
+    float handleLength = 100.0f;
+
+    GizmoType type = state.GetGizmoType();
+    
+    // Hover Detection
+    GizmoAxis hovered = GizmoAxis::NONE;
+    if (type == GizmoType::TRANSLATE)
+    {
+        // Forgiving hitboxes: using slightly larger areas and including the tips
+        // Center handle
+        if (CheckCollisionPointRec(mousePos, { origin.x - 15, origin.y - 15, 30, 30 }))
+            hovered = GizmoAxis::BOTH;
+        // X Axis (includes the triangle tip)
+        else if (CheckCollisionPointRec(mousePos, { origin.x, origin.y - 15, handleLength + 40, 30 }))
+            hovered = GizmoAxis::X;
+        // Y Axis (includes the triangle tip)
+        else if (CheckCollisionPointRec(mousePos, { origin.x - 15, origin.y, 30, handleLength + 40 }))
+            hovered = GizmoAxis::Y;
+    }
+    else if (type == GizmoType::ROTATE)
+    {
+        float radius = 80.0f;
+        float dist = Vector2Distance(mousePos, origin);
+        if (std::abs(dist - radius) < 10.0f || dist < 10.0f)
+            hovered = GizmoAxis::BOTH;
+    }
+    
+    state.SetHoveredAxis(hovered);
+
+    // Interaction
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        state.SetActiveAxis(hovered);
+    }
+
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    {
+        state.SetActiveAxis(GizmoAxis::NONE);
+    }
+
+    if (state.GetActiveAxis() != GizmoAxis::NONE && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    {
+        Vector2 delta = GetMouseDelta();
+        if (delta.x != 0 || delta.y != 0)
+        {
+            float zoom = camera.GetRaylibCamera().zoom;
+            Vec2 worldDelta(
+                (delta.x / zoom) * Config::PixelToMeter,
+                (delta.y / zoom) * Config::PixelToMeter
+            );
+
+            if (type == GizmoType::TRANSLATE)
+            {
+                if (state.GetActiveAxis() == GizmoAxis::X)
+                    selected->transform.SetPosition(selected->transform.position + Vec2(worldDelta.x, 0));
+                else if (state.GetActiveAxis() == GizmoAxis::Y)
+                    selected->transform.SetPosition(selected->transform.position + Vec2(0, worldDelta.y));
+                else if (state.GetActiveAxis() == GizmoAxis::BOTH)
+                    selected->transform.SetPosition(selected->transform.position + worldDelta);
+            }
+            else if (type == GizmoType::ROTATE)
+            {
+                Vector2 currentDir = Vector2Subtract(mousePos, origin);
+                Vector2 prevDir = Vector2Subtract(Vector2Subtract(mousePos, delta), origin);
+                
+                if (Vector2Length(currentDir) > 0.1f && Vector2Length(prevDir) > 0.1f)
+                {
+                    float angle1 = atan2f(currentDir.y, currentDir.x);
+                    float angle2 = atan2f(prevDir.y, prevDir.x);
+                    float diff = angle1 - angle2;
+                    
+                    // Handle wrap around
+                    if (diff > PI) diff -= 2.0f * PI;
+                    if (diff < -PI) diff += 2.0f * PI;
+                    
+                    selected->transform.SetRotation(selected->transform.rotation + diff);
+                }
             }
         }
     }

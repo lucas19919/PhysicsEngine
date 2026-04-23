@@ -34,6 +34,9 @@ int main() {
     const float dt = 1.0f / 60.0f;
     while (!WindowShouldClose()) {
         input.Update(world, camera, selectedFile, screenWidth, screenHeight, dt);
+        
+        GizmoUpdate(camera);
+
         world.Step(dt);
 
         BeginDrawing();
@@ -43,6 +46,8 @@ int main() {
                 Render(world, camera); 
             camera.End();
             
+            GizmoRender(camera);
+
             rlImGuiBegin();
             ImGui::Begin("Physics Tools");
             
