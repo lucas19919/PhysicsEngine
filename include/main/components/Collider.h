@@ -27,6 +27,7 @@ class Collider : public Component
         const Array<20>& GetNormals() const { return cachedNormals; }
 
         virtual void UpdateCache(const TransformComponent& transform) = 0;
+        virtual bool TestPoint(Vec2 point) const = 0;
 
         BBox GetBounds() const { return bounds; }
         void SetBounds(const BBox& newBounds) { bounds = newBounds; }

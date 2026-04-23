@@ -31,3 +31,14 @@ void PolygonCollider::UpdateCache(const TransformComponent& transform)
         cachedNormals.PushBack(normal.Norm());
     }
 }
+
+bool PolygonCollider::TestPoint(Vec2 point) const
+{
+    for (size_t i = 0; i < cachedVertices.Size(); i++)
+    {
+        Vec2 v = cachedVertices[i];
+        Vec2 n = cachedNormals[i];
+        if (n.Dot(point - v) > 0.0f) return false;
+    }
+    return true;
+}

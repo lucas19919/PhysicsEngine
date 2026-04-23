@@ -143,6 +143,8 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     {
         LoadControllers(sceneData["controllers"], world);
     }
+
+    world.UpdateCaches();
 }
 
 GameObject* LoadScene::LoadObject(const json& item, World& world)

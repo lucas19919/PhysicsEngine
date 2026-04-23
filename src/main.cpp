@@ -40,7 +40,7 @@ int main() {
             ClearBackground(DARKGRAY);
 
             camera.Begin();
-                Render(world); 
+                Render(world, camera); 
             camera.End();
             
             rlImGuiBegin();

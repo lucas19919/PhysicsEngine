@@ -26,6 +26,11 @@ void World::AddConstraint(std::unique_ptr<Constraint> c)
     constraints.push_back(std::move(c));
 }
 
+void World::UpdateCaches()
+{
+    broadphase->UpdateBroadphase(gameObjects);
+}
+
 void World::Clear()
 {
     gameObjects.clear();

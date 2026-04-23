@@ -18,6 +18,7 @@ class World
         World();
         
         void Step(float dt);
+        void UpdateCaches();
         void Clear();       
 
         void AddGameObject(std::unique_ptr<GameObject> obj);

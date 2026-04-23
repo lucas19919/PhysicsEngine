@@ -18,6 +18,7 @@ public:
     // Convert World Meters -> Screen Pixels
     Vector2 WorldToScreenPixels(Vec2 worldPos) const;
 
+    const Camera2D& GetRaylibCamera() const { return camera; }
     Camera2D& GetRaylibCamera() { return camera; }
 
 private:

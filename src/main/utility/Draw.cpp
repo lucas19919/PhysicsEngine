@@ -8,14 +8,19 @@
 #include "main/components/constrainttypes/Pin.h"
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/constrainttypes/Motor.h"
+#include "main/utility/EditorState.h"
 #include <cmath>
 #include "math/RotationMatrix.h"
 
 inline Vector2 ToScreen(Vec2 pos) { return { pos.x * Config::MeterToPixel, pos.y * Config::MeterToPixel }; }
 inline float ToScreen(float val) { return val * Config::MeterToPixel; }
 
-void Render(World& world)
+void Render(World& world, const EditorCamera& camera)
 {
+    GameObject* selected = EditorState::Get().GetSelected();
+    float zoom = camera.GetRaylibCamera().zoom;
+    float thickness = 4.0f / zoom; // 4 screen pixels thick
+
     // Draw World Area
     Vec2 worldSize = world.GetWorldSize();
     Vector2 screenWorldSize = ToScreen(worldSize);
@@ -28,6 +33,8 @@ void Render(World& world)
 
         Renderer *r = obj->GetComponent<Renderer>();
         Shape shape = r->GetShape();
+
+        // If selected, draw a highlight first or after. Let's draw after for clarity.
 
         switch (shape.form)
         {
@@ -161,6 +168,29 @@ void Render(World& world)
             Vector2 pos = ToScreen(jc->position);
             DrawCircleV(pos, 5.0f, DARKGRAY);
             DrawCircleLines(pos.x, pos.y, 5.0f, BLACK);
+        }
+    }
+
+    // Draw selection highlight at the very end to ensure it is on top
+    if (selected && selected->c)
+    {
+        if (selected->c->GetType() == ColliderType::CIRCLE)
+        {
+            float radius = ToScreen(static_cast<CircleCollider*>(selected->c)->radius);
+            Vector2 pos = ToScreen(selected->transform.position);
+            // Dynamic thickness to keep highlight consistent on screen, no gap
+            DrawRing(pos, radius, radius + thickness, 0.0f, 360.0f, 36, ORANGE);
+        }
+        else
+        {
+            const Array<20>& vertices = selected->c->GetVertices();
+            for (size_t i = 0; i < vertices.Size(); i++)
+            {
+                Vector2 p1 = ToScreen(vertices[i]);
+                Vector2 p2 = ToScreen(vertices[(i + 1) % vertices.Size()]);
+                // Dynamic thickness for lines
+                DrawLineEx(p1, p2, thickness, ORANGE);
+            }
         }
     }
 }
