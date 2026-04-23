@@ -27,12 +27,4 @@ struct Config
     static inline float biasConstraint = 0.1f; 
 
     static inline float generatorJitterRange = 4.0f;
-
-    static inline bool debugDraw = true;
-    static inline bool drawAABB = false;
-    static inline bool drawContactPoints = false;
-    static inline bool drawContactNormals = false;
-    static inline bool drawVelocities = false;
-    static inline bool drawAccelerations = false;
-    static inline bool drawGrid = false;
 };

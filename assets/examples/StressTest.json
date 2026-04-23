@@ -3,11 +3,11 @@
   "useWalls": true,
   "objects": [
     {
-      "id": 1, "name": "Floor",
+      "name": "Floor",
       "components": {
-        "TransformComponent": {"position":{"x":640,"y":940},"rotation":0},
-        "Collider": {"type":"BOX","isActive":true,"size":{"x":1280,"y":40}},
-        "Renderer": {"form":"R_BOX","color":"BLUE","scale":{"x":1280,"y":40}}
+        "TransformComponent": { "position": { "x": 640.0, "y": 940.0 }, "rotation": 0.0 },
+        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 1280.0, "y": 40.0 } },
+        "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 1280.0, "y": 40.0 } }
       }
     }
   ],
@@ -16,64 +16,22 @@
       "grid": {
         "rows": 40,
         "columns": 25,
-        "startX": 100,
-        "startY": 50,
-        "spacingX": 45,
-        "spacingY": 20
+        "startX": 100.0,
+        "startY": 50.0,
+        "spacingX": 45.0,
+        "spacingY": 20.0
       },
       "object": {
         "name": "Box",
         "components": {
-          "TransformComponent": {
-            "position": {
-              "x": 0,
-              "y": 0
-            },
-            "rotation": 0
-          },
-          "Collider": {
-            "type": "BOX",
-            "isActive": true,
-            "size": {
-              "x": 20,
-              "y": 15
-            }
-          },
-          "Renderer": {
-            "form": "R_BOX",
-            "color": "GREEN",
-            "scale": {
-              "x": 20,
-              "y": 15
-            }
-          },
+          "TransformComponent": { "position": { "x": 0.0, "y": 0.0 }, "rotation": 0.0 },
+          "Collider": { "type": "BOX", "isActive": true, "size": { "x": 20.0, "y": 15.0 } },
+          "Renderer": { "form": "R_BOX", "color": "GREEN", "scale": { "x": 20.0, "y": 15.0 } },
           "RigidBody": {
             "gravityEnabled": true,
-            "properties": {
-              "mass": 1,
-              "restitution": 0.2,
-              "friction": 0.5,
-              "inertia": 50
-            },
-            "linearState": {
-              "velocity": {
-                "x": 0,
-                "y": 0
-              },
-              "acceleration": {
-                "x": 0,
-                "y": 0
-              },
-              "netForce": {
-                "x": 0,
-                "y": 0
-              }
-            },
-            "angularState": {
-              "angularVelocity": 0,
-              "angularAcceleration": 0,
-              "torque": 0
-            }
+            "properties": { "mass": 1.0, "restitution": 0.2, "friction": 0.5, "inertia": 50.0 },
+            "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
+            "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
           }
         }
       }

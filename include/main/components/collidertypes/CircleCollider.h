@@ -9,7 +9,5 @@ class CircleCollider : public Collider
         CircleCollider(float r);
         ColliderType GetType() const override;
         
-        void UpdateCache(const TransformComponent& transform) override;
-
-        bool IsPointInside(Vec2 point) const override;
+        void UpdateCache(const TransformComponent& transform) override {}
 };

@@ -28,13 +28,8 @@ class World
         void AddController(std::unique_ptr<Controller> c) { controllers.push_back(std::move(c)); }
         const std::vector<std::unique_ptr<Controller>>& GetControllers() const { return controllers; }
 
-        Broadphase* GetBroadphase() const { return broadphase.get(); }
-        ContactManager* GetContactManager() const { return contactManager.get(); }
-
         //abstract stuff like this later ???
         bool isPaused = true;
-
-        GameObject* selectedObject = nullptr;
 
     private:
         std::unique_ptr<Integrate> integrate;

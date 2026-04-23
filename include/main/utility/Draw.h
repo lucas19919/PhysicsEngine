@@ -3,5 +3,5 @@
 #include "main/World.h"
 #include "raylib.h"
 
+
 void Render(World& world);
-static void DrawContact(const ContactConstraint& contact);
