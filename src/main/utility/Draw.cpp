@@ -11,8 +11,16 @@
 #include <cmath>
 #include "math/RotationMatrix.h"
 
+inline Vector2 ToScreen(Vec2 pos) { return { pos.x * Config::MeterToPixel, pos.y * Config::MeterToPixel }; }
+inline float ToScreen(float val) { return val * Config::MeterToPixel; }
+
 void Render(World& world)
 {
+    // Draw World Area
+    Vec2 worldSize = world.GetWorldSize();
+    Vector2 screenWorldSize = ToScreen(worldSize);
+    DrawRectangleV({ -screenWorldSize.x / 2.0f, -screenWorldSize.y / 2.0f }, screenWorldSize, WHITE);
+
     for (const auto& objPtr : world.GetGameObjects())
     {
         GameObject* obj = objPtr.get();
@@ -25,22 +33,24 @@ void Render(World& world)
         {
         case RenderShape::R_CIRCLE:
         {
-            float radius = std::get<float>(shape.scale);
-            Vec2 pos = obj->transform.position;
+            float radius = ToScreen(std::get<float>(shape.scale));
+            Vector2 pos = ToScreen(obj->transform.position);
             float rot = obj->transform.rotation;
 
-            DrawCircle(pos.x, pos.y, radius, shape.color);
+            DrawCircleV(pos, radius, shape.color);
             
-            DrawRing({ pos.x, pos.y }, radius - 2.0f, radius, 0.0f, 360.0f, 36, BLACK);
+            DrawRing(pos, radius - 2.0f, radius, 0.0f, 360.0f, 36, BLACK);
             break;
         }
         case RenderShape::R_BOX:
         {
             Vec2 size = std::get<Vec2>(shape.scale);
+            Vector2 screenPos = ToScreen(obj->transform.position);
+            Vector2 screenSize = ToScreen(size);
             
             DrawRectanglePro(
-                Rectangle{ obj->transform.position.x, obj->transform.position.y, size.x, size.y },
-                { size.x / 2.0f, size.y / 2.0f },
+                Rectangle{ screenPos.x, screenPos.y, screenSize.x, screenSize.y },
+                { screenSize.x / 2.0f, screenSize.y / 2.0f },
                 obj->transform.rotation * RAD2DEG,
                 shape.color
             );        
@@ -49,9 +59,9 @@ void Render(World& world)
             
             for (size_t i = 0; i < vertices.Size(); i++) 
             {
-                Vec2 p1 = vertices[i];
-                Vec2 p2 = vertices[(i + 1) % vertices.Size()];
-                DrawLineEx({ p1.x, p1.y }, { p2.x, p2.y }, 2.0f, BLACK);
+                Vector2 p1 = ToScreen(vertices[i]);
+                Vector2 p2 = ToScreen(vertices[(i + 1) % vertices.Size()]);
+                DrawLineEx(p1, p2, 2.0f, BLACK);
             }
             break;
         }
@@ -65,7 +75,7 @@ void Render(World& world)
             std::vector<Vector2> raylibVerts(vertexCount);
             for (int i = 0; i < vertexCount; i++) 
             {
-                raylibVerts[i] = { vertices[i].x, vertices[i].y }; 
+                raylibVerts[i] = ToScreen(vertices[i]); 
             }
 
             for (int i = 1; i < vertexCount - 1; i++) 
@@ -95,24 +105,24 @@ void Render(World& world)
             RotMatrix rot2(dc->attached->transform.rotation);
             Vec2 rAttachedOffset = rot2.Rotate(dc->attachedOffset);
 
-            Vec2 pos1 = dc->anchor->transform.position + rAnchorOffset;
-            Vec2 pos2 = dc->attached->transform.position + rAttachedOffset;
+            Vector2 pos1 = ToScreen(dc->anchor->transform.position + rAnchorOffset);
+            Vector2 pos2 = ToScreen(dc->attached->transform.position + rAttachedOffset);
 
-            DrawLineEx({ pos1.x, pos1.y }, { pos2.x, pos2.y }, 2.0f, DARKGRAY);
+            DrawLineEx(pos1, pos2, 2.0f, DARKGRAY);
         }
         if (c->GetType() == ConstraintType::PIN)
         {
             PinConstraint* pc = static_cast<PinConstraint*>(c.get());
             for (const auto& att : pc->attachments)
             {
-                Vec2 pos = pc->position; //center of pin
+                Vector2 pos = ToScreen(pc->position); //center of pin
 
                 bool fixedX = pc->fixedX;
                 bool fixedY = pc->fixedY;
 
                 if (fixedX && fixedY)
                 {
-                    DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
+                    DrawTriangle( pos, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
 
                     for (int i = 0; i < 9; i++)
                     {
@@ -122,16 +132,16 @@ void Render(World& world)
                 }
                 else if (fixedX)
                 {
-                    DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y - 25.0f }, { pos.x - 25.0f, pos.y + 25.0f }, BLACK);
+                    DrawTriangle( pos, { pos.x - 25.0f, pos.y - 25.0f }, { pos.x - 25.0f, pos.y + 25.0f }, BLACK);
                     DrawLine(pos.x - 30.0f, pos.y - 25.0f, pos.x - 30.0f, pos.y + 25.0f, BLACK);
                 }
                 else if (fixedY)
                 {
-                    DrawTriangle( { pos.x, pos.y }, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
+                    DrawTriangle( pos, { pos.x - 25.0f, pos.y + 25.0f }, { pos.x + 25.0f, pos.y + 25.0f }, BLACK);
                     DrawLine(pos.x - 25.0f, pos.y + 30.0f, pos.x + 25.0f, pos.y + 30.0f, BLACK);
                 }
 
-                DrawCircle(pos.x, pos.y, 5.0f, BLACK);
+                DrawCircleV(pos, 5.0f, BLACK);
                 DrawCircleLines(pos.x, pos.y, 5.0f, DARKGRAY);
             }
         }
@@ -139,17 +149,17 @@ void Render(World& world)
         {
             MotorConstraint* mc = static_cast<MotorConstraint*>(c.get());
             Vec2 r = RotMatrix(mc->rotor->transform.rotation).Rotate(mc->localPosition);
-            Vec2 pos = mc->rotor->transform.position + r;
+            Vector2 pos = ToScreen(mc->rotor->transform.position + r);
 
-            DrawCircle(pos.x, pos.y, 10.0f, RED);
+            DrawCircleV(pos, 10.0f, RED);
             DrawCircleLines(pos.x, pos.y, 10.0f, BLACK);
         }
 
         if (c->GetType() == ConstraintType::JOINT)
         {
             JointConstraint* jc = static_cast<JointConstraint*>(c.get());
-            Vec2 pos = jc->position;
-            DrawCircle(pos.x, pos.y, 5.0f, DARKGRAY);
+            Vector2 pos = ToScreen(jc->position);
+            DrawCircleV(pos, 5.0f, DARKGRAY);
             DrawCircleLines(pos.x, pos.y, 5.0f, BLACK);
         }
     }

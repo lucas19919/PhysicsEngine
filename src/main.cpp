@@ -7,6 +7,7 @@
 #include "main/utility/Draw.h"
 #include "main/utility/InputHandler.h"
 #include "main/physics/Config.h"
+#include "main/utility/EditorCamera.h"
 #include <string>
 
 int main() {
@@ -20,6 +21,7 @@ int main() {
 
     World world;
     InputHandler input;
+    EditorCamera camera((float)screenWidth, (float)screenHeight);
 
     std::string selectedFile = "../assets/examples/PrattTruss.json";
     char filePathBuffer[256] = "../assets/examples/";
@@ -31,13 +33,15 @@ int main() {
 
     const float dt = 1.0f / 60.0f;
     while (!WindowShouldClose()) {
-        input.Update(world, selectedFile, screenWidth, screenHeight, dt);
+        input.Update(world, camera, selectedFile, screenWidth, screenHeight, dt);
         world.Step(dt);
 
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(DARKGRAY);
 
-            Render(world); 
+            camera.Begin();
+                Render(world); 
+            camera.End();
             
             rlImGuiBegin();
             ImGui::Begin("Physics Tools");
@@ -50,11 +54,17 @@ int main() {
                 world.Clear();
                 
                 LoadScene::Load(selectedFile, world, screenWidth, screenHeight);  
-          }
+            }
 
             if (!selectedFile.empty()) {
                 ImGui::Text("Currently active file: %s", selectedFile.c_str());
             }
+
+            ImGui::Separator();
+            ImGui::Text("Viewport Info:");
+            ImGui::Text("Zoom: %.2fx", camera.GetRaylibCamera().zoom);
+            Vec2 mousePos = input.GetMouseWorldPos();
+            ImGui::Text("Mouse World (m): %.2f, %.2f", mousePos.x, mousePos.y);
 
             ImGui::End();
 

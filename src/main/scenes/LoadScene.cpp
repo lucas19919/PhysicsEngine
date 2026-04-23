@@ -50,26 +50,39 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     json sceneData;
     file >> sceneData;
 
+    Vec2 worldSize = sceneData.contains("worldSize") ? ParseVec2(sceneData["worldSize"]) : Vec2(screenWidth * Config::PixelToMeter, screenHeight * Config::PixelToMeter);
+    world.SetWorldSize(worldSize);
+
     if (sceneData.value("useWalls", false))
     {
+        float sw = worldSize.x;
+        float sh = worldSize.y;
+
+        float halfW = sw / 2.0f;
+        float halfH = sh / 2.0f;
+
+        // Bottom
         Instantiate()
-            .WithTransform(Vec2(screenWidth / 2.0f, screenHeight + 100.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(screenWidth, 200.0f))
+            .WithTransform(Vec2(0.0f, halfH + 2.0f), 0.0f)
+            .WithCollider(ColliderType::BOX, Vec2(sw, 4.0f))
             .Create(world, -1);
 
+        // Top
         Instantiate()
-            .WithTransform(Vec2(screenWidth / 2.0f, -100.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(screenWidth, 200.0f))
+            .WithTransform(Vec2(0.0f, -halfH - 2.0f), 0.0f)
+            .WithCollider(ColliderType::BOX, Vec2(sw, 4.0f))
             .Create(world, -1);
 
+        // Left
         Instantiate()
-            .WithTransform(Vec2(-100.0f, screenHeight / 2.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(200.0f, screenHeight))
+            .WithTransform(Vec2(-halfW - 2.0f, 0.0f), 0.0f)
+            .WithCollider(ColliderType::BOX, Vec2(4.0f, sh))
             .Create(world, -1);
 
+        // Right
         Instantiate()
-            .WithTransform(Vec2(screenWidth + 100.0f, screenHeight / 2.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(200.0f, screenHeight))
+            .WithTransform(Vec2(halfW + 2.0f, 0.0f), 0.0f)
+            .WithCollider(ColliderType::BOX, Vec2(4.0f, sh))
             .Create(world, -1);
     }
 

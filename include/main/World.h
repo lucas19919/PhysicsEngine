@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <memory>
+#include "math/Vec2.h"
 
 class World
 {
@@ -28,6 +29,9 @@ class World
         void AddController(std::unique_ptr<Controller> c) { controllers.push_back(std::move(c)); }
         const std::vector<std::unique_ptr<Controller>>& GetControllers() const { return controllers; }
 
+        void SetWorldSize(Vec2 size) { worldSize = size; }
+        Vec2 GetWorldSize() const { return worldSize; }
+
         //abstract stuff like this later ???
         bool isPaused = true;
 
@@ -36,6 +40,7 @@ class World
         std::unique_ptr<Broadphase> broadphase;
         std::unique_ptr<ContactManager> contactManager;
 
+        Vec2 worldSize = Vec2(32.0f, 18.0f);
         
         std::vector<std::unique_ptr<GameObject>> gameObjects;
         std::vector<std::unique_ptr<Constraint>> constraints;
