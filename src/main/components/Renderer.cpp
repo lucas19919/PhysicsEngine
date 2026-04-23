@@ -4,12 +4,6 @@
 
 Renderer::Renderer(Shape shape) : shape(shape) 
 {
-    RebuildLocalCoordinates();
-}
-
-void Renderer::RebuildLocalCoordinates()
-{
-    localCoordinates.Clear();
     if (shape.form == RenderShape::R_BOX)
     {
         float x = std::get<Vec2>(shape.scale).x / 2.0f;
