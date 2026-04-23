@@ -5,7 +5,7 @@
 #include "external/imgui/imgui.h"
 #include "main/components/Collider.h"
 
-void InputHandler::Update(World& world, const std::string& filePath, int screenWidth, int screenHeight, float dt)
+void InputHandler::Update(World& world, const std::string& filePath, int viewportWidth, int viewportHeight, float dt, Camera2D camera)
 {
     if (IsKeyPressed(KEY_SPACE))
     {
@@ -15,23 +15,28 @@ void InputHandler::Update(World& world, const std::string& filePath, int screenW
     {
         world.isPaused = true;
         world.Clear();
-        LoadScene::Load(filePath, world, screenWidth, screenHeight);
+        LoadScene::Load(filePath, world, viewportWidth, viewportHeight);
     }
 
     // Selection Logic
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !ImGui::GetIO().WantCaptureMouse)
     {
         Vector2 mousePos = GetMousePosition();
-        // Subtract 300px sidebar offset to get world-space coordinates
-        Vec2 point(mousePos.x - 300.0f, mousePos.y); 
+        Vector2 worldMouse = GetScreenToWorld2D(mousePos, camera);
+        Vec2 point(worldMouse.x, worldMouse.y); 
         
         world.selectedObject = nullptr;
         for (auto& objPtr : world.GetGameObjects())
         {
-            if (objPtr->c && objPtr->c->IsPointInside(point))
+            if (objPtr->c)
             {
-                world.selectedObject = objPtr.get();
-                break;
+                // Force update cache for accurate point testing even when paused
+                objPtr->c->UpdateCache(objPtr->transform);
+                if (objPtr->c->IsPointInside(point))
+                {
+                    world.selectedObject = objPtr.get();
+                    break;
+                }
             }
         }
     }

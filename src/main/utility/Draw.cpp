@@ -107,14 +107,18 @@ void Render(World& world)
             if (shape.form == RenderShape::R_CIRCLE)
             {
                 float radius = std::get<float>(shape.scale);
-                DrawCircleLines(obj->transform.position.x, obj->transform.position.y, radius + 2.0f, YELLOW);
+                DrawRing({ obj->transform.position.x, obj->transform.position.y }, radius - 1.5f, radius - 3.5f, 0.0f, 360.0f, 36, BLACK);
+                DrawRing({ obj->transform.position.x, obj->transform.position.y }, radius - 2.0f, radius - 3.0f, 0.0f, 360.0f, 36, YELLOW);
             }
             else
             {
                 Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
                 for (size_t i = 0; i < vertices.Size(); i++)
                 {
-                    DrawLineEx({ vertices[i].x, vertices[i].y }, { vertices[(i + 1) % vertices.Size()].x, vertices[(i + 1) % vertices.Size()].y }, 3.0f, YELLOW);
+                    Vec2 p1 = vertices[i];
+                    Vec2 p2 = vertices[(i + 1) % vertices.Size()];
+                    DrawLineEx({ p1.x, p1.y }, { p2.x, p2.y }, 5.0f, BLACK);
+                    DrawLineEx({ p1.x, p1.y }, { p2.x, p2.y }, 3.0f, YELLOW);
                 }
             }
             
@@ -122,8 +126,10 @@ void Render(World& world)
             Vec2 pos = obj->transform.position;
             Vec2 forward = RotMatrix(obj->transform.rotation).Rotate(Vec2(20, 0));
             Vec2 up = RotMatrix(obj->transform.rotation).Rotate(Vec2(0, -20));
-            DrawLineEx({pos.x, pos.y}, {pos.x + forward.x, pos.y + forward.y}, 2.0f, RED);
-            DrawLineEx({pos.x, pos.y}, {pos.x + up.x, pos.y + up.y}, 2.0f, GREEN);
+            DrawLineEx({pos.x, pos.y}, {pos.x + forward.x, pos.y + forward.y}, 3.0f, BLACK);
+            DrawLineEx({pos.x, pos.y}, {pos.x + forward.x, pos.y + forward.y}, 1.5f, RED);
+            DrawLineEx({pos.x, pos.y}, {pos.x + up.x, pos.y + up.y}, 3.0f, BLACK);
+            DrawLineEx({pos.x, pos.y}, {pos.x + up.x, pos.y + up.y}, 1.5f, GREEN);
         }
 
         if (Config::debugDraw)

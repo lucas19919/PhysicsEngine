@@ -31,9 +31,12 @@ class Renderer : public Component
         Array<20> UpdateWorldCoordinates(Vec2 position, float rotation);
 
         Shape GetShape() const { return shape; }
+        void SetShape(Shape newShape) { shape = newShape; RebuildLocalCoordinates(); }
+        void SetScale(std::variant<Vec2, float, Array<20>> newScale) { shape.scale = newScale; RebuildLocalCoordinates(); }
 
         //Debug helper
         void SetColor(Color color) { shape.color = color; }
+        void RebuildLocalCoordinates();
 
     private:
         Shape shape;

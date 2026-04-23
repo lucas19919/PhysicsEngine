@@ -50,6 +50,8 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     json sceneData;
     file >> sceneData;
 
+    size_t nextID = 0;
+
     if (sceneData.value("useWalls", false))
     {
         Instantiate()
@@ -71,6 +73,8 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
             .WithTransform(Vec2(screenWidth + 100.0f, screenHeight / 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(200.0f, screenHeight))
             .Create(world, 9003);
+            
+        nextID = 9004;
     }
 
     std::unordered_map<int, GameObject*> idMap;
@@ -78,10 +82,12 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     for (const auto& item : sceneData["objects"])
     {
         GameObject* obj = LoadObject(item, world);
-        if (obj && item.contains("id"))
+        if (obj)
         {
-            obj->SetID(item["id"].get<int>());
-            idMap[item["id"].get<int>()] = obj;
+            size_t id = item.contains("id") ? (size_t)item["id"].get<int>() : nextID++;
+            obj->SetID(id);
+            idMap[(int)id] = obj;
+            if (id >= nextID) nextID = id + 1;
         }
     }
 
@@ -115,7 +121,8 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
                     genObject["components"]["TransformComponent"]["position"]["x"] = posX;
                     genObject["components"]["TransformComponent"]["position"]["y"] = posY;
 
-                    LoadObject(genObject, world);
+                    GameObject* obj = LoadObject(genObject, world);
+                    if (obj) obj->SetID(nextID++);
                 }
             }
         }
