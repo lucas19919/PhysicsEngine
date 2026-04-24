@@ -25,6 +25,7 @@ void Broadphase::UpdateBroadphase(std::vector<std::unique_ptr<GameObject>>& game
         Collider* c = obj->c;
 
         if (!c) continue;
+        if (!c->isActive) continue;
 
         if (obj->transform.isDirty) {
             c->UpdateCache(obj->transform);

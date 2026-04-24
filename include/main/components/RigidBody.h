@@ -37,6 +37,9 @@ class RigidBody : public Component
         RigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings);
         ~RigidBody();
 
+        const char* GetName() const override { return "RigidBody"; }
+        void OnInspectorGui() override;
+
         void SetGravity(bool enabled) { gravityEnabled = enabled; }
         const bool& IsGravityEnabled() const { return gravityEnabled; }
 

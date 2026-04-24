@@ -9,6 +9,11 @@ struct Config
     static inline int targetFPS = 60;      
 
     static inline bool drawFPS = true;
+    static inline bool drawNormals = false;
+    static inline bool drawContactPoints = false;
+    static inline bool drawVelocity = false;
+    static inline bool drawAcceleration = false;
+    static inline bool drawAABB = false;
 
     static constexpr float MeterToPixel = 50.0f;
     static constexpr float PixelToMeter = 1.0f / MeterToPixel;

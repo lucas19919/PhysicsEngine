@@ -11,6 +11,10 @@ namespace Editor {
 
         ImGui::Begin(GetName(), &isOpen);
         
+        if (Config::drawFPS) {
+            ImGui::Text("FPS: %d", GetFPS());
+        }
+
         ImGui::Text("Viewport Info:");
         ImGui::Text("Zoom: %.2fx", camera.GetRaylibCamera().zoom);
         Vec2 mousePos = input.GetMouseWorldPos();

@@ -473,8 +473,8 @@
       "constraints": [
         100,
         101
-      ],
-      "torqueMax": 400000.0
+      ], 
+      "torqueMax": 200.0
     }
   ],
   "worldSize": {

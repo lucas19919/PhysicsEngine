@@ -6,7 +6,7 @@ EditorCamera::EditorCamera(float screenWidth, float screenHeight) {
     camera.target = { 0.0f, 0.0f };
     camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
     camera.rotation = 0.0f;
-    camera.zoom = 1.0f;
+    camera.zoom = 0.7f;
 }
 
 void EditorCamera::Begin() {

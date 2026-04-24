@@ -17,5 +17,7 @@ class DistanceConstraint : public Constraint
 
         DistanceConstraint(GameObject* anchor, GameObject* attached, float length, Vec2 anchorOffset, Vec2 attachedOffset);
         ConstraintType GetType() const override;
+        const char* GetName() const override { return "DistanceConstraint"; }
+
         void Solve(float dt) override;
 };

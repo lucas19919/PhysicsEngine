@@ -9,6 +9,7 @@ class PolygonCollider : public Collider
         Array<20> vertices;
         PolygonCollider(const Array<20>& vertices);
         ColliderType GetType() const override;
+        const char* GetName() const override { return "PolygonCollider"; }
 
         void UpdateCache(const TransformComponent& transform) override;
         bool TestPoint(Vec2 point) const override;

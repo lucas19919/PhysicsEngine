@@ -1,7 +1,7 @@
 #include "main/GameObject.h"
 #include <algorithm>
 
-GameObject::GameObject()
+GameObject::GameObject() : id((size_t)-1)
 {
 }
 

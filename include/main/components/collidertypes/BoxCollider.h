@@ -6,8 +6,9 @@ class BoxCollider : public Collider
 {
     public:
         Vec2 size;
-        BoxCollider(Vec2 s);
+        BoxCollider(Vec2 size);
         ColliderType GetType() const override;
+        const char* GetName() const override { return "BoxCollider"; }
 
         void UpdateCache(const TransformComponent& transform) override;
         bool TestPoint(Vec2 point) const override;

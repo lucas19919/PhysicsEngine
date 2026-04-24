@@ -65,25 +65,25 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
         Instantiate()
             .WithTransform(Vec2(0.0f, halfH + 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(sw, 4.0f))
-            .Create(world, -1);
+            .Create(world, 9000)->SetName("Bottom_Wall");
 
         // Top
         Instantiate()
             .WithTransform(Vec2(0.0f, -halfH - 2.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(sw, 4.0f))
-            .Create(world, -1);
+            .Create(world, 9001)->SetName("Top_Wall");
 
         // Left
         Instantiate()
             .WithTransform(Vec2(-halfW - 2.0f, 0.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(4.0f, sh))
-            .Create(world, -1);
+            .Create(world, 9002)->SetName("Left_Wall");
 
         // Right
         Instantiate()
             .WithTransform(Vec2(halfW + 2.0f, 0.0f), 0.0f)
             .WithCollider(ColliderType::BOX, Vec2(4.0f, sh))
-            .Create(world, -1);
+            .Create(world, 9003)->SetName("Right_Wall");
     }
 
     std::unordered_map<int, GameObject*> idMap;
@@ -91,10 +91,17 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     for (const auto& item : sceneData["objects"])
     {
         GameObject* obj = LoadObject(item, world);
-        if (obj && item.contains("id"))
+        if (obj)
         {
-            obj->SetID(item["id"].get<int>());
-            idMap[item["id"].get<int>()] = obj;
+            if (item.contains("id"))
+            {
+                obj->SetID(item["id"].get<int>());
+                idMap[item["id"].get<int>()] = obj;
+            }
+            if (item.contains("name"))
+            {
+                obj->SetName(item["name"].get<std::string>());
+            }
         }
     }
 
@@ -104,9 +111,12 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
         std::mt19937 gen(rd());
         std::uniform_real_distribution<float> jitter(-Config::generatorJitterRange, Config::generatorJitterRange);
 
+        int genIdx = 0;
         for (const auto& generator : sceneData["generators"])
         {
             if (!generator.contains("grid") || !generator.contains("object")) continue;
+            
+            std::string groupName = generator.value("name", "Generator " + std::to_string(genIdx++));
 
             const auto& grid = generator["grid"];
             int rows = grid["rows"];
@@ -128,7 +138,11 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
                     genObject["components"]["TransformComponent"]["position"]["x"] = posX;
                     genObject["components"]["TransformComponent"]["position"]["y"] = posY;
 
-                    LoadObject(genObject, world);
+                    GameObject* obj = LoadObject(genObject, world);
+                    if (obj) {
+                        obj->SetGroupName(groupName);
+                        obj->SetName(groupName + " (" + std::to_string(r * cols + c) + ")");
+                    }
                 }
             }
         }

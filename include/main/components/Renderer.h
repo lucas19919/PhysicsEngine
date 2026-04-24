@@ -26,6 +26,9 @@ class Renderer : public Component
         Renderer(Shape shape);
         ~Renderer() = default;
 
+        const char* GetName() const override { return "Renderer"; }
+        void OnInspectorGui() override;
+
         Array<20> GetLocalCoordinates() const;
         Array<20> GetWorldCoordinates(Vec2 position) const;
         Array<20> UpdateWorldCoordinates(Vec2 position, float rotation);

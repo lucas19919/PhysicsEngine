@@ -56,6 +56,8 @@ class ContactManager
         void PrepareContacts(float dt);
         void SolveConstraints(const std::vector<std::unique_ptr<Constraint>>& constraints, float dt);
     
+        const std::vector<ContactConstraint>& GetContacts() const { return currentFrameContacts; }
+
     private:
         std::vector<ContactConstraint> currentFrameContacts;
         std::vector<ContactConstraint> lastFrameContacts;

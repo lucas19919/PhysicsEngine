@@ -25,7 +25,19 @@ void Render(World& world, const EditorCamera& camera)
 
     Vec2 worldSize = world.GetWorldSize();
     Vector2 screenWorldSize = ToScreen(worldSize);
+    
+    // Draw background
     DrawRectangleV({ -screenWorldSize.x / 2.0f, -screenWorldSize.y / 2.0f }, screenWorldSize, WHITE);
+    
+    // Draw thick border completely outside the world
+    float borderThickness = 10.0f;
+    Rectangle borderRect = { 
+        (-screenWorldSize.x / 2.0f) - borderThickness / 2.0f, 
+        (-screenWorldSize.y / 2.0f) - borderThickness / 2.0f, 
+        screenWorldSize.x + borderThickness, 
+        screenWorldSize.y + borderThickness 
+    };
+    DrawRectangleLinesEx(borderRect, borderThickness, BLACK);
 
     for (const auto& objPtr : world.GetGameObjects())
     {
@@ -97,6 +109,50 @@ void Render(World& world, const EditorCamera& camera)
         }
         default:
             break;
+        }
+
+        // --- Debug Visualizations for GameObjects ---
+        if (Config::drawAABB && obj->c) {
+            BBox bounds = obj->c->GetBounds();
+            Vector2 min = ToScreen(bounds.min);
+            Vector2 max = ToScreen(bounds.max);
+            DrawRectangleLinesEx({min.x, min.y, max.x - min.x, max.y - min.y}, 1.0f, GREEN);
+        }
+
+        if (obj->rb) {
+            if (Config::drawVelocity) {
+                Vector2 start = ToScreen(obj->transform.position);
+                // Scale velocity vector (0.2x)
+                Vector2 end = ToScreen(obj->transform.position + obj->rb->GetVelocity() * 0.2f);
+                DrawLineEx(start, end, 2.0f, BLUE);
+                DrawCircleV(end, 3.0f, BLUE);
+            }
+            if (Config::drawAcceleration) {
+                Vector2 start = ToScreen(obj->transform.position);
+                // Scale acceleration vector (0.05x) to handle high gravity/forces
+                Vector2 end = ToScreen(obj->transform.position + obj->rb->GetAcceleration() * 0.05f);
+                DrawLineEx(start, end, 2.0f, RED);
+                DrawCircleV(end, 3.0f, RED);
+            }
+        }
+    }
+
+    // --- Debug Visualizations for Contacts ---
+    const auto& contacts = world.GetContacts();
+    for (const auto& contact : contacts) {
+        if (Config::drawNormals) {
+            // Draw normal at each contact point (0.2m long)
+            for (int i = 0; i < contact.pointCount; i++) {
+                Vector2 start = ToScreen(contact.points[i]);
+                Vector2 end = ToScreen(contact.points[i] + contact.normal * 0.2f);
+                DrawLineEx(start, end, 1.0f, YELLOW);
+            }
+        }
+        if (Config::drawContactPoints) {
+            for (int i = 0; i < contact.pointCount; i++) {
+                Vector2 p = ToScreen(contact.points[i]);
+                DrawCircleV(p, 4.0f, RED);
+            }
         }
     }
 

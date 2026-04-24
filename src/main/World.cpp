@@ -18,6 +18,10 @@ std::vector<std::unique_ptr<GameObject>>& World::GetGameObjects()
 
 void World::AddGameObject(std::unique_ptr<GameObject> obj)
 {
+    if (obj->GetID() == (size_t)-1)
+    {
+        obj->SetID(nextID++);
+    }
     gameObjects.push_back(std::move(obj));
 }
 
@@ -41,6 +45,8 @@ void World::Clear()
     broadphase->Clear();
     contactManager->Clear();
 
+    nextID = 0;
+
     timer.~Timer();
 }
 
@@ -52,6 +58,11 @@ void World::Step(float dt)
     int subTicks = Config::pipelineSubTicks;
     float subDt = dt / subTicks;
 
+    integrateVelocityTime = 0.0f;
+    broadphaseTime = 0.0f;
+    solverTime = 0.0f;
+    integratePositionTime = 0.0f;
+
     for (int i = 0; i < subTicks; i++)
     {
         //frame subtick begin
@@ -59,21 +70,21 @@ void World::Step(float dt)
 
         timer.StartTimer();
         integrate->IntegrateVelocity(gameObjects, subDt);
-        integrateVelocityTime = timer.StopTimer();
+        integrateVelocityTime += timer.StopTimer();
 
         timer.StartTimer();
         broadphase->UpdateBroadphase(gameObjects); 
         contactManager->BuildContacts(broadphase->GeneratePairs());
-        broadphaseTime = timer.StopTimer();
+        broadphaseTime += timer.StopTimer();
 
         timer.StartTimer();
         contactManager->PrepareContacts(subDt);
         contactManager->SolveConstraints(constraints, subDt);
-        solverTime = timer.StopTimer();
+        solverTime += timer.StopTimer();
 
         timer.StartTimer();
         integrate->IntegratePosition(gameObjects, subDt);
-        integratePositionTime = timer.StopTimer();
+        integratePositionTime += timer.StopTimer();
 
         contactManager->FinishFrame();  
         //end subtick frame      

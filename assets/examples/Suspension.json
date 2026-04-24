@@ -1348,7 +1348,7 @@
         200,
         201
       ],
-      "torqueMax": 2000000.0
+      "torqueMax": 200.0
     }
   ],
   "worldSize": {

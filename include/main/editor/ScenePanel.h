@@ -14,6 +14,7 @@ private:
     int screenWidth;
     int screenHeight;
     char filePathBuffer[256];
+    std::string currentDirectory;
 };
 
 } // namespace Editor

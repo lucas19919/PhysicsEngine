@@ -54,6 +54,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} raylib)
 
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} comdlg32)
+endif()
+
 # --------------------------------------------------------------------------
 # Platform Specific Configurations
 # --------------------------------------------------------------------------

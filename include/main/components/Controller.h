@@ -15,4 +15,7 @@ struct Controller : public Component
     virtual ~Controller() = default;
     virtual ControllerType GetType() const = 0;
     virtual void Update(float dt) = 0;
+
+    const char* GetName() const override { return "Controller"; }
+    void OnInspectorGui() override;
 };

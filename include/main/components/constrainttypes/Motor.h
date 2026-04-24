@@ -14,7 +14,9 @@ class MotorConstraint : public Constraint
         float torque;
         Vec2 localPosition; //relative to rotor center
 
-        MotorConstraint(GameObject* rotor, Vec2 pos, float torque);
+        MotorConstraint(GameObject* rotor, Vec2 localPosition, float torque);
         ConstraintType GetType() const override;
+        const char* GetName() const override { return "MotorConstraint"; }
+
         void Solve(float dt) override;
 };

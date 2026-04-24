@@ -6,9 +6,10 @@ class CircleCollider : public Collider
 {
     public:
         float radius;    
-        CircleCollider(float r);
+        CircleCollider(float radius);
         ColliderType GetType() const override;
-        
-        void UpdateCache(const TransformComponent& transform) override {}
+        const char* GetName() const override { return "CircleCollider"; }
+
+        void UpdateCache(const TransformComponent& transform) override;
         bool TestPoint(Vec2 point) const override;
 };

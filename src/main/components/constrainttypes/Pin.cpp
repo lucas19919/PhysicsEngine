@@ -5,8 +5,8 @@
 #include "math/RotationMatrix.h"
 #include "math/Matrix2x2.h"
 
-PinConstraint::PinConstraint(const std::vector<PinAttachment>& attachments, Vec2 pos, bool fixedX, bool fixedY)
-    : attachments(attachments), fixedX(fixedX), fixedY(fixedY)
+PinConstraint::PinConstraint(std::vector<PinAttachment> attachments, Vec2 pos, bool fixedX, bool fixedY)
+    : attachments(std::move(attachments)), fixedX(fixedX), fixedY(fixedY)
 { 
     this->position = pos;
 }

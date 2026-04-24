@@ -23,6 +23,9 @@ class Collider : public Component
         virtual ~Collider() = default;
         virtual ColliderType GetType() const = 0;
 
+        const char* GetName() const override { return "Collider"; }
+        void OnInspectorGui() override;
+
         const Array<20>& GetVertices() const { return cachedVertices; }
         const Array<20>& GetNormals() const { return cachedNormals; }
 

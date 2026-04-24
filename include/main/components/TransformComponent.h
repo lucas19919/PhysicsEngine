@@ -9,6 +9,9 @@ class TransformComponent : public Component
     public:
         TransformComponent();
 
+        const char* GetName() const override { return "Transform"; }
+        void OnInspectorGui() override;
+
         Vec2 position;
         float rotation;
         bool isDirty = true;

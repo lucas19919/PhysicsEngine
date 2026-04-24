@@ -2,6 +2,25 @@
 #include "math/Vec2.h"
 #include <algorithm>
 
+#include "external/imgui/imgui.h"
+
+void RigidBody::OnInspectorGui() {
+    float m = mass;
+    if (ImGui::DragFloat("Mass", &m, 0.1f, 0.001f, 10000.0f)) {
+        SetMass(m);
+    }
+
+    ImGui::DragFloat("Restitution", &restitution, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Friction", &friction, 0.01f, 0.0f, 1.0f);
+
+    if (ImGui::TreeNode("Dynamics")) {
+        ImGui::Text("Velocity: %.2f, %.2f", velocity.x, velocity.y);
+        ImGui::Text("Angular Vel: %.2f", angularVelocity);
+        ImGui::Checkbox("Use Gravity", &gravityEnabled);
+        ImGui::TreePop();
+    }
+}
+
 RigidBody::RigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings)
 {
     mass = properties.mass > 0.0f ? properties.mass : 1.0f;

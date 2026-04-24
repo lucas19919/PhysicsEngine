@@ -17,6 +17,7 @@ int main() {
     const int screenHeight = Config::screenHeight;
 
     InitWindow(screenWidth, screenHeight, "Halliday2D");
+    SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
     SetTargetFPS(Config::targetFPS);    
 
     rlImGuiSetup(true);
@@ -42,10 +43,6 @@ int main() {
             ClearBackground(DARKGRAY);
 
             editor.Update(world);
-            
-            if (FPS) {
-                DrawFPS(10, 10);
-            }
         
         EndDrawing();
     }
