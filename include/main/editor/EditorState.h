@@ -1,6 +1,7 @@
 #pragma once
 #include "main/GameObject.h"
 #include "math/Vec2.h"
+#include <external/nlohmann/json.hpp>
 
 enum class GizmoType { NONE, TRANSLATE, ROTATE, SCALE };
 enum class GizmoAxis { NONE, X, Y, BOTH };
@@ -12,8 +13,11 @@ public:
         return instance;
     }
 
-    void SetSelected(GameObject* obj) { selectedObject = obj; }
+    void SetSelected(GameObject* obj) { selectedObject = obj; if (obj) selectedGroup = ""; }
     GameObject* GetSelected() const { return selectedObject; }
+
+    void SetSelectedGroup(const std::string& name) { selectedGroup = name; if (!name.empty()) selectedObject = nullptr; }
+    const std::string& GetSelectedGroup() const { return selectedGroup; }
 
     void SetGizmoType(GizmoType type) { activeGizmoType = type; }
     GizmoType GetGizmoType() const { return activeGizmoType; }
@@ -42,9 +46,15 @@ public:
     void SetViewportFocused(bool focused) { isViewportFocused = focused; }
     bool IsViewportFocused() const { return isViewportFocused; }
 
+    void CaptureInitialState(const nlohmann::json& state) { initialEditorState = state; }
+    const nlohmann::json& GetInitialState() const { return initialEditorState; }
+    bool HasInitialState() const { return !initialEditorState.is_null(); }
+    void ClearInitialState() { initialEditorState = nlohmann::json(); }
+
     private:
-    EditorState() : selectedObject(nullptr), activeGizmoType(GizmoType::TRANSLATE), hoveredAxis(GizmoAxis::NONE), activeAxis(GizmoAxis::NONE), currentScenePath("../assets/examples/PrattTruss.json"), viewportMousePos{0,0}, viewportSize{0,0}, isViewportHovered(false), isViewportFocused(false) {}
+    EditorState() : selectedObject(nullptr), selectedGroup(""), activeGizmoType(GizmoType::TRANSLATE), hoveredAxis(GizmoAxis::NONE), activeAxis(GizmoAxis::NONE), currentScenePath("../assets/examples/PrattTruss.json"), viewportMousePos{0,0}, viewportSize{0,0}, isViewportHovered(false), isViewportFocused(false) {}
     GameObject* selectedObject;
+    std::string selectedGroup;
     GizmoType activeGizmoType;
     GizmoAxis hoveredAxis;
     GizmoAxis activeAxis;
@@ -54,4 +64,6 @@ public:
     Vec2 viewportSize;
     bool isViewportHovered;
     bool isViewportFocused;
+
+    nlohmann::json initialEditorState;
     };

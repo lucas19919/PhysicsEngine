@@ -1,5 +1,9 @@
 {
   "name": "Beetle Car",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -331,6 +335,73 @@
       }
     }
   ],
+  "generators": [
+    {
+      "grid": {
+        "rows": 6,
+        "columns": 3,
+        "startX": 8.2,
+        "startY": 3.4000000000000004,
+        "spacingX": 0.9,
+        "spacingY": 0.9
+      },
+      "object": {
+        "components": {
+          "TransformComponent": {
+            "position": {
+              "x": -12.8,
+              "y": -9.6
+            },
+            "rotation": 0.0
+          },
+          "Collider": {
+            "type": "BOX",
+            "size": {
+              "x": 0.8,
+              "y": 0.8
+            }
+          },
+          "Renderer": {
+            "form": "R_BOX",
+            "color": "YELLOW",
+            "scale": {
+              "x": 0.8,
+              "y": 0.8
+            }
+          },
+          "RigidBody": {
+            "gravityEnabled": true,
+            "properties": {
+              "mass": 10.0,
+              "restitution": 0.1,
+              "friction": 0.8,
+              "inertia": 0.32
+            },
+            "linearState": {
+              "velocity": {
+                "x": 0.0,
+                "y": 0.0
+              },
+              "acceleration": {
+                "x": 0.0,
+                "y": 0.0
+              },
+              "netForce": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "angularState": {
+              "angularVelocity": 0.0,
+              "angularAcceleration": 0.0,
+              "torque": 0.0
+            }
+          }
+        }
+      },
+      "name": "Generator"
+    }
+  ],
   "constraints": [
     {
       "type": "JOINT",
@@ -399,72 +470,6 @@
       "torque": 0.0
     }
   ],
-  "generators": [
-    {
-      "grid": {
-        "rows": 6,
-        "columns": 3,
-        "startX": 8.2,
-        "startY": 3.4000000000000004,
-        "spacingX": 0.9,
-        "spacingY": 0.9
-      },
-      "object": {
-        "components": {
-          "TransformComponent": {
-            "position": {
-              "x": -12.8,
-              "y": -9.6
-            },
-            "rotation": 0.0
-          },
-          "Collider": {
-            "type": "BOX",
-            "size": {
-              "x": 0.8,
-              "y": 0.8
-            }
-          },
-          "Renderer": {
-            "form": "R_BOX",
-            "color": "YELLOW",
-            "scale": {
-              "x": 0.8,
-              "y": 0.8
-            }
-          },
-          "RigidBody": {
-            "gravityEnabled": true,
-            "properties": {
-              "mass": 10.0,
-              "restitution": 0.1,
-              "friction": 0.8,
-              "inertia": 0.32
-            },
-            "linearState": {
-              "velocity": {
-                "x": 0.0,
-                "y": 0.0
-              },
-              "acceleration": {
-                "x": 0.0,
-                "y": 0.0
-              },
-              "netForce": {
-                "x": 0.0,
-                "y": 0.0
-              }
-            },
-            "angularState": {
-              "angularVelocity": 0.0,
-              "angularAcceleration": 0.0,
-              "torque": 0.0
-            }
-          }
-        }
-      }
-    }
-  ],
   "controllers": [
     {
       "id": 1,
@@ -473,12 +478,8 @@
       "constraints": [
         100,
         101
-      ], 
+      ],
       "torqueMax": 200.0
     }
-  ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  ]
 }

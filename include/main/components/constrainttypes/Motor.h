@@ -19,4 +19,5 @@ class MotorConstraint : public Constraint
         const char* GetName() const override { return "MotorConstraint"; }
 
         void Solve(float dt) override;
+        void OnObjectRemoved(size_t id) override;
 };

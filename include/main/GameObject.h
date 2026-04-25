@@ -46,6 +46,8 @@ class GameObject
             return ref;
         }
 
+        void RemoveComponent(Component* component);
+
         void SetID(size_t newID) { id = newID; }
         const size_t& GetID() const { return id; }
 

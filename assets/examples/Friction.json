@@ -1,4 +1,8 @@
 {
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -74,7 +78,7 @@
         },
         "Renderer": {
           "form": "R_BOX",
-          "color": "CYAN",
+          "color": "BLUE",
           "scale": {
             "x": 0.8,
             "y": 0.8
@@ -330,8 +334,8 @@
       }
     }
   ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  "generators": [],
+  "constraints": [],
+  "controllers": [],
+  "name": "Friction"
 }

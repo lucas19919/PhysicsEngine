@@ -30,6 +30,8 @@ struct Config
 
     static inline bool warmStart = true;
 
+    static inline bool useWalls = false;
+
     static inline float restitutionThreshold = 0.5f; //10-15 best for now
 
     static inline float contactSlop = 0.01f;        

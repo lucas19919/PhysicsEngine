@@ -4,6 +4,8 @@
 #include "main/editor/EditorState.h"
 #include "raylib.h"
 #include "external/imgui/imgui.h"
+#include "main/scenes/LoadScene.h"
+#include "main/scenes/SaveScene.h"
 
 void InputHandler::Update(World& world, EditorCamera& camera, const std::string& filePath, int screenWidth, int screenHeight, float dt)
 {
@@ -53,16 +55,23 @@ void InputHandler::Update(World& world, EditorCamera& camera, const std::string&
 
     if (IsKeyPressed(KEY_SPACE))
     {
+        if (world.isPaused && !EditorState::Get().HasInitialState())
+        {
+            EditorState::Get().CaptureInitialState(SaveScene::SerializeScene(world));
+        }
         world.isPaused = !world.isPaused;
     }
 
     // Reset Logic
     if (IsKeyPressed(KEY_R))
     {
-        EditorState::Get().SetSelected(nullptr); 
-        world.isPaused = true;
-        world.Clear();
-        LoadScene::Load(filePath, world, screenWidth, screenHeight);
+        if (EditorState::Get().HasInitialState())
+        {
+            EditorState::Get().SetSelected(nullptr); 
+            world.isPaused = true;
+            LoadScene::LoadFromJSON(EditorState::Get().GetInitialState(), world, screenWidth, screenHeight);
+            EditorState::Get().ClearInitialState();
+        }
     }
 
     if (IsKeyPressed(KEY_G) && !IsKeyDown(KEY_LEFT_CONTROL) && !IsKeyDown(KEY_RIGHT_CONTROL))
@@ -76,6 +85,17 @@ void InputHandler::Update(World& world, EditorCamera& camera, const std::string&
     if (IsKeyPressed(KEY_S) && !IsKeyDown(KEY_LEFT_CONTROL) && !IsKeyDown(KEY_RIGHT_CONTROL))
     {
         EditorState::Get().SetGizmoType(GizmoType::SCALE);
+    }
+    if (IsKeyPressed(KEY_DELETE))
+    {
+        GameObject* selected = EditorState::Get().GetSelected();
+        if (selected)
+        {
+            world.RemoveGameObject(selected->GetID());
+            state.SetSelected(nullptr);
+            state.SetActiveAxis(GizmoAxis::NONE);
+            state.SetHoveredAxis(GizmoAxis::NONE);
+        }
     }
 
     for (const auto& c : world.GetControllers())

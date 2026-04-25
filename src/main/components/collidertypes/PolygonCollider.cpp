@@ -1,7 +1,32 @@
 #include "main/components/collidertypes/PolygonCollider.h"
+#include "main/GameObject.h"
 #include <cmath>
+#include "external/imgui/imgui.h"
 
 PolygonCollider::PolygonCollider(const Array<20>& vertices) : vertices(vertices) {}
+
+void PolygonCollider::OnInspectorGui()
+{
+    Collider::OnInspectorGui();
+    bool changed = false;
+    for (size_t i = 0; i < vertices.Size(); i++)
+    {
+        ImGui::PushID((int)i);
+        if (ImGui::DragFloat2("Vertex", &vertices[i].x, 0.1f))
+        {
+            changed = true;
+        }
+        ImGui::PopID();
+    }
+    
+    if (ImGui::Button("Add Vertex") && vertices.Size() < 20)
+    {
+        vertices.PushBack(Vec2(0,0));
+        changed = true;
+    }
+    
+    if (changed && owner) UpdateCache(owner->transform);
+}
 
 ColliderType PolygonCollider::GetType() const
 {

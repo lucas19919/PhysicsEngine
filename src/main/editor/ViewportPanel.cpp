@@ -49,8 +49,8 @@ void ViewportPanel::OnImGui(World& world) {
         camera.Begin();
             Render(world, camera);
         camera.End();
-        GizmoRender(camera);
-        GizmoUpdate(camera);
+        GizmoRender(world, camera);
+        GizmoUpdate(world, camera);
         if (Config::drawFPS) DrawFPS(10, 10);
     EndTextureMode();
 

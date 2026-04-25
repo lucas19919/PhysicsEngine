@@ -1,9 +1,11 @@
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/Constraint.h"
 #include "main/World.h"
+#include "main/GameObject.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
 #include "math/Matrix2x2.h"
+#include <algorithm>
 
 JointConstraint::JointConstraint(std::vector<JointAttachment> attachments, Vec2 position, bool collisions)
     : attachments(attachments), collisions(collisions)
@@ -163,4 +165,17 @@ void JointConstraint::ComplexJoint(float dt)
         rb->SetVelocity(rb->GetVelocity() + lambda * invMass);
         rb->SetAngularVelocity(rb->GetAngularVelocity() + r.Cross(lambda) * invInertia);
     }
+}
+
+void JointConstraint::OnObjectRemoved(size_t id)
+{
+    Component::OnObjectRemoved(id);
+    attachments.erase(std::remove_if(attachments.begin(), attachments.end(), [id](const JointAttachment& a) {
+        return a.obj->GetID() == id;
+    }), attachments.end());
+}
+
+bool JointConstraint::IsInvalid() const
+{
+    return isComponentDeleted || attachments.size() < 2;
 }

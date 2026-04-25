@@ -22,6 +22,8 @@ class JointConstraint : public Constraint
         const char* GetName() const override { return "JointConstraint"; }
 
         void Solve(float dt) override;
+        void OnObjectRemoved(size_t id) override;
+        bool IsInvalid() const override;
 
     private:
         void SingleJoint(float dt);

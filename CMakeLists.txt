@@ -36,7 +36,7 @@ set(IMGUI_SOURCES
 )
 
 if (WIN32)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} "app.rc")
+    add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} "icon.rc")
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES})
 endif()

@@ -12,4 +12,6 @@ class CircleCollider : public Collider
 
         void UpdateCache(const TransformComponent& transform) override;
         bool TestPoint(Vec2 point) const override;
+
+        void OnInspectorGui() override;
 };

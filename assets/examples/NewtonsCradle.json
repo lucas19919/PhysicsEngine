@@ -1,5 +1,9 @@
 {
   "name": "Newton's Cradle",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -309,6 +313,7 @@
       }
     }
   ],
+  "generators": [],
   "constraints": [
     {
       "type": "DISTANCE",
@@ -341,8 +346,5 @@
       "length": 6.0
     }
   ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  "controllers": []
 }

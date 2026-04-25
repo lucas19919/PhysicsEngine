@@ -1,5 +1,9 @@
 {
   "name": "Optimization Stress Test",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -61,7 +65,7 @@
   ],
   "generators": [
     {
-      "comment": "Dense Circle Rain",
+      "name": "Circle Rain",
       "grid": {
         "rows": 12,
         "columns": 28,
@@ -85,7 +89,7 @@
           },
           "Renderer": {
             "form": "R_CIRCLE",
-            "color": "CYAN",
+            "color": "BLUE",
             "scale": 0.3
           },
           "RigidBody": {
@@ -120,12 +124,12 @@
       }
     },
     {
-      "comment": "Dense Box Rain",
+      "name": "Box Rain",
       "grid": {
         "rows": 4,
         "columns": 20,
         "startX": -8.8,
-        "startY": 0.40000000000000036,
+        "startY": 0.4,
         "spacingX": 0.9,
         "spacingY": 0.9
       },
@@ -147,7 +151,7 @@
           },
           "Renderer": {
             "form": "R_BOX",
-            "color": "PURPLE",
+            "color": "ORANGE",
             "scale": {
               "x": 0.5,
               "y": 0.5
@@ -185,8 +189,6 @@
       }
     }
   ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  "constraints": [],
+  "controllers": []
 }

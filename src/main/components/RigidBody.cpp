@@ -12,13 +12,22 @@ void RigidBody::OnInspectorGui() {
 
     ImGui::DragFloat("Restitution", &restitution, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Friction", &friction, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Inertia", &inertia, 0.1f, 0.001f, 10000.0f);
+    if (inertia > 0.0f) invInertia = 1.0f / inertia;
 
-    if (ImGui::TreeNode("Dynamics")) {
-        ImGui::Text("Velocity: %.2f, %.2f", velocity.x, velocity.y);
-        ImGui::Text("Angular Vel: %.2f", angularVelocity);
-        ImGui::Checkbox("Use Gravity", &gravityEnabled);
-        ImGui::TreePop();
-    }
+    ImGui::Checkbox("Use Gravity", &gravityEnabled);
+
+    ImGui::Separator();
+    ImGui::Text("Linear State");
+    ImGui::DragFloat2("Velocity", &velocity.x, 0.1f);
+    ImGui::DragFloat2("Acceleration", &acceleration.x, 0.1f);
+    ImGui::DragFloat2("Net Force", &netForce.x, 0.1f);
+
+    ImGui::Separator();
+    ImGui::Text("Angular State");
+    ImGui::DragFloat("Angular Velocity", &angularVelocity, 0.1f);
+    ImGui::DragFloat("Angular Accel", &angularAcceleration, 0.1f);
+    ImGui::DragFloat("Torque", &torque, 0.1f);
 }
 
 RigidBody::RigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings)

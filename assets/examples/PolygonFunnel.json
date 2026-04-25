@@ -1,5 +1,9 @@
 {
   "name": "Polygon Funnel",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -8,8 +12,8 @@
       "components": {
         "TransformComponent": {
           "position": {
-            "x": -6.800000000000001,
-            "y": -3.5999999999999996
+            "x": -6.8,
+            "y": -3.6
           },
           "rotation": 0.5
         },
@@ -64,8 +68,8 @@
       "components": {
         "TransformComponent": {
           "position": {
-            "x": 6.800000000000001,
-            "y": -3.5999999999999996
+            "x": 6.8,
+            "y": -3.6
           },
           "rotation": -0.5
         },
@@ -117,11 +121,11 @@
   ],
   "generators": [
     {
-      "comment": "Wide Irregular Shapes Rain",
+      "name": "Triangle Rain",
       "grid": {
         "rows": 6,
         "columns": 15,
-        "startX": -6.800000000000001,
+        "startX": -6.8,
         "startY": -9.1,
         "spacingX": 0.9,
         "spacingY": 0.9
@@ -130,8 +134,8 @@
         "components": {
           "TransformComponent": {
             "position": {
-              "x": -12.8,
-              "y": -9.6
+              "x": 0,
+              "y": 0
             },
             "rotation": 0
           },
@@ -173,7 +177,7 @@
           "RigidBody": {
             "gravityEnabled": true,
             "properties": {
-              "mass": 5,
+              "mass": 5.0,
               "restitution": 0.2,
               "friction": 0.5,
               "inertia": 0.4
@@ -193,17 +197,15 @@
               }
             },
             "angularState": {
-              "angularVelocity": 0,
-              "angularAcceleration": 0,
-              "torque": 0
+              "angularVelocity": 0.0,
+              "angularAcceleration": 0.0,
+              "torque": 0.0
             }
           }
         }
       }
     }
   ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  "constraints": [],
+  "controllers": []
 }

@@ -1,5 +1,9 @@
 {
   "name": "Statically Determinate Crane",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -445,6 +449,7 @@
       }
     }
   ],
+  "generators": [],
   "constraints": [
     {
       "type": "PIN",
@@ -593,8 +598,5 @@
       "length": 4.0
     }
   ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  "controllers": []
 }

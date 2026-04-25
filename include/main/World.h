@@ -8,7 +8,20 @@
 #include "main/utility/Timer.h"
 #include <vector>
 #include <memory>
+#include <algorithm>
 #include "math/Vec2.h"
+
+struct GeneratorDef {
+    std::string name;
+    int rows = 1;
+    int columns = 1;
+    float startX = 0;
+    float startY = 0;
+    float spacingX = 1.0f;
+    float spacingY = 1.0f;
+    std::string objectJson; 
+    std::unique_ptr<GameObject> templateObject;
+};
 
 class World
 {
@@ -35,6 +48,24 @@ class World
         void SetWorldSize(Vec2 size) { worldSize = size; }
         Vec2 GetWorldSize() const { return worldSize; }
 
+        void RemoveGameObject(size_t id);
+        void RemoveGroup(const std::string& groupName);
+
+        void AddGenerator(GeneratorDef&& def) { generators.push_back(std::move(def)); }
+        std::vector<GeneratorDef>& GetGenerators() { return generators; }
+        GeneratorDef* GetGenerator(const std::string& name) {
+            for (auto& g : generators) if (g.name == name) return &g;
+            return nullptr;
+        }
+        void RemoveGenerator(const std::string& name) {
+            generators.erase(std::remove_if(generators.begin(), generators.end(), [&](const GeneratorDef& g) {
+                return g.name == name;
+            }), generators.end());
+        }
+
+        void RegenerateGenerator(const std::string& currentName, const std::string& oldName = "");
+        void RenameGenerator(const std::string& oldName, const std::string& newName);
+
         //abstract stuff like this later ???
         bool isPaused = true;
 
@@ -48,6 +79,9 @@ class World
         std::vector<std::unique_ptr<GameObject>> gameObjects;
         std::vector<std::unique_ptr<Constraint>> constraints;
         std::vector<std::unique_ptr<Controller>> controllers;
+        std::vector<GeneratorDef> generators;
+
+        void RemoveGroupInternal(const std::string& groupName, bool prune);
 
         size_t nextID = 0;
 

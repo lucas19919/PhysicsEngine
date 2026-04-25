@@ -2,6 +2,8 @@
 #include "main/GameObject.h"
 #include "math/Vec2.h"
 #include "main/physics/Config.h"
+#include "main/editor/EditorState.h"
+#include <algorithm>
 
 World::World()
 { 
@@ -37,14 +39,145 @@ void World::UpdateCaches()
 
 void World::Clear()
 {
+    EditorState::Get().SetSelected(nullptr);
     gameObjects.clear();
     constraints.clear();
     controllers.clear();  
+    generators.clear();
 
     broadphase->Clear();
     contactManager->Clear();
 
     nextID = 0;
+}
+
+void World::RemoveGameObject(size_t id)
+{
+    // 1. Notify all systems BEFORE deletion so they can safely check the object's data
+    for (auto& c : constraints) c->OnObjectRemoved(id);
+    for (auto& c : controllers) c->OnObjectRemoved(id);
+
+    // 2. Remove the object itself
+    auto it = std::remove_if(gameObjects.begin(), gameObjects.end(), [id](const std::unique_ptr<GameObject>& obj) {
+        return obj->GetID() == id;
+    });
+
+    if (it == gameObjects.end()) return; // Object not found
+    gameObjects.erase(it, gameObjects.end());
+
+    // 3. Prune components that marked themselves as invalid
+    constraints.erase(std::remove_if(constraints.begin(), constraints.end(), [](const std::unique_ptr<Constraint>& c) {
+        return c->IsInvalid();
+    }), constraints.end());
+
+    controllers.erase(std::remove_if(controllers.begin(), controllers.end(), [](const std::unique_ptr<Controller>& c) {
+        return c->IsInvalid();
+    }), controllers.end());
+
+    // 4. Clean up physics caches
+    contactManager->Clear(); 
+    UpdateCaches();
+}
+
+void World::RemoveGroup(const std::string& groupName)
+{
+    RemoveGroupInternal(groupName, true);
+}
+
+void World::RemoveGroupInternal(const std::string& groupName, bool prune)
+{
+    if (groupName.empty()) return;
+
+    std::vector<size_t> idsToRemove;
+    for (const auto& obj : gameObjects) {
+        if (obj->GetGroupName() == groupName) {
+            idsToRemove.push_back(obj->GetID());
+        }
+    }
+
+    if (idsToRemove.empty()) return;
+
+    // Notify for all IDs
+    for (size_t id : idsToRemove) {
+        for (auto& c : constraints) c->OnObjectRemoved(id);
+        for (auto& c : controllers) c->OnObjectRemoved(id);
+    }
+
+    // Remove objects
+    gameObjects.erase(std::remove_if(gameObjects.begin(), gameObjects.end(), [&](const std::unique_ptr<GameObject>& obj) {
+        return obj->GetGroupName() == groupName;
+    }), gameObjects.end());
+
+    if (prune) {
+        // Prune invalid components
+        constraints.erase(std::remove_if(constraints.begin(), constraints.end(), [](const std::unique_ptr<Constraint>& c) {
+            return c->IsInvalid();
+        }), constraints.end());
+
+        controllers.erase(std::remove_if(controllers.begin(), controllers.end(), [](const std::unique_ptr<Controller>& c) {
+            return c->IsInvalid();
+        }), controllers.end());
+    }
+
+    contactManager->Clear();
+    UpdateCaches();
+}
+
+#include "main/scenes/LoadScene.h"
+
+void World::RegenerateGenerator(const std::string& currentName, const std::string& oldName)
+{
+    GeneratorDef* def = GetGenerator(currentName);
+    if (!def) return;
+
+    // 1. Remove old objects WITHOUT pruning constraints
+    // If we are renaming, we MUST clear the OLD group name.
+    // If not renaming, currentName == oldName is handled by the default param or logic below.
+    std::string nameToClear = oldName.empty() ? currentName : oldName;
+    RemoveGroupInternal(nameToClear, false);
+
+    // 2. Delegate creation to LoadScene (which already has the logic)
+    LoadScene::Regenerate(*this, *def);
+
+    // 3. Final Re-validation
+    // Now that objects are back, reset the "deleted" flags for any surviving components
+    for (auto& c : constraints) c->ResetInvalid();
+    for (auto& c : controllers) c->ResetInvalid();
+
+    // 4. Prune anything that is STILL invalid (actually dead)
+    constraints.erase(std::remove_if(constraints.begin(), constraints.end(), [](const std::unique_ptr<Constraint>& c) {
+        return c->IsInvalid();
+    }), constraints.end());
+
+    controllers.erase(std::remove_if(controllers.begin(), controllers.end(), [](const std::unique_ptr<Controller>& c) {
+        return c->IsInvalid();
+    }), controllers.end());
+
+    contactManager->Clear();
+    UpdateCaches();
+}
+
+void World::RenameGenerator(const std::string& oldName, const std::string& newName)
+{
+    if (oldName == newName || newName.empty()) return;
+
+    // 1. Update the definition name
+    GeneratorDef* def = GetGenerator(oldName);
+    if (def) {
+        def->name = newName;
+    }
+
+    // 2. Update all instantiated gameobjects
+    for (auto& obj : gameObjects) {
+        if (obj->GetGroupName() == oldName) {
+            obj->SetGroupName(newName);
+            // Optionally update the individual object name if it followed the pattern
+            std::string objName = obj->GetName();
+            if (objName.find(oldName) == 0) {
+                obj->SetName(newName + objName.substr(oldName.length()));
+            }
+        }
+    }
 }
 
 //step world forward by dt seconds

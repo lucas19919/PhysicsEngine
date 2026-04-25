@@ -1,6 +1,7 @@
 #include "main/components/constrainttypes/Distance.h"
 #include "main/components/Constraint.h"
 #include "main/World.h"
+#include "main/GameObject.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
 
@@ -73,5 +74,14 @@ void DistanceConstraint::Solve(float dt)
     {
         rb2->SetVelocity(v2 + impulse * invMass2);
         rb2->SetAngularVelocity(w2 + (r2.Cross(impulse) * invInertia2));
+    }
+}
+
+void DistanceConstraint::OnObjectRemoved(size_t id)
+{
+    Component::OnObjectRemoved(id);
+    if (anchor->GetID() == id || attached->GetID() == id)
+    {
+        isComponentDeleted = true;
     }
 }

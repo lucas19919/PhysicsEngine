@@ -1,4 +1,5 @@
 #include "main/utility/Draw.h"
+#include "main/World.h"
 #include "main/components/Collider.h"
 #include "main/components/Renderer.h"
 #include "main/physics/Config.h"
@@ -20,6 +21,7 @@ inline float ToScreen(float val) { return val * Config::MeterToPixel; }
 void Render(World& world, const EditorCamera& camera)
 {
     GameObject* selected = EditorState::Get().GetSelected();
+    std::string selectedGroup = EditorState::Get().GetSelectedGroup();
     float zoom = camera.GetRaylibCamera().zoom;
     float thickness = 4.0f / zoom; 
 
@@ -90,14 +92,27 @@ void Render(World& world, const EditorCamera& camera)
         Renderer *r = obj->GetComponent<Renderer>();
         Shape shape = r->GetShape();
 
+        // highlight color if in selected group
+        Color renderColor = shape.color;
+        if (!selectedGroup.empty() && obj->GetGroupName() == selectedGroup) {
+            renderColor = ORANGE;
+        }
+
         switch (shape.form)
         {
         case RenderShape::R_CIRCLE:
         {
             float radius = ToScreen(std::get<float>(shape.scale));
             Vector2 pos = ToScreen(obj->transform.position);
-            DrawCircleV(pos, radius, shape.color);
+            DrawCircleV(pos, radius, renderColor);
             DrawRing(pos, radius - 2.0f, radius, 0.0f, 360.0f, 36, BLACK);
+            
+            // Draw rotation line
+            Vector2 end = { 
+                pos.x + std::cos(obj->transform.rotation) * radius, 
+                pos.y + std::sin(obj->transform.rotation) * radius 
+            };
+            DrawLineEx(pos, end, 2.0f / zoom, BLACK);
             break;
         }
         case RenderShape::R_BOX:
@@ -109,7 +124,7 @@ void Render(World& world, const EditorCamera& camera)
                 Rectangle{ screenPos.x, screenPos.y, screenSize.x, screenSize.y },
                 { screenSize.x / 2.0f, screenSize.y / 2.0f },
                 obj->transform.rotation * RAD2DEG,
-                shape.color
+                renderColor
             );        
             Array<20> vertices = r->UpdateWorldCoordinates(obj->transform.position, obj->transform.rotation);
             for (size_t i = 0; i < vertices.Size(); i++) 
@@ -123,7 +138,7 @@ void Render(World& world, const EditorCamera& camera)
             if (vertexCount < 3) break; 
             std::vector<Vector2> raylibVerts(vertexCount);
             for (int i = 0; i < vertexCount; i++) raylibVerts[i] = ToScreen(vertices[i]); 
-            for (int i = 1; i < vertexCount - 1; i++) DrawTriangle(raylibVerts[0], raylibVerts[i + 1], raylibVerts[i], shape.color);
+            for (int i = 1; i < vertexCount - 1; i++) DrawTriangle(raylibVerts[0], raylibVerts[i + 1], raylibVerts[i], renderColor);
             for (int i = 0; i < vertexCount; i++) DrawLineEx(raylibVerts[i], raylibVerts[(i + 1) % vertexCount], 2.0f, BLACK);
             break;
         }
@@ -132,9 +147,9 @@ void Render(World& world, const EditorCamera& camera)
 
         // debug
         if (Config::drawAABB && obj->c) {
-            BBox bounds = obj->c->GetBounds();
-            Vector2 min = ToScreen(bounds.min);
-            Vector2 max = ToScreen(bounds.max);
+            BBox b = obj->c->GetBounds();
+            Vector2 min = ToScreen(b.min);
+            Vector2 max = ToScreen(b.max);
             DrawRectangleLinesEx({min.x, min.y, max.x - min.x, max.y - min.y}, 1.0f / zoom, GREEN);
         }
 
@@ -236,13 +251,24 @@ void Render(World& world, const EditorCamera& camera)
     }
 }
 
-void GizmoRender(const EditorCamera& camera)
+void GizmoRender(World& world, const EditorCamera& camera)
 {
     EditorState& state = EditorState::Get();
     GameObject* selected = state.GetSelected();
-    if (!selected) return;
+    std::string selectedGroup = state.GetSelectedGroup();
+    
+    Vec2 worldPos;
+    if (selected) {
+        worldPos = selected->transform.position;
+    } else if (!selectedGroup.empty()) {
+        GeneratorDef* gen = world.GetGenerator(selectedGroup);
+        if (!gen) return;
+        worldPos = Vec2(gen->startX, gen->startY);
+    } else {
+        return;
+    }
 
-    Vec2 origin = camera.WorldToScreenPixels(selected->transform.position);
+    Vec2 origin = camera.WorldToScreenPixels(worldPos);
     Vector2 originV = { origin.x, origin.y };
     GizmoType type = state.GetGizmoType();
     GizmoAxis hovered = state.GetHoveredAxis();
@@ -267,6 +293,7 @@ void GizmoRender(const EditorCamera& camera)
         }
         case GizmoType::ROTATE :
         {
+            if (!selected) break; // Don't rotate generators yet
             float radius = 80.0f;
             Color colorBoth = (hovered == GizmoAxis::BOTH || active == GizmoAxis::BOTH) ? YELLOW : BLUE;
             DrawCircleLinesV(originV, radius, colorBoth);
@@ -279,18 +306,27 @@ void GizmoRender(const EditorCamera& camera)
     }
 }
 
-void GizmoUpdate(const EditorCamera& camera)
+void GizmoUpdate(World& world, const EditorCamera& camera)
 {
     EditorState& state = EditorState::Get();
     Vec2 mousePos = state.GetViewportMousePos();
     GameObject* selected = state.GetSelected();
-    if (!selected)
-    {
+    std::string selectedGroup = state.GetSelectedGroup();
+    
+    Vec2 worldPos;
+    GeneratorDef* genDef = nullptr;
+    if (selected) {
+        worldPos = selected->transform.position;
+    } else if (!selectedGroup.empty()) {
+        genDef = world.GetGenerator(selectedGroup);
+        if (!genDef) return;
+        worldPos = Vec2(genDef->startX, genDef->startY);
+    } else {
         state.SetActiveAxis(GizmoAxis::NONE);
         return;
     }
 
-    Vec2 origin = camera.WorldToScreenPixels(selected->transform.position);
+    Vec2 origin = camera.WorldToScreenPixels(worldPos);
     float handleLength = 100.0f;
     GizmoType type = state.GetGizmoType();
     
@@ -303,7 +339,7 @@ void GizmoUpdate(const EditorCamera& camera)
         else if (CheckCollisionPointRec(mPos, { oPos.x, oPos.y - 15, handleLength + 40, 30 })) hovered = GizmoAxis::X;
         else if (CheckCollisionPointRec(mPos, { oPos.x - 15, oPos.y, 30, handleLength + 40 })) hovered = GizmoAxis::Y;
     }
-    else if (type == GizmoType::ROTATE)
+    else if (type == GizmoType::ROTATE && selected)
     {
         Vector2 mPos = { mousePos.x, mousePos.y };
         Vector2 oPos = { origin.x, origin.y };
@@ -326,11 +362,18 @@ void GizmoUpdate(const EditorCamera& camera)
             Vec2 worldDelta( (delta.x / zoom) * Config::PixelToMeter, (delta.y / zoom) * Config::PixelToMeter );
             if (type == GizmoType::TRANSLATE)
             {
-                if (state.GetActiveAxis() == GizmoAxis::X) selected->transform.SetPosition(selected->transform.position + Vec2(worldDelta.x, 0));
-                else if (state.GetActiveAxis() == GizmoAxis::Y) selected->transform.SetPosition(selected->transform.position + Vec2(0, worldDelta.y));
-                else if (state.GetActiveAxis() == GizmoAxis::BOTH) selected->transform.SetPosition(selected->transform.position + worldDelta);
+                if (selected) {
+                    if (state.GetActiveAxis() == GizmoAxis::X) selected->transform.SetPosition(selected->transform.position + Vec2(worldDelta.x, 0));
+                    else if (state.GetActiveAxis() == GizmoAxis::Y) selected->transform.SetPosition(selected->transform.position + Vec2(0, worldDelta.y));
+                    else if (state.GetActiveAxis() == GizmoAxis::BOTH) selected->transform.SetPosition(selected->transform.position + worldDelta);
+                } else if (genDef) {
+                    if (state.GetActiveAxis() == GizmoAxis::X) genDef->startX += worldDelta.x;
+                    else if (state.GetActiveAxis() == GizmoAxis::Y) genDef->startY += worldDelta.y;
+                    else if (state.GetActiveAxis() == GizmoAxis::BOTH) { genDef->startX += worldDelta.x; genDef->startY += worldDelta.y; }
+                    world.RegenerateGenerator(selectedGroup);
+                }
             }
-            else if (type == GizmoType::ROTATE)
+            else if (type == GizmoType::ROTATE && selected)
             {
                 Vector2 mPos = { mousePos.x, mousePos.y };
                 Vector2 oPos = { origin.x, origin.y };

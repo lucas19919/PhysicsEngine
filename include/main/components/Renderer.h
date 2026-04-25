@@ -35,6 +35,8 @@ class Renderer : public Component
 
         Shape GetShape() const { return shape; }
 
+        void UpdateLocalCoordinates();
+
         //Debug helper
         void SetColor(Color color) { shape.color = color; }
 

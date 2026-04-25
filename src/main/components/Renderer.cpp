@@ -13,17 +13,43 @@ void Renderer::OnInspectorGui() {
         shape.color.a = (unsigned char)(color[3] * 255.0f);
     }
     
-    const char* shapeStr = "Unknown";
-    switch (shape.form) {
-        case R_CIRCLE: shapeStr = "Circle"; break;
-        case R_BOX: shapeStr = "Box"; break;
-        case R_POLYGON: shapeStr = "Polygon"; break;
+    const char* shapes[] = { "Circle", "Box", "Polygon" };
+    int currentShape = (int)shape.form;
+    if (ImGui::Combo("Form", &currentShape, shapes, IM_ARRAYSIZE(shapes))) {
+        shape.form = (RenderShape)currentShape;
+        
+        // Reset scale to defaults for the new shape type
+        if (shape.form == R_CIRCLE) shape.scale = 1.0f;
+        else if (shape.form == R_BOX) shape.scale = Vec2(1.0f, 1.0f);
+        else if (shape.form == R_POLYGON) shape.scale = Array<20>();
+        
+        UpdateLocalCoordinates();
     }
-    ImGui::Text("Form: %s", shapeStr);
+
+    if (shape.form == R_CIRCLE) {
+        float radius = std::get<float>(shape.scale);
+        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.01f, 100.0f)) {
+            shape.scale = radius;
+            UpdateLocalCoordinates();
+        }
+    } else if (shape.form == R_BOX) {
+        Vec2 size = std::get<Vec2>(shape.scale);
+        if (ImGui::DragFloat2("Size", &size.x, 0.1f, 0.01f, 100.0f)) {
+            shape.scale = size;
+            UpdateLocalCoordinates();
+        }
+    }
 }
 
 Renderer::Renderer(Shape shape) : shape(shape) 
 {
+    UpdateLocalCoordinates();
+}
+
+void Renderer::UpdateLocalCoordinates()
+{
+    localCoordinates = Array<20>();
+
     if (shape.form == RenderShape::R_BOX)
     {
         float x = std::get<Vec2>(shape.scale).x / 2.0f;

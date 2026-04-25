@@ -1,7 +1,18 @@
 #include "main/components/collidertypes/BoxCollider.h"
+#include "main/GameObject.h"
 #include <cmath>
+#include "external/imgui/imgui.h"
 
 BoxCollider::BoxCollider(Vec2 size) : size(size) {}
+
+void BoxCollider::OnInspectorGui()
+{
+    Collider::OnInspectorGui();
+    if (ImGui::DragFloat2("Size", &size.x, 0.1f, 0.01f, 100.0f))
+    {
+        if (owner) UpdateCache(owner->transform);
+    }
+}
 
 ColliderType BoxCollider::GetType() const
 {

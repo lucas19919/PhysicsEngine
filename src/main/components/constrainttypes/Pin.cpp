@@ -1,9 +1,11 @@
 #include "main/components/constrainttypes/Pin.h"
 #include "main/components/Constraint.h"
 #include "main/World.h"
+#include "main/GameObject.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
 #include "math/Matrix2x2.h"
+#include <algorithm>
 
 PinConstraint::PinConstraint(std::vector<PinAttachment> attachments, Vec2 pos, bool fixedX, bool fixedY)
     : attachments(std::move(attachments)), fixedX(fixedX), fixedY(fixedY)
@@ -79,4 +81,17 @@ void PinConstraint::Solve(float dt)
         if (!fixedX) position.x = worldAnchor.x;
         if (!fixedY) position.y = worldAnchor.y;
     }
+}
+
+void PinConstraint::OnObjectRemoved(size_t id)
+{
+    Component::OnObjectRemoved(id);
+    attachments.erase(std::remove_if(attachments.begin(), attachments.end(), [id](const PinAttachment& a) {
+        return a.obj->GetID() == id;
+    }), attachments.end());
+}
+
+bool PinConstraint::IsInvalid() const
+{
+    return isComponentDeleted || attachments.empty();
 }

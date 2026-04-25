@@ -1,5 +1,9 @@
 {
   "name": "Generator Stress Test - 1000+ Bodies",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
@@ -8,13 +12,12 @@
         "TransformComponent": {
           "position": {
             "x": 0.0,
-            "y": 9.200000000000001
+            "y": 9.2
           },
           "rotation": 0.0
         },
         "Collider": {
           "type": "BOX",
-          "isActive": true,
           "size": {
             "x": 25.6,
             "y": 0.8
@@ -33,6 +36,7 @@
   ],
   "generators": [
     {
+      "name": "Stress Test Box Grid",
       "grid": {
         "rows": 40,
         "columns": 25,
@@ -46,14 +50,13 @@
         "components": {
           "TransformComponent": {
             "position": {
-              "x": -12.8,
-              "y": -9.6
+              "x": 0.0,
+              "y": 0.0
             },
             "rotation": 0.0
           },
           "Collider": {
             "type": "BOX",
-            "isActive": true,
             "size": {
               "x": 0.4,
               "y": 0.3
@@ -99,8 +102,6 @@
       }
     }
   ],
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  }
+  "constraints": [],
+  "controllers": []
 }

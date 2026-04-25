@@ -1,4 +1,6 @@
 #include "main/scenes/LoadScene.h"
+#include "main/scenes/SaveScene.h"
+#include "main/scenes/BoundarySystem.h"
 #include "main/utility/Instantiate.h"
 #include "main/GameObject.h"
 #include "math/Vec2.h"
@@ -17,7 +19,6 @@
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/constrainttypes/Motor.h"
 #include "main/components/controllertypes/MotorController.h"
-
 
 using json = nlohmann::json;
 
@@ -42,69 +43,57 @@ static Vec2 ParseVec2(const json& j)
 
 void LoadScene::Load(const std::string& filePath, World& world, int screenWidth, int screenHeight)
 {
+    if (filePath.empty()) {
+        LoadFromJSON(json::object(), world, screenWidth, screenHeight);
+        return;
+    }
+
     world.Clear();
 
     std::ifstream file(filePath);
-    if (!file.is_open()) return;
+    if (!file.is_open()) {
+        // Fallback for failed file open
+        LoadFromJSON(json::object(), world, screenWidth, screenHeight);
+        return;
+    }
 
     json sceneData;
     file >> sceneData;
 
+    LoadFromJSON(sceneData, world, screenWidth, screenHeight);
+}
+
+void LoadScene::LoadFromJSON(const json& sceneData, World& world, int screenWidth, int screenHeight)
+{
+    world.Clear();
+
     Vec2 worldSize = sceneData.contains("worldSize") ? ParseVec2(sceneData["worldSize"]) : Vec2(screenWidth * Config::PixelToMeter, screenHeight * Config::PixelToMeter);
     world.SetWorldSize(worldSize);
 
-    // Update global config to match the loaded world size
     Config::screenWidth = (int)(worldSize.x * Config::MeterToPixel);
     Config::screenHeight = (int)(worldSize.y * Config::MeterToPixel);
 
-    if (sceneData.value("useWalls", false))
-    {
-        float sw = worldSize.x;
-        float sh = worldSize.y;
-
-        float halfW = sw / 2.0f;
-        float halfH = sh / 2.0f;
-
-        // Bottom
-        Instantiate()
-            .WithTransform(Vec2(0.0f, halfH + 2.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(sw, 4.0f))
-            .Create(world, 9000)->SetName("Bottom_Wall");
-
-        // Top
-        Instantiate()
-            .WithTransform(Vec2(0.0f, -halfH - 2.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(sw, 4.0f))
-            .Create(world, 9001)->SetName("Top_Wall");
-
-        // Left
-        Instantiate()
-            .WithTransform(Vec2(-halfW - 2.0f, 0.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(4.0f, sh))
-            .Create(world, 9002)->SetName("Left_Wall");
-
-        // Right
-        Instantiate()
-            .WithTransform(Vec2(halfW + 2.0f, 0.0f), 0.0f)
-            .WithCollider(ColliderType::BOX, Vec2(4.0f, sh))
-            .Create(world, 9003)->SetName("Right_Wall");
-    }
+    Config::useWalls = sceneData.value("useWalls", false);
+    BoundarySystem::UpdateBoundaries(world);
 
     std::unordered_map<int, GameObject*> idMap;
 
-    for (const auto& item : sceneData["objects"])
+    if (sceneData.contains("objects"))
     {
-        GameObject* obj = LoadObject(item, world);
-        if (obj)
+        for (const auto& item : sceneData["objects"])
         {
-            if (item.contains("id"))
+            GameObject* obj = LoadObject(item, world);
+            if (obj)
             {
-                obj->SetID(item["id"].get<int>());
-                idMap[item["id"].get<int>()] = obj;
-            }
-            if (item.contains("name"))
-            {
-                obj->SetName(item["name"].get<std::string>());
+                if (item.contains("id"))
+                {
+                    obj->SetID(item["id"].get<int>());
+                    idMap[item["id"].get<int>()] = obj;
+                }
+                if (item.contains("name"))
+                {
+                    obj->SetName(item["name"].get<std::string>());
+                }
             }
         }
     }
@@ -115,29 +104,49 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
         std::mt19937 gen(rd());
         std::uniform_real_distribution<float> jitter(-Config::generatorJitterRange, Config::generatorJitterRange);
 
-        int genIdx = 0;
         for (const auto& generator : sceneData["generators"])
         {
             if (!generator.contains("grid") || !generator.contains("object")) continue;
             
-            std::string groupName = generator.value("name", "Generator " + std::to_string(genIdx++));
+            std::string baseName = generator.value("name", "Generator");
+            std::string uniqueName = baseName;
+            int counter = 1;
+            while (world.GetGenerator(uniqueName) != nullptr) {
+                uniqueName = baseName + " " + std::to_string(counter++);
+            }
+            
+            std::string groupName = uniqueName;
 
             const auto& grid = generator["grid"];
-            int rows = grid["rows"];
-            int cols = grid["columns"];
-            float startX = grid["startX"];
-            float startY = grid["startY"];
-            float spacingX = grid["spacingX"];
-            float spacingY = grid["spacingY"];
+            GeneratorDef def;
+            def.name = groupName;
+            def.rows = grid["rows"];
+            def.columns = grid["columns"];
+            def.startX = grid["startX"];
+            def.startY = grid["startY"];
+            def.spacingX = grid["spacingX"];
+            def.spacingY = grid["spacingY"];
 
             json genObject = generator["object"];
+            
+            // Initialize template object correctly as an orphan
+            def.templateObject = LoadObjectOrphan(genObject, world);
+            if (def.templateObject) {
+                def.objectJson = SaveScene::SerializeObject(def.templateObject.get()).dump();
+            }
+            
+            world.AddGenerator(std::move(def));
 
+            int rows = def.rows;
+            int cols = def.columns;
+
+            // Initial generation
             for (int r = 0; r < rows; r++)
             {
                 for (int c = 0; c < cols; c++)
                 {
-                    float posX = startX + (c * spacingX) + jitter(gen);
-                    float posY = startY + (r * spacingY) + jitter(gen);
+                    float posX = def.startX + (c * def.spacingX) + jitter(gen);
+                    float posY = def.startY + (r * def.spacingY) + jitter(gen);
 
                     genObject["components"]["TransformComponent"]["position"]["x"] = posX;
                     genObject["components"]["TransformComponent"]["position"]["y"] = posY;
@@ -145,7 +154,7 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
                     GameObject* obj = LoadObject(genObject, world);
                     if (obj) {
                         obj->SetGroupName(groupName);
-                        obj->SetName(groupName + " (" + std::to_string(r * cols + c) + ")");
+                        obj->SetName(groupName + " (" + std::to_string(r * def.columns + c) + ")");
                     }
                 }
             }
@@ -165,9 +174,73 @@ void LoadScene::Load(const std::string& filePath, World& world, int screenWidth,
     world.UpdateCaches();
 }
 
-GameObject* LoadScene::LoadObject(const json& item, World& world)
+void LoadScene::Regenerate(World& world, GeneratorDef& def, const std::string& clearGroupName)
 {
-    if (!item.contains("components")) return nullptr;
+    if (def.name.empty() || !def.templateObject) return;
+
+    def.objectJson = SaveScene::SerializeObject(def.templateObject.get()).dump();
+    nlohmann::json genObject = nlohmann::json::parse(def.objectJson);
+
+    std::string toRemove = clearGroupName.empty() ? def.name : clearGroupName;
+    world.RemoveGroup(toRemove);
+
+    for (int r = 0; r < def.rows; r++)
+    {
+        for (int c = 0; c < def.columns; c++)
+        {
+            float posX = def.startX + (c * def.spacingX);
+            float posY = def.startY + (r * def.spacingY);
+
+            genObject["components"]["TransformComponent"]["position"]["x"] = posX;
+            genObject["components"]["TransformComponent"]["position"]["y"] = posY;
+
+            GameObject* obj = LoadObject(genObject, world);
+            if (obj) {
+                obj->SetGroupName(def.name);
+                obj->SetName(def.name + " (" + std::to_string(r * def.columns + c) + ")");
+            }
+        }
+    }
+    
+    world.UpdateCaches();
+}
+
+void LoadScene::LoadCollection(const nlohmann::json& data, World& world, Vec2 offset)
+{
+    std::unordered_map<int, GameObject*> idMap;
+
+    if (data.contains("objects"))
+    {
+        for (const auto& item : data["objects"])
+        {
+            GameObject* obj = LoadObject(item, world);
+            if (obj)
+            {
+                obj->transform.SetPosition(obj->transform.position + offset);
+                if (item.contains("id"))
+                {
+                    // We generate a NEW ID for the world, but we need the mapping for internal constraints
+                    idMap[item["id"].get<int>()] = obj;
+                }
+            }
+        }
+    }
+
+    if (data.contains("constraints"))
+    {
+        // We need to be careful with IDs here. LoadConstraints expects an idMap
+        LoadConstraints(data["constraints"], world, idMap);
+    }
+
+    if (data.contains("controllers"))
+    {
+        LoadControllers(data["controllers"], world);
+    }
+}
+
+static void PopulateBuilder(Instantiate& builder, const json& item)
+{
+    if (!item.contains("components")) return;
     const auto& components = item["components"];
 
     float posX = 0.0f, posY = 0.0f, rotation = 0.0f;
@@ -179,7 +252,6 @@ GameObject* LoadScene::LoadObject(const json& item, World& world)
         rotation = components["TransformComponent"]["rotation"];
     }
 
-    Instantiate builder;
     builder.WithTransform(Vec2(posX, posY), rotation);
 
     if (components.contains("Collider"))
@@ -188,18 +260,13 @@ GameObject* LoadScene::LoadObject(const json& item, World& world)
         std::string type = col["type"];
 
         if (type == "BOX")
-        {
             builder.WithCollider(ColliderType::BOX, ParseVec2(col["size"]));
-        }
         else if (type == "CIRCLE")
-        {
             builder.WithCollider(ColliderType::CIRCLE, col["radius"].get<float>());
-        }
         else if (type == "POLYGON")
         {
             Array<20> verts;
-            for (const auto& v : col["vertices"])
-                verts.PushBack(ParseVec2(v));
+            for (const auto& v : col["vertices"]) verts.PushBack(ParseVec2(v));
             builder.WithCollider(ColliderType::POLYGON, verts);
         }
     }
@@ -225,11 +292,9 @@ GameObject* LoadScene::LoadObject(const json& item, World& world)
         {
             shape.form = RenderShape::R_POLYGON;
             Array<20> verts;
-            for (const auto& v : ren["scale"])
-                verts.PushBack(ParseVec2(v));
+            for (const auto& v : ren["scale"]) verts.PushBack(ParseVec2(v));
             shape.scale = verts;
         }
-
         builder.WithRenderer(shape);
     }
 
@@ -241,25 +306,26 @@ GameObject* LoadScene::LoadObject(const json& item, World& world)
         const auto& ang = rb["angularState"];
 
         builder.WithRigidBody(
-            Properties{
-                props["mass"], props["restitution"],
-                props["inertia"], props["friction"]
-            },
-            LinearState{
-                ParseVec2(lin["velocity"]),
-                ParseVec2(lin["acceleration"]),
-                ParseVec2(lin["netForce"])
-            },
-            AngularState{
-                ang["angularVelocity"],
-                ang["angularAcceleration"],
-                ang["torque"]
-            },
+            Properties{ props["mass"], props["restitution"], props["inertia"], props["friction"] },
+            LinearState{ ParseVec2(lin["velocity"]), ParseVec2(lin["acceleration"]), ParseVec2(lin["netForce"]) },
+            AngularState{ ang["angularVelocity"], ang["angularAcceleration"], ang["torque"] },
             Settings{ rb.value("gravityEnabled", true) }
         );
     }
+}
 
+GameObject* LoadScene::LoadObject(const json& item, World& world)
+{
+    Instantiate builder;
+    PopulateBuilder(builder, item);
     return builder.Create(world, -1);
+}
+
+std::unique_ptr<GameObject> LoadScene::LoadObjectOrphan(const json& item, World& world)
+{
+    Instantiate builder;
+    PopulateBuilder(builder, item);
+    return builder.CreateOrphan(-1);
 }
 
 void LoadScene::LoadConstraints(const json& constraints, World& world, const std::unordered_map<int, GameObject*>& idMap)
@@ -271,43 +337,30 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
 
         if (type == "DISTANCE")
         {
-            int anchorId = item["anchor"];
-            int attachedId = item["attached"];
-            float length = item["length"];
-            Vec2 anchorOffset = item.contains("anchorOffset") ? ParseVec2(item["anchorOffset"]) : Vec2();
-            Vec2 attachedOffset = item.contains("attachedOffset") ? ParseVec2(item["attachedOffset"]) : Vec2();
-
-            auto itA = idMap.find(anchorId);
-            auto itB = idMap.find(attachedId);
+            auto itA = idMap.find(item["anchor"]);
+            auto itB = idMap.find(item["attached"]);
             if (itA == idMap.end() || itB == idMap.end()) continue;
 
-            auto distance = std::make_unique<DistanceConstraint>(itA->second, itB->second, length, anchorOffset, attachedOffset);
+            auto distance = std::make_unique<DistanceConstraint>(itA->second, itB->second, item["length"], 
+                item.contains("anchorOffset") ? ParseVec2(item["anchorOffset"]) : Vec2(),
+                item.contains("attachedOffset") ? ParseVec2(item["attachedOffset"]) : Vec2());
             if (ID != -1) distance->SetID(ID);
             world.AddConstraint(std::move(distance));
         }
         else if (type == "PIN")
         {
             std::vector<PinAttachment> attachments;
-            Vec2 anchor = Vec2();
-
             for (const auto& att : item["attachments"])
             {
                 auto it = idMap.find(att["id"].get<int>());
-                if (it == idMap.end()) continue;
-
-                anchor = att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2();
-                attachments.push_back({ it->second, anchor });
+                if (it != idMap.end())
+                    attachments.push_back({ it->second, att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2() });
             }
 
             if (attachments.empty()) continue;
-
-            bool fixedX = item.value("fixedX", true);
-            bool fixedY = item.value("fixedY", true);
-
-            if (!fixedX && !fixedY) continue;
-
-            Vec2 pinPos = item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position;
-            auto pin = std::make_unique<PinConstraint>(attachments, pinPos, fixedX, fixedY);
+            auto pin = std::make_unique<PinConstraint>(attachments, 
+                item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position,
+                item.value("fixedX", true), item.value("fixedY", true));
             if (ID != -1) pin->SetID(ID);
             world.AddConstraint(std::move(pin));
         }
@@ -317,39 +370,31 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             for (const auto& att : item["attachments"])
             {
                 auto it = idMap.find(att["id"].get<int>());
-                if (it == idMap.end()) continue;
-
-                Vec2 anchor = att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2();
-                attachments.push_back(JointAttachment{ it->second, anchor });
+                if (it != idMap.end())
+                    attachments.push_back({ it->second, att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2() });
             }
 
             if (attachments.size() < 2) continue;
-
             for (size_t i = 0; i < attachments.size(); i++)
-            {
-                for (size_t j = i + 1; j < attachments.size(); j++)
-                {
+                for (size_t j = i + 1; j < attachments.size(); j++) {
                     attachments[i].obj->AddIgnored(attachments[j].obj->GetID());
                     attachments[j].obj->AddIgnored(attachments[i].obj->GetID());
                 }
-            }
 
-            Vec2 position = item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position;
-
-            auto joint = std::make_unique<JointConstraint>(attachments, position, item.value("collisions", false));
+            auto joint = std::make_unique<JointConstraint>(attachments, 
+                item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position,
+                item.value("collisions", false));
             if (ID != -1) joint->SetID(ID);
             world.AddConstraint(std::move(joint));
         }
         else if (type == "MOTOR")
         {
-            int rotorId = item["rotor"];
-            Vec2 localPosition = item.contains("localPosition") ? ParseVec2(item["localPosition"]) : Vec2();
-            float torque = item["torque"].get<float>();
-
-            auto it = idMap.find(rotorId);
+            auto it = idMap.find(item["rotor"]);
             if (it == idMap.end()) continue;
 
-            auto motor = std::make_unique<MotorConstraint>(it->second, localPosition, torque);
+            auto motor = std::make_unique<MotorConstraint>(it->second, 
+                item.contains("localPosition") ? ParseVec2(item["localPosition"]) : Vec2(),
+                item["torque"].get<float>());
             if (ID != -1) motor->SetID(ID);
             world.AddConstraint(std::move(motor));
         }
@@ -360,44 +405,19 @@ void LoadScene::LoadControllers(const json& controllers, World& world)
 {
     for (const auto& item : controllers)
     {
-        std::string type = item["type"];
-
-        if (type == "MOTOR")
+        if (item["type"] == "MOTOR")
         {
-            bool active = item.value("active", true);
             std::vector<MotorConstraint*> motors;
-
-            if (item.contains("constraints"))
+            for (const auto& cId : item["constraints"])
             {
-                for (const auto& cId : item["constraints"])
-                {
-                    int idToFind = cId.get<int>();
-                    Constraint* targetConstraint = nullptr;
-                    
-                    for (const auto& c : world.GetConstraints())
-                    {
-                        if (c->GetID() == idToFind)
-                        {
-                            targetConstraint = c.get();
-                            break;
-                        }
+                int idToFind = cId.get<int>();
+                for (const auto& c : world.GetConstraints())
+                    if (c->GetID() == idToFind) {
+                        if (auto* m = dynamic_cast<MotorConstraint*>(c.get())) motors.push_back(m);
+                        break;
                     }
-                    
-                    if (targetConstraint)
-                    {
-                        MotorConstraint* motor = dynamic_cast<MotorConstraint*>(targetConstraint);
-                        if (motor)
-                        {
-                            motors.push_back(motor);
-                        }
-                    }
-                }
             }
-
-            float torqueMax = item.value("torqueMax", 100.0f);
-
-            auto controller = std::make_unique<MotorController>(active, motors, torqueMax);
-            world.AddController(std::move(controller));
+            world.AddController(std::make_unique<MotorController>(item.value("active", true), motors, item.value("torqueMax", 100.0f)));
         }
     }
 }

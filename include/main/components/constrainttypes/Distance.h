@@ -20,4 +20,5 @@ class DistanceConstraint : public Constraint
         const char* GetName() const override { return "DistanceConstraint"; }
 
         void Solve(float dt) override;
+        void OnObjectRemoved(size_t id) override;
 };

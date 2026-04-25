@@ -24,4 +24,6 @@ class PinConstraint : public Constraint
         const char* GetName() const override { return "PinConstraint"; }
 
         void Solve(float dt) override;
+        void OnObjectRemoved(size_t id) override;
+        bool IsInvalid() const override;
 };

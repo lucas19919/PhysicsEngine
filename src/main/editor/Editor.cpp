@@ -13,6 +13,7 @@
 #include "main/physics/Config.h"
 #include "main/scenes/LoadScene.h"
 #include "main/scenes/SaveScene.h"
+#include "main/scenes/BoundarySystem.h"
 #include "main/editor/EditorState.h"
 
 namespace Editor {
@@ -147,12 +148,18 @@ void Editor::Update(World& world) {
             ImGui::TextDisabled("Physics World Settings");
             ImGui::Separator();
             
+            if (ImGui::Checkbox("Use Boundary Walls", &Config::useWalls)) {
+                BoundarySystem::UpdateBoundaries(world);
+            }
+            ImGui::Separator();
+
             bool changed = false;
             changed |= ImGui::DragInt("Screen Width", &Config::screenWidth, 1, 100, 4000);
             changed |= ImGui::DragInt("Screen Height", &Config::screenHeight, 1, 100, 4000);
             
             if (changed) {
                 world.SetWorldSize(Vec2(Config::screenWidth * Config::PixelToMeter, Config::screenHeight * Config::PixelToMeter));
+                if (Config::useWalls) BoundarySystem::UpdateBoundaries(world);
             }
 
             ImGui::Separator();
@@ -161,6 +168,7 @@ void Editor::Update(World& world) {
                 world.SetWorldSize(size);
                 Config::screenWidth = (int)(size.x * Config::MeterToPixel);
                 Config::screenHeight = (int)(size.y * Config::MeterToPixel);
+                if (Config::useWalls) BoundarySystem::UpdateBoundaries(world);
             }
             ImGui::EndMenu();
         }
@@ -172,23 +180,31 @@ void Editor::Update(World& world) {
         ImGui::SetCursorPosX((barWidth - groupW) * 0.5f);
         
         if (world.isPaused) {
-            if (ImGui::Button(">", ImVec2(btnW, 0))) world.isPaused = false;
+            if (ImGui::Button(">", ImVec2(btnW, 0))) {
+                if (!EditorState::Get().HasInitialState()) {
+                    EditorState::Get().CaptureInitialState(SaveScene::SerializeScene(world));
+                }
+                world.isPaused = false;
+            }
         } else {
             if (ImGui::Button("||", ImVec2(btnW, 0))) world.isPaused = true;
         }
         ImGui::SameLine();
         if (ImGui::Button("|>", ImVec2(btnW, 0))) {
+            if (!EditorState::Get().HasInitialState()) {
+                EditorState::Get().CaptureInitialState(SaveScene::SerializeScene(world));
+            }
             world.isPaused = false;
             world.Step(1.0f / 60.0f);
             world.isPaused = true;
         }
         ImGui::SameLine();
         if (ImGui::Button("R", ImVec2(btnW, 0))) {
-            if (!EditorState::Get().GetActiveScenePath().empty()) {
+            if (EditorState::Get().HasInitialState()) {
                 EditorState::Get().SetSelected(nullptr);
                 world.isPaused = true;
-                world.Clear();
-                LoadScene::Load(EditorState::Get().GetActiveScenePath(), world, Config::screenWidth, Config::screenHeight);
+                LoadScene::LoadFromJSON(EditorState::Get().GetInitialState(), world, Config::screenWidth, Config::screenHeight);
+                EditorState::Get().ClearInitialState();
             }
         }
         ImGui::EndMainMenuBar();

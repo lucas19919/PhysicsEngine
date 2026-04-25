@@ -55,6 +55,12 @@ GameObject* Instantiate::Create(World& world, size_t id)
     return ptr;
 }
 
+std::unique_ptr<GameObject> Instantiate::CreateOrphan(size_t id)
+{
+    obj->SetID(id);
+    return std::move(obj);
+}
+
 Instantiate::Instantiate()
 {
     obj = std::make_unique<GameObject>();

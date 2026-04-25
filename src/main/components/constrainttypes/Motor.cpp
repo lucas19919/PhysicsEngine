@@ -1,6 +1,7 @@
 #include "main/components/constrainttypes/Motor.h"
 #include "main/components/Constraint.h"
 #include "main/World.h"
+#include "main/GameObject.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
 
@@ -35,5 +36,14 @@ void MotorConstraint::Solve(float dt)
         
         float newAngularVel = rb->GetAngularVelocity() + (iterationImpulse * rb->GetInvInertia());
         rb->SetAngularVelocity(newAngularVel);
+    }
+}
+
+void MotorConstraint::OnObjectRemoved(size_t id)
+{
+    Component::OnObjectRemoved(id);
+    if (rotor->GetID() == id)
+    {
+        isComponentDeleted = true;
     }
 }
