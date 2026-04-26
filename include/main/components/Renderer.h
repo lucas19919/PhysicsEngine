@@ -27,7 +27,7 @@ class Renderer : public Component
         ~Renderer() = default;
 
         const char* GetName() const override { return "Renderer"; }
-        void OnInspectorGui() override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 
         Array<20> GetLocalCoordinates() const;
         Array<20> GetWorldCoordinates(Vec2 position) const;

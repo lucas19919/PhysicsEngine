@@ -8,6 +8,7 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <unordered_set>
 
 class GameObject
 {
@@ -51,9 +52,9 @@ class GameObject
         void SetID(size_t newID) { id = newID; }
         const size_t& GetID() const { return id; }
 
-        void AddIgnored(int id);
-        void RemoveIgnored(int id);
-        const std::vector<int>& GetIgnoredIDs() const { return ignoredIDs; }
+        void AddIgnored(size_t id);
+        void RemoveIgnored(size_t id);
+        const std::unordered_set<size_t>& GetIgnoredIDs() const { return ignoredIDs; }
 
         const std::vector<std::unique_ptr<Component>>& GetComponents() const { return components; }
 
@@ -68,6 +69,6 @@ class GameObject
 
         size_t id;
         std::string groupName;
-        std::vector<int> ignoredIDs;
+        std::unordered_set<size_t> ignoredIDs;
         std::string name;
 };

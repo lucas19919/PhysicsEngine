@@ -38,7 +38,7 @@ class RigidBody : public Component
         ~RigidBody();
 
         const char* GetName() const override { return "RigidBody"; }
-        void OnInspectorGui() override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 
         void SetGravity(bool enabled) { gravityEnabled = enabled; }
         const bool& IsGravityEnabled() const { return gravityEnabled; }

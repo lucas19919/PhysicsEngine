@@ -1,0 +1,153 @@
+{
+    "constraints": [],
+    "controllers": [],
+    "generators": [
+        {
+            "grid": {
+                "columns": 30,
+                "rows": 20,
+                "spacingX": 1.399999976158142,
+                "spacingY": 1.399999976158142,
+                "startX": -20.0,
+                "startY": -20.0
+            },
+            "name": "Balls",
+            "object": {
+                "components": {
+                    "Collider": {
+                        "radius": 0.5,
+                        "type": "CIRCLE"
+                    },
+                    "Renderer": {
+                        "color": {
+                            "a": 255,
+                            "b": 76,
+                            "g": 172,
+                            "r": 7
+                        },
+                        "form": "R_CIRCLE",
+                        "scale": 0.5
+                    },
+                    "RigidBody": {
+                        "angularState": {
+                            "angularAcceleration": 0.0,
+                            "angularVelocity": 0.0,
+                            "torque": 0.0
+                        },
+                        "gravityEnabled": true,
+                        "linearState": {
+                            "acceleration": {
+                                "x": 0.0,
+                                "y": 0.0
+                            },
+                            "netForce": {
+                                "x": 0.0,
+                                "y": 0.0
+                            },
+                            "velocity": {
+                                "x": 0.0,
+                                "y": 0.0
+                            }
+                        },
+                        "properties": {
+                            "friction": 0.5,
+                            "inertia": 0.5,
+                            "mass": 1.0,
+                            "restitution": 0.5
+                        }
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "rotation": 0.0
+                    }
+                },
+                "id": 18446744073709551615,
+                "name": ""
+            }
+        }
+    ],
+    "groups": [
+        "Slopes"
+    ],
+    "name": "Saved Scene",
+    "objects": [
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 25.0,
+                        "y": 1.0
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": {
+                        "a": 255,
+                        "b": 5,
+                        "g": 5,
+                        "r": 223
+                    },
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 25.0,
+                        "y": 1.0
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": -12.84892749786377,
+                        "y": 13.730090141296387
+                    },
+                    "rotation": 0.5135546922683716
+                }
+            },
+            "groupName": "Slopes",
+            "id": 1590,
+            "name": "Static Box"
+        },
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 1.0,
+                        "y": 18.600000381469727
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": {
+                        "a": 255,
+                        "b": 124,
+                        "g": 10,
+                        "r": 4
+                    },
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 1.0,
+                        "y": 18.600000381469727
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": 10.164316177368164,
+                        "y": -2.4534525871276855
+                    },
+                    "rotation": -2.5793240070343018
+                }
+            },
+            "groupName": "Slopes",
+            "id": 151,
+            "name": "Static"
+        }
+    ],
+    "screenHeight": 2500,
+    "screenWidth": 2500,
+    "useWalls": true,
+    "worldSize": {
+        "x": 50.0,
+        "y": 50.0
+    }
+}

@@ -175,6 +175,13 @@ json SaveScene::SerializeObject(GameObject* obj)
     j["name"] = obj->GetName();
     if (!obj->GetGroupName().empty()) j["groupName"] = obj->GetGroupName();
 
+    const auto& ignored = obj->GetIgnoredIDs();
+    if (!ignored.empty()) {
+        json ignoredArr = json::array();
+        for (size_t id : ignored) ignoredArr.push_back(id);
+        j["ignored"] = ignoredArr;
+    }
+
     json components;
     components["TransformComponent"] = { {"position", Vec2ToJSON(obj->transform.position)}, {"rotation", obj->transform.rotation} };
 
@@ -255,7 +262,7 @@ json SaveScene::SerializeConstraints(const std::vector<Constraint*>& constraints
             c["fixedX"] = pc->fixedX;
             c["fixedY"] = pc->fixedY;
             json atts = json::array();
-            for (const auto& att : pc->attachments) atts.push_back({ {"id", att.obj->GetID()}, {"localAnchor", Vec2ToJSON(att.localAnchor)} });
+            for (const auto& att : pc->attachments) atts.push_back({ {"id", att.obj->GetID()}, {"localX", att.localX}, {"localY", att.localY} });
             c["attachments"] = atts;
         } else if (cPtr->GetType() == ConstraintType::JOINT) {
             c["type"] = "JOINT";
@@ -263,7 +270,7 @@ json SaveScene::SerializeConstraints(const std::vector<Constraint*>& constraints
             c["position"] = Vec2ToJSON(jc->position);
             c["collisions"] = jc->collisions;
             json atts = json::array();
-            for (const auto& att : jc->attachments) atts.push_back({ {"id", att.obj->GetID()}, {"localAnchor", Vec2ToJSON(att.localAnchor)} });
+            for (const auto& att : jc->attachments) atts.push_back({ {"id", att.obj->GetID()}, {"localX", att.localX}, {"localY", att.localY} });
             c["attachments"] = atts;
         } else if (cPtr->GetType() == ConstraintType::MOTOR) {
             c["type"] = "MOTOR";

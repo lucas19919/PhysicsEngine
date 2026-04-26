@@ -20,13 +20,14 @@ ConstraintType PinConstraint::GetType() const
 
 void PinConstraint::Solve(float dt)
 {
-    for (PinAttachment att : attachments)
+    for (PinAttachment& att : attachments)
     {
         GameObject* obj = att.obj;
         RigidBody* rb = obj->rb;
         if (!rb) continue;
 
-        Vec2 r = RotMatrix(obj->transform.rotation).Rotate(att.localAnchor);
+        Vec2 localAnchor(att.localX, att.localY);
+        Vec2 r = RotMatrix(obj->transform.rotation).Rotate(localAnchor);
 
         Vec2 worldAnchor = obj->transform.position + r;
         Vec2 delta = position - worldAnchor;
@@ -94,4 +95,41 @@ void PinConstraint::OnObjectRemoved(size_t id)
 bool PinConstraint::IsInvalid() const
 {
     return isComponentDeleted || attachments.empty();
+}
+
+bool PinConstraint::InvolvesObject(GameObject* obj) const
+{
+    for (const auto& att : attachments) if (att.obj == obj) return true;
+    return false;
+}
+
+#include "external/imgui/imgui.h"
+
+bool PinConstraint::OnInspectorGui(World* world)
+{
+    ImGui::Text("Type: Pin");
+    bool changed = false;
+    if (ImGui::Checkbox("Fixed X", &fixedX)) changed = true;
+    ImGui::SameLine();
+    if (ImGui::Checkbox("Fixed Y", &fixedY)) changed = true;
+    
+    if (ImGui::DragFloat2("Position", &position.x, 0.05f)) {
+        for (auto& att : attachments) {
+            Vec2 local = RotMatrix(-att.obj->transform.rotation).Rotate(position - att.obj->transform.position);
+            att.localX = local.x;
+            att.localY = local.y;
+        }
+        changed = true;
+    }
+
+    ImGui::Text("Attachments:");
+    for (size_t i = 0; i < attachments.size(); i++) {
+        auto& att = attachments[i];
+        ImGui::PushID(i);
+        ImGui::BulletText("%s", att.obj->GetName().c_str());
+        if (ImGui::DragFloat("Local X", &att.localX, 0.01f)) changed = true;
+        if (ImGui::DragFloat("Local Y", &att.localY, 0.01f)) changed = true;
+        ImGui::PopID();
+    }
+    return changed;
 }

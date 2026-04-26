@@ -21,4 +21,6 @@ class DistanceConstraint : public Constraint
 
         void Solve(float dt) override;
         void OnObjectRemoved(size_t id) override;
+        bool InvolvesObject(GameObject* obj) const override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 };

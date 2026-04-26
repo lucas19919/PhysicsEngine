@@ -5,16 +5,16 @@
 
 PolygonCollider::PolygonCollider(const Array<20>& vertices) : vertices(vertices) {}
 
-void PolygonCollider::OnInspectorGui()
+bool PolygonCollider::OnInspectorGui(World* world)
 {
-    Collider::OnInspectorGui();
-    bool changed = false;
+    bool colliderBaseChanged = Collider::OnInspectorGui(world);
+    bool verticesChanged = false;
     for (size_t i = 0; i < vertices.Size(); i++)
     {
         ImGui::PushID((int)i);
         if (ImGui::DragFloat2("Vertex", &vertices[i].x, 0.1f))
         {
-            changed = true;
+            verticesChanged = true;
         }
         ImGui::PopID();
     }
@@ -22,10 +22,11 @@ void PolygonCollider::OnInspectorGui()
     if (ImGui::Button("Add Vertex") && vertices.Size() < 20)
     {
         vertices.PushBack(Vec2(0,0));
-        changed = true;
+        verticesChanged = true;
     }
     
-    if (changed && owner) UpdateCache(owner->transform);
+    if (verticesChanged && owner) UpdateCache(owner->transform);
+    return colliderBaseChanged || verticesChanged;
 }
 
 ColliderType PolygonCollider::GetType() const

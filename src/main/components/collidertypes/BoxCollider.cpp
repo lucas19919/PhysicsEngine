@@ -5,13 +5,15 @@
 
 BoxCollider::BoxCollider(Vec2 size) : size(size) {}
 
-void BoxCollider::OnInspectorGui()
+bool BoxCollider::OnInspectorGui(World* world)
 {
-    Collider::OnInspectorGui();
+    bool changed = Collider::OnInspectorGui(world);
     if (ImGui::DragFloat2("Size", &size.x, 0.1f, 0.01f, 100.0f))
     {
         if (owner) UpdateCache(owner->transform);
+        changed = true;
     }
+    return changed;
 }
 
 ColliderType BoxCollider::GetType() const

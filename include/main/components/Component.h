@@ -9,7 +9,7 @@ class Component {
         virtual ~Component() = default;
 
         virtual const char* GetName() const = 0;
-        virtual void OnInspectorGui() {}
+        virtual bool OnInspectorGui(class World* world = nullptr) { return false; }
 
         virtual void OnObjectRemoved(size_t id);
         virtual bool IsInvalid() const { return isComponentDeleted; }
@@ -18,3 +18,4 @@ class Component {
     protected:
         bool isComponentDeleted = false;
 };
+

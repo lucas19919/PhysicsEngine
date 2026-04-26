@@ -10,21 +10,14 @@ GameObject::~GameObject()
 }
 
 
-void GameObject::AddIgnored(int id)
+void GameObject::AddIgnored(size_t id)
 {
-    if (std::find(ignoredIDs.begin(), ignoredIDs.end(), id) == ignoredIDs.end())
-    {
-        ignoredIDs.push_back(id);
-    }
+    ignoredIDs.insert(id);
 }
 
-void GameObject::RemoveIgnored(int id)
+void GameObject::RemoveIgnored(size_t id)
 {
-    auto it = std::find(ignoredIDs.begin(), ignoredIDs.end(), id);
-    if (it != ignoredIDs.end())
-    {
-        ignoredIDs.erase(it);
-    }
+    ignoredIDs.erase(id);
 }
 
 void GameObject::RemoveComponent(Component* component)

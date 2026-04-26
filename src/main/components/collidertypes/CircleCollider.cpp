@@ -5,13 +5,15 @@
 
 CircleCollider::CircleCollider(float radius) : radius(radius) {}
 
-void CircleCollider::OnInspectorGui()
+bool CircleCollider::OnInspectorGui(World* world)
 {
-    Collider::OnInspectorGui();
+    bool changed = Collider::OnInspectorGui(world);
     if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.01f, 100.0f))
     {
         if (owner) UpdateCache(owner->transform);
+        changed = true;
     }
+    return changed;
 }
 
 ColliderType CircleCollider::GetType() const

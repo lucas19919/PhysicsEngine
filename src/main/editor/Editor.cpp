@@ -26,7 +26,7 @@ Editor::Editor(World& world, EditorCamera& camera, InputHandler& input) {
     panels.push_back(std::make_unique<DebugPanel>());
     panels.push_back(std::make_unique<ScenePanel>(Config::screenWidth, Config::screenHeight));
 
-    ThemeManager::ApplyTheme(EditorTheme::ModernDark);
+    ThemeManager::ApplyTheme(EditorTheme::Retro);
 }
 
 Editor::~Editor() {

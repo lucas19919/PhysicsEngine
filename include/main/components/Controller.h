@@ -17,5 +17,5 @@ struct Controller : public Component
     virtual void Update(float dt) = 0;
 
     const char* GetName() const override { return "Controller"; }
-    void OnInspectorGui() override;
+    bool OnInspectorGui(class World* world = nullptr) override;
 };

@@ -69,8 +69,7 @@ std::vector<std::pair<GameObject*, GameObject*>> Broadphase::GeneratePairs()
                 size_t obj1ID = obj1->GetID();
                 size_t obj2ID = obj2->GetID();
 
-                if (std::find(obj1->GetIgnoredIDs().begin(), obj1->GetIgnoredIDs().end(), obj2ID) != obj1->GetIgnoredIDs().end() ||
-                    std::find(obj2->GetIgnoredIDs().begin(), obj2->GetIgnoredIDs().end(), obj1ID) != obj2->GetIgnoredIDs().end())
+                if (obj1->GetIgnoredIDs().count(obj2ID) || obj2->GetIgnoredIDs().count(obj1ID))
                     continue;
 
                 RigidBody* rb1 = obj1->rb;

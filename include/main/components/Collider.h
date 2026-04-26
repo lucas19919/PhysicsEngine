@@ -24,7 +24,7 @@ class Collider : public Component
         virtual ColliderType GetType() const = 0;
 
         const char* GetName() const override { return "Collider"; }
-        void OnInspectorGui() override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 
         const Array<20>& GetVertices() const { return cachedVertices; }
         const Array<20>& GetNormals() const { return cachedNormals; }

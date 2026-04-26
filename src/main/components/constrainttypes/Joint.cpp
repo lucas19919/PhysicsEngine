@@ -49,10 +49,10 @@ void JointConstraint::SingleJoint(float dt)
         if (invMass1 == 0.0f && invMass2 == 0.0f) continue;
 
         RotMatrix rot1(obj1->transform.rotation);
-        Vec2 r1 = rot1.Rotate(attachments[0].localAnchor);
+        Vec2 r1 = rot1.Rotate(Vec2(attachments[0].localX, attachments[0].localY));
 
         RotMatrix rot2(obj2->transform.rotation);
-        Vec2 r2 = rot2.Rotate(attachments[i].localAnchor);
+        Vec2 r2 = rot2.Rotate(Vec2(attachments[i].localX, attachments[i].localY));
 
         Vec2 p1 = obj1->transform.position + r1;
         Vec2 p2 = obj2->transform.position + r2;
@@ -113,7 +113,7 @@ void JointConstraint::ComplexJoint(float dt)
         totalMass += mass;
 
         RotMatrix rot(obj->transform.rotation);
-        Vec2 r = rot.Rotate(attachment.localAnchor);
+        Vec2 r = rot.Rotate(Vec2(attachment.localX, attachment.localY));
         Vec2 p = obj->transform.position + r;
 
         Vec2 v = rb->GetVelocity();
@@ -140,7 +140,7 @@ void JointConstraint::ComplexJoint(float dt)
         float invInertia = rb->GetInvInertia();
 
         RotMatrix rot(obj->transform.rotation);
-        Vec2 r = rot.Rotate(attachment.localAnchor);
+        Vec2 r = rot.Rotate(Vec2(attachment.localX, attachment.localY));
         Vec2 p = obj->transform.position + r;
 
         Vec2 v = rb->GetVelocity();
@@ -178,4 +178,39 @@ void JointConstraint::OnObjectRemoved(size_t id)
 bool JointConstraint::IsInvalid() const
 {
     return isComponentDeleted || attachments.size() < 2;
+}
+
+bool JointConstraint::InvolvesObject(GameObject* obj) const
+{
+    for (const auto& att : attachments) if (att.obj == obj) return true;
+    return false;
+}
+
+#include "external/imgui/imgui.h"
+
+bool JointConstraint::OnInspectorGui(World* world)
+{
+    ImGui::Text("Type: Joint");
+    bool changed = false;
+    if (ImGui::Checkbox("Collisions", &collisions)) changed = true;
+    
+    if (ImGui::DragFloat2("Position", &position.x, 0.05f)) {
+        for (auto& att : attachments) {
+            Vec2 local = RotMatrix(-att.obj->transform.rotation).Rotate(position - att.obj->transform.position);
+            att.localX = local.x;
+            att.localY = local.y;
+        }
+        changed = true;
+    }
+
+    ImGui::Text("Attachments:");
+    for (size_t i = 0; i < attachments.size(); i++) {
+        auto& att = attachments[i];
+        ImGui::PushID(i);
+        ImGui::BulletText("%s", att.obj->GetName().c_str());
+        if (ImGui::DragFloat("Local X", &att.localX, 0.01f)) changed = true;
+        if (ImGui::DragFloat("Local Y", &att.localY, 0.01f)) changed = true;
+        ImGui::PopID();
+    }
+    return changed;
 }

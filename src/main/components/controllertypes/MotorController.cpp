@@ -2,6 +2,7 @@
 #include "main/components/constrainttypes/Motor.h"
 #include "main/components/Constraint.h"
 #include "main/GameObject.h"
+#include "main/World.h"
 #include "raylib.h"
 #include <algorithm>
 

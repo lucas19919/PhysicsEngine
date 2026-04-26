@@ -32,6 +32,26 @@ void World::AddConstraint(std::unique_ptr<Constraint> c)
     constraints.push_back(std::move(c));
 }
 
+std::vector<Constraint*> World::GetConstraintsForObject(GameObject* obj)
+{
+    std::vector<Constraint*> result;
+    for (auto& c : constraints)
+    {
+        if (c->InvolvesObject(obj))
+        {
+            result.push_back(c.get());
+        }
+    }
+    return result;
+}
+
+void World::RemoveConstraint(size_t id)
+{
+    constraints.erase(std::remove_if(constraints.begin(), constraints.end(), [id](const std::unique_ptr<Constraint>& c) {
+        return c->GetID() == id;
+    }), constraints.end());
+}
+
 void World::UpdateCaches()
 {
     broadphase->UpdateBroadphase(gameObjects);
@@ -44,6 +64,7 @@ void World::Clear()
     constraints.clear();
     controllers.clear();  
     generators.clear();
+    groups.clear();
 
     broadphase->Clear();
     contactManager->Clear();
@@ -82,6 +103,7 @@ void World::RemoveGameObject(size_t id)
 void World::RemoveGroup(const std::string& groupName)
 {
     RemoveGroupInternal(groupName, true);
+    groups.erase(std::remove(groups.begin(), groups.end(), groupName), groups.end());
 }
 
 void World::RemoveGroupInternal(const std::string& groupName, bool prune)

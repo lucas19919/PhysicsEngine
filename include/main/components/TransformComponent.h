@@ -10,7 +10,7 @@ class TransformComponent : public Component
         TransformComponent();
 
         const char* GetName() const override { return "Transform"; }
-        void OnInspectorGui() override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 
         Vec2 position;
         float rotation;

@@ -37,6 +37,8 @@ class World
 
         void AddConstraint(std::unique_ptr<Constraint> c);
         const std::vector<std::unique_ptr<Constraint>>& GetConstraints() const { return constraints; }
+        std::vector<Constraint*> GetConstraintsForObject(GameObject* obj);
+        void RemoveConstraint(size_t id);
 
         void AddController(std::unique_ptr<Controller> c) { controllers.push_back(std::move(c)); }
         const std::vector<std::unique_ptr<Controller>>& GetControllers() const { return controllers; }
@@ -63,6 +65,9 @@ class World
             }), generators.end());
         }
 
+        void AddGroup(const std::string& name) { if (std::find(groups.begin(), groups.end(), name) == groups.end()) groups.push_back(name); }
+        const std::vector<std::string>& GetGroups() const { return groups; }
+
         void RegenerateGenerator(const std::string& currentName, const std::string& oldName = "");
         void RenameGenerator(const std::string& oldName, const std::string& newName);
 
@@ -80,6 +85,7 @@ class World
         std::vector<std::unique_ptr<Constraint>> constraints;
         std::vector<std::unique_ptr<Controller>> controllers;
         std::vector<GeneratorDef> generators;
+        std::vector<std::string> groups;
 
         void RemoveGroupInternal(const std::string& groupName, bool prune);
 

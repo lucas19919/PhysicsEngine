@@ -4,13 +4,15 @@
 
 #include "external/imgui/imgui.h"
 
-void Renderer::OnInspectorGui() {
+bool Renderer::OnInspectorGui(World* world) {
+    bool changed = false;
     float color[4] = { (float)shape.color.r / 255.0f, (float)shape.color.g / 255.0f, (float)shape.color.b / 255.0f, (float)shape.color.a / 255.0f };
     if (ImGui::ColorEdit4("Color", color)) {
         shape.color.r = (unsigned char)(color[0] * 255.0f);
         shape.color.g = (unsigned char)(color[1] * 255.0f);
         shape.color.b = (unsigned char)(color[2] * 255.0f);
         shape.color.a = (unsigned char)(color[3] * 255.0f);
+        changed = true;
     }
     
     const char* shapes[] = { "Circle", "Box", "Polygon" };
@@ -24,6 +26,7 @@ void Renderer::OnInspectorGui() {
         else if (shape.form == R_POLYGON) shape.scale = Array<20>();
         
         UpdateLocalCoordinates();
+        changed = true;
     }
 
     if (shape.form == R_CIRCLE) {
@@ -31,14 +34,18 @@ void Renderer::OnInspectorGui() {
         if (ImGui::DragFloat("Radius", &radius, 0.1f, 0.01f, 100.0f)) {
             shape.scale = radius;
             UpdateLocalCoordinates();
+            changed = true;
         }
     } else if (shape.form == R_BOX) {
         Vec2 size = std::get<Vec2>(shape.scale);
         if (ImGui::DragFloat2("Size", &size.x, 0.1f, 0.01f, 100.0f)) {
             shape.scale = size;
             UpdateLocalCoordinates();
+            changed = true;
         }
     }
+
+    return changed;
 }
 
 Renderer::Renderer(Shape shape) : shape(shape) 

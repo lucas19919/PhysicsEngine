@@ -40,13 +40,22 @@ void EditorCamera::Zoom(float delta, Vec2 mousePos) {
 }
 
 Vec2 EditorCamera::ScreenToWorldMeters(Vec2 screenPos) const {
-    Vector2 s = { screenPos.x, screenPos.y };
-    Vector2 worldPixels = GetScreenToWorld2D(s, camera);
-    return Vec2(worldPixels.x * Config::PixelToMeter, worldPixels.y * Config::PixelToMeter);
+    // Manual conversion to avoid dependency on global Raylib screen state
+    // worldPos = (screenPos - offset) / zoom + target
+    float worldX = (screenPos.x - camera.offset.x) / camera.zoom + camera.target.x;
+    float worldY = (screenPos.y - camera.offset.y) / camera.zoom + camera.target.y;
+    
+    return Vec2(worldX * Config::PixelToMeter, worldY * Config::PixelToMeter);
 }
 
 Vec2 EditorCamera::WorldToScreenPixels(Vec2 worldPos) const {
-    Vector2 worldPixels = { worldPos.x * Config::MeterToPixel, worldPos.y * Config::MeterToPixel };
-    Vector2 screenPixels = GetWorldToScreen2D(worldPixels, camera);
-    return Vec2(screenPixels.x, screenPixels.y);
+    // Manual conversion to avoid dependency on global Raylib screen state
+    // screenPos = (worldPos - target) * zoom + offset
+    float worldPixelsX = worldPos.x * Config::MeterToPixel;
+    float worldPixelsY = worldPos.y * Config::MeterToPixel;
+    
+    float screenX = (worldPixelsX - camera.target.x) * camera.zoom + camera.offset.x;
+    float screenY = (worldPixelsY - camera.target.y) * camera.zoom + camera.offset.y;
+    
+    return Vec2(screenX, screenY);
 }

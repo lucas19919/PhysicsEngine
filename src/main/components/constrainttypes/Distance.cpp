@@ -85,3 +85,24 @@ void DistanceConstraint::OnObjectRemoved(size_t id)
         isComponentDeleted = true;
     }
 }
+
+bool DistanceConstraint::InvolvesObject(GameObject* obj) const
+{
+    return anchor == obj || attached == obj;
+}
+
+#include "external/imgui/imgui.h"
+
+bool DistanceConstraint::OnInspectorGui(World* world)
+{
+    ImGui::Text("Type: Distance");
+    ImGui::Text("Anchor: %s (ID: %zu)", anchor->GetName().c_str(), anchor->GetID());
+    ImGui::Text("Attached: %s (ID: %zu)", attached->GetName().c_str(), attached->GetID());
+
+    bool changed = false;
+    if (ImGui::DragFloat("Length", &length, 0.05f, 0.0f, 100.0f)) changed = true;
+    if (ImGui::DragFloat2("Anchor Offset", &anchorOffset.x, 0.05f)) changed = true;
+    if (ImGui::DragFloat2("Attached Offset", &attachedOffset.x, 0.05f)) changed = true;
+
+    return changed;
+}

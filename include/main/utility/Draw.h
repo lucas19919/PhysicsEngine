@@ -7,4 +7,3 @@
 
 void Render(World& world, const EditorCamera& camera);
 void GizmoRender(World& world, const EditorCamera& camera);
-void GizmoUpdate(World& world, const EditorCamera& camera);

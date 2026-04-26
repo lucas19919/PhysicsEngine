@@ -93,10 +93,19 @@ void Render(World& world, const EditorCamera& camera)
         Renderer *r = obj->GetComponent<Renderer>();
         Shape shape = r->GetShape();
 
-        // highlight color if in selected group
         Color renderColor = shape.color;
-        if (!selectedGroup.empty() && obj->GetGroupName() == selectedGroup) {
-            renderColor = theme.selectionColor;
+        bool isGroupSelected = (!selectedGroup.empty() && obj->GetGroupName() == selectedGroup);
+
+        // selection highlight for groups
+        if (isGroupSelected && obj->c) {
+            if (obj->c->GetType() == ColliderType::CIRCLE) {
+                float radius = ToScreen(static_cast<CircleCollider*>(obj->c)->radius);
+                DrawRing(ToScreen(obj->transform.position), radius, radius + thickness, 0.0f, 360.0f, 36, theme.selectionColor);
+            } else {
+                const Array<20>& vertices = obj->c->GetVertices();
+                for (size_t i = 0; i < vertices.Size(); i++)
+                    DrawLineEx(ToScreen(vertices[i]), ToScreen(vertices[(i + 1) % vertices.Size()]), thickness, theme.selectionColor);
+            }
         }
 
         switch (shape.form)
@@ -230,8 +239,9 @@ void Render(World& world, const EditorCamera& camera)
         if (c->GetType() == ConstraintType::JOINT)
         {
             JointConstraint* jc = static_cast<JointConstraint*>(c.get());
-            DrawCircleV(ToScreen(jc->position), 5.0f / zoom, DARKGRAY);
-            DrawCircleLines(ToScreen(jc->position).x, ToScreen(jc->position).y, 5.0f / zoom, BLACK);
+            Vector2 pos = ToScreen(jc->position);
+            DrawCircleV(pos, 5.0f / zoom, DARKGRAY);
+            DrawCircleLines(pos.x, pos.y, 5.0f / zoom, BLACK);
         }
     }
 
@@ -255,6 +265,7 @@ void Render(World& world, const EditorCamera& camera)
 void GizmoRender(World& world, const EditorCamera& camera)
 {
     EditorState& state = EditorState::Get();
+    const auto& theme = state.GetThemeColors();
     GameObject* selected = state.GetSelected();
     std::string selectedGroup = state.GetSelectedGroup();
     
@@ -318,120 +329,105 @@ void GizmoRender(World& world, const EditorCamera& camera)
         }
         default: break;
     }
-}
 
-void GizmoUpdate(World& world, const EditorCamera& camera)
-{
-    EditorState& state = EditorState::Get();
-    Vec2 mousePos = state.GetViewportMousePos();
-    GameObject* selected = state.GetSelected();
-    std::string selectedGroup = state.GetSelectedGroup();
-    
-    Vec2 worldPos;
-    GeneratorDef* genDef = nullptr;
+    // Anchor points rendering
     if (selected) {
-        worldPos = selected->transform.position;
-    } else if (!selectedGroup.empty()) {
-        genDef = world.GetGenerator(selectedGroup);
-        if (genDef) {
-            worldPos = Vec2(genDef->startX, genDef->startY);
-        } else {
-            // Calculate center of group for gizmo placement
-            Vec2 center(0, 0);
-            int count = 0;
-            for (const auto& obj : world.GetGameObjects()) {
-                if (obj->GetGroupName() == selectedGroup) {
-                    center += obj->transform.position;
-                    count++;
+        auto constraints = world.GetConstraintsForObject(selected);
+        Vector2 mousePos = GetMousePosition();
+        EditorState::SelectedAnchor hoveredAnchor = { nullptr, -1, false };
+        float dotRadius = 6.0f;
+
+        for (auto* c : constraints) {
+            std::vector<Vec2> worldAnchors;
+            std::vector<GameObject*> associatedObjects; // To draw lines to objects
+
+            if (c->GetType() == ConstraintType::DISTANCE) {
+                DistanceConstraint* dc = static_cast<DistanceConstraint*>(c);
+                worldAnchors.push_back(dc->anchor->transform.position + RotMatrix(dc->anchor->transform.rotation).Rotate(dc->anchorOffset));
+                associatedObjects.push_back(dc->anchor);
+                worldAnchors.push_back(dc->attached->transform.position + RotMatrix(dc->attached->transform.rotation).Rotate(dc->attachedOffset));
+                associatedObjects.push_back(dc->attached);
+            } else if (c->GetType() == ConstraintType::PIN) {
+                PinConstraint* pc = static_cast<PinConstraint*>(c);
+                worldAnchors.push_back(pc->position);
+                associatedObjects.push_back(nullptr); // Main position not tied to one object
+                for (auto& att : pc->attachments) {
+                    worldAnchors.push_back(att.obj->transform.position + RotMatrix(att.obj->transform.rotation).Rotate(Vec2(att.localX, att.localY)));
+                    associatedObjects.push_back(att.obj);
                 }
+            } else if (c->GetType() == ConstraintType::JOINT) {
+                JointConstraint* jc = static_cast<JointConstraint*>(c);
+                worldAnchors.push_back(jc->position);
+                associatedObjects.push_back(nullptr);
+                for (auto& att : jc->attachments) {
+                    worldAnchors.push_back(att.obj->transform.position + RotMatrix(att.obj->transform.rotation).Rotate(Vec2(att.localX, att.localY)));
+                    associatedObjects.push_back(att.obj);
+                }
+            } else if (c->GetType() == ConstraintType::MOTOR) {
+                MotorConstraint* mc = static_cast<MotorConstraint*>(c);
+                worldAnchors.push_back(mc->rotor->transform.position + RotMatrix(mc->rotor->transform.rotation).Rotate(mc->localPosition));
+                associatedObjects.push_back(mc->rotor);
             }
-            if (count > 0) worldPos = center * (1.0f / count);
-            else {
-                state.SetSelectedGroup("");
-                state.SetActiveAxis(GizmoAxis::NONE);
-                return;
-            }
-        }
-    } else {
-        state.SetActiveAxis(GizmoAxis::NONE);
-        return;
-    }
 
-    Vec2 origin = camera.WorldToScreenPixels(worldPos);
-    float handleLength = 100.0f;
-    GizmoType type = state.GetGizmoType();
-    
-    GizmoAxis hovered = GizmoAxis::NONE;
-    if (type == GizmoType::TRANSLATE)
-    {
-        Vector2 mPos = { mousePos.x, mousePos.y };
-        Vector2 oPos = { origin.x, origin.y };
-        if (CheckCollisionPointRec(mPos, { oPos.x - 15, oPos.y - 15, 30, 30 })) hovered = GizmoAxis::BOTH;
-        else if (CheckCollisionPointRec(mPos, { oPos.x, oPos.y - 15, handleLength + 40, 30 })) hovered = GizmoAxis::X;
-        else if (CheckCollisionPointRec(mPos, { oPos.x - 15, oPos.y, 30, handleLength + 40 })) hovered = GizmoAxis::Y;
-    }
-    else if (type == GizmoType::ROTATE && selected)
-    {
-        Vector2 mPos = { mousePos.x, mousePos.y };
-        Vector2 oPos = { origin.x, origin.y };
-        float radius = 80.0f;
-        float dist = Vector2Distance(mPos, oPos);
-        if (std::abs(dist - radius) < 10.0f || dist < 10.0f) hovered = GizmoAxis::BOTH;
-    }
-    
-    state.SetHoveredAxis(hovered);
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) state.SetActiveAxis(hovered);
-    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) state.SetActiveAxis(GizmoAxis::NONE);
+            // Draw in reverse order (idx 0 last) so it's always on top and easier to click
+            for (int i = (int)worldAnchors.size() - 1; i >= 0; i--) {
+                Vec2 s = camera.WorldToScreenPixels(worldAnchors[i]);
+                Vector2 sp = { s.x, s.y };
 
-    if (state.GetActiveAxis() != GizmoAxis::NONE && IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-    {
-        Vector2 d = GetMouseDelta();
-        Vec2 delta(d.x, d.y);
-        if (delta.x != 0 || delta.y != 0)
-        {
-            float zoom = camera.GetRaylibCamera().zoom;
-            Vec2 worldDelta( (delta.x / zoom) * Config::PixelToMeter, (delta.y / zoom) * Config::PixelToMeter );
-            if (type == GizmoType::TRANSLATE)
-            {
-                if (selected) {
-                    if (state.GetActiveAxis() == GizmoAxis::X) selected->transform.SetPosition(selected->transform.position + Vec2(worldDelta.x, 0));
-                    else if (state.GetActiveAxis() == GizmoAxis::Y) selected->transform.SetPosition(selected->transform.position + Vec2(0, worldDelta.y));
-                    else if (state.GetActiveAxis() == GizmoAxis::BOTH) selected->transform.SetPosition(selected->transform.position + worldDelta);
-                } else if (!selectedGroup.empty()) {
-                    if (genDef) {
-                        if (state.GetActiveAxis() == GizmoAxis::X) genDef->startX += worldDelta.x;
-                        else if (state.GetActiveAxis() == GizmoAxis::Y) genDef->startY += worldDelta.y;
-                        else if (state.GetActiveAxis() == GizmoAxis::BOTH) { genDef->startX += worldDelta.x; genDef->startY += worldDelta.y; }
-                        world.RegenerateGenerator(selectedGroup);
-                    } else {
-                        // Regular group movement
-                        for (auto& obj : world.GetGameObjects()) {
-                            if (obj->GetGroupName() == selectedGroup) {
-                                if (state.GetActiveAxis() == GizmoAxis::X) obj->transform.SetPosition(obj->transform.position + Vec2(worldDelta.x, 0));
-                                else if (state.GetActiveAxis() == GizmoAxis::Y) obj->transform.SetPosition(obj->transform.position + Vec2(0, worldDelta.y));
-                                else if (state.GetActiveAxis() == GizmoAxis::BOTH) obj->transform.SetPosition(obj->transform.position + worldDelta);
-                            }
-                        }
+                float currentRadius = (i == 0 && (c->GetType() == ConstraintType::PIN || c->GetType() == ConstraintType::JOINT)) ? dotRadius * 1.5f : dotRadius * 0.8f;
+                bool isHovered = CheckCollisionPointCircle(mousePos, sp, currentRadius + 2.0f);
+                
+                // Prioritize center anchor (idx 0) for selection if they overlap
+                if (isHovered) {
+                    if (i == 0 || !hoveredAnchor.isHovered)
+                        hoveredAnchor = { c, (int)i, true };
+                }
+
+                bool isActive = (state.GetActiveAnchor().constraint == c && state.GetActiveAnchor().index == (int)i);
+                
+                Color color;
+                if (isHovered || isActive) {
+                    color = YELLOW;
+                } else {
+                    color = (i == 0) ? ORANGE : LIME;
+                }
+
+                // Visual feedback for Joint main anchor
+                if (i == 0 && c->GetType() == ConstraintType::JOINT) {
+                     DrawLineEx({sp.x - 6, sp.y}, {sp.x + 6, sp.y}, 2.0f, BLACK);
+                     DrawLineEx({sp.x, sp.y - 6}, {sp.x, sp.y + 6}, 2.0f, BLACK);
+                }
+
+                // Draw line to associated object
+                if (associatedObjects[i]) {
+                    Vec2 objScreen = camera.WorldToScreenPixels(associatedObjects[i]->transform.position);
+                    DrawLineEx({objScreen.x, objScreen.y}, sp, 1.0f, Fade(color, 0.5f));
+                } else if (c->GetType() == ConstraintType::PIN || c->GetType() == ConstraintType::JOINT) {
+                    if (i == 0) {
+                         if (c->GetType() == ConstraintType::PIN) {
+                             PinConstraint* pc = static_cast<PinConstraint*>(c);
+                             for (auto& att : pc->attachments) {
+                                 Vec2 objS = camera.WorldToScreenPixels(att.obj->transform.position);
+                                 DrawLineEx({objS.x, objS.y}, sp, 1.0f, Fade(color, 0.3f));
+                             }
+                         } else {
+                             JointConstraint* jc = static_cast<JointConstraint*>(c);
+                             for (auto& att : jc->attachments) {
+                                 Vec2 objS = camera.WorldToScreenPixels(att.obj->transform.position);
+                                 DrawLineEx({objS.x, objS.y}, sp, 1.0f, Fade(color, 0.3f));
+                             }
+                         }
                     }
                 }
-            }
-            else if (type == GizmoType::ROTATE && selected)
-            {
-                Vector2 mPos = { mousePos.x, mousePos.y };
-                Vector2 oPos = { origin.x, origin.y };
-                Vector2 currentDir = Vector2Subtract(mPos, oPos);
-                Vector2 prevPos = { mousePos.x - delta.x, mousePos.y - delta.y };
-                Vector2 prevDir = Vector2Subtract(prevPos, oPos);
-                if (Vector2Length(currentDir) > 0.1f && Vector2Length(prevDir) > 0.1f)
-                {
-                    float angle1 = atan2f(currentDir.y, currentDir.x);
-                    float angle2 = atan2f(prevDir.y, prevDir.x);
-                    float diff = angle1 - angle2;
-                    if (diff > PI) diff -= 2.0f * PI;
-                    if (diff < -PI) diff += 2.0f * PI;
-                    selected->transform.SetRotation(selected->transform.rotation + diff);
+
+                DrawCircleV(sp, currentRadius, color);
+                DrawCircleLinesV(sp, currentRadius, BLACK);
+
+                if (isActive) {
+                    DrawCircleLinesV(sp, currentRadius + 3.0f, YELLOW);
                 }
             }
         }
+        state.SetHoveredAnchor(hoveredAnchor);
     }
 }

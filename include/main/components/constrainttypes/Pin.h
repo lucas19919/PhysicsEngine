@@ -8,7 +8,8 @@ class GameObject;
 struct PinAttachment
 {
     GameObject* obj;
-    Vec2 localAnchor;
+    float localX;
+    float localY;
 };
 
 class PinConstraint : public Constraint
@@ -26,4 +27,6 @@ class PinConstraint : public Constraint
         void Solve(float dt) override;
         void OnObjectRemoved(size_t id) override;
         bool IsInvalid() const override;
+        bool InvolvesObject(GameObject* obj) const override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 };

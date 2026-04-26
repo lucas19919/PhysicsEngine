@@ -47,3 +47,22 @@ void MotorConstraint::OnObjectRemoved(size_t id)
         isComponentDeleted = true;
     }
 }
+
+bool MotorConstraint::InvolvesObject(GameObject* obj) const
+{
+    return rotor == obj;
+}
+
+#include "external/imgui/imgui.h"
+
+bool MotorConstraint::OnInspectorGui(World* world)
+{
+    ImGui::Text("Type: Motor");
+    ImGui::Text("Rotor: %s (ID: %zu)", rotor->GetName().c_str(), rotor->GetID());
+
+    bool changed = false;
+    if (ImGui::DragFloat("Torque", &torque, 1.0f)) changed = true;
+    if (ImGui::DragFloat2("Local Pos", &localPosition.x, 0.05f)) changed = true;
+
+    return changed;
+}

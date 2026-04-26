@@ -8,7 +8,8 @@ class GameObject;
 struct JointAttachment
 {
     GameObject* obj;
-    Vec2 localAnchor;
+    float localX;
+    float localY;
 };
 
 class JointConstraint : public Constraint
@@ -24,6 +25,8 @@ class JointConstraint : public Constraint
         void Solve(float dt) override;
         void OnObjectRemoved(size_t id) override;
         bool IsInvalid() const override;
+        bool InvolvesObject(GameObject* obj) const override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 
     private:
         void SingleJoint(float dt);

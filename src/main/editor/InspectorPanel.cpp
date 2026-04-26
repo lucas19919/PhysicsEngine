@@ -8,6 +8,10 @@
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/Renderer.h"
+#include "main/components/constrainttypes/Distance.h"
+#include "main/components/constrainttypes/Pin.h"
+#include "main/components/constrainttypes/Joint.h"
+#include "main/components/constrainttypes/Motor.h"
 #include <string>
 #include <cstring>
 #include <fstream>
@@ -60,16 +64,78 @@ void InspectorPanel::OnImGui(World& world) {
             // Inspect template components
             if (genDef->templateObject) {
                 const auto& components = genDef->templateObject->GetComponents();
+                Component* componentToRemove = nullptr;
+
                 for (size_t i = 0; i < components.size(); i++) {
                     ImGui::PushID((int)i);
-                    if (ImGui::CollapsingHeader(components[i]->GetName(), ImGuiTreeNodeFlags_DefaultOpen)) {
-                        components[i]->OnInspectorGui();
-                        if (ImGui::IsItemDeactivatedAfterEdit() || 
-                           (ImGui::IsWindowFocused() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))) {
+                    bool open = ImGui::CollapsingHeader(components[i]->GetName(), ImGuiTreeNodeFlags_DefaultOpen);
+                    
+                    if (ImGui::BeginPopupContextItem()) {
+                        if (ImGui::MenuItem("Delete Component")) {
+                            componentToRemove = components[i].get();
+                        }
+                        ImGui::EndPopup();
+                    }
+
+                    if (open) {
+                        if (components[i]->OnInspectorGui(&world)) {
                             templateChanged = true;
                         }
                     }
                     ImGui::PopID();
+                }
+
+                if (componentToRemove) {
+                    genDef->templateObject->RemoveComponent(componentToRemove);
+                    templateChanged = true;
+                }
+
+                ImGui::Separator();
+        
+                // Add Component Button for Template
+                if (ImGui::Button("Add Component...", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                    ImGui::OpenPopup("AddTemplateComponentPopup");
+                }
+
+                if (ImGui::BeginPopup("AddTemplateComponentPopup")) {
+                    if (genDef->templateObject->rb == nullptr) {
+                        if (ImGui::MenuItem("RigidBody")) {
+                            genDef->templateObject->AddComponent(std::make_unique<RigidBody>(
+                                Properties{1.0f, 0.5f, 0.5f, 0.5f},
+                                LinearState{Vec2(0,0), Vec2(0,0), Vec2(0,0)},
+                                AngularState{0, 0, 0},
+                                Settings{true}
+                            ));
+                            templateChanged = true;
+                            ImGui::CloseCurrentPopup();
+                        }
+                    }
+
+                    if (genDef->templateObject->c == nullptr) {
+                        if (ImGui::BeginMenu("Collider")) {
+                            if (ImGui::MenuItem("Box Collider")) {
+                                genDef->templateObject->AddComponent(std::make_unique<BoxCollider>(Vec2(1.0f, 1.0f)));
+                                templateChanged = true;
+                                ImGui::CloseCurrentPopup();
+                            }
+                            if (ImGui::MenuItem("Circle Collider")) {
+                                genDef->templateObject->AddComponent(std::make_unique<CircleCollider>(0.5f));
+                                templateChanged = true;
+                                ImGui::CloseCurrentPopup();
+                            }
+                            ImGui::EndMenu();
+                        }
+                    }
+
+                    if (genDef->templateObject->GetComponent<Renderer>() == nullptr) {
+                        if (ImGui::MenuItem("Renderer")) {
+                            genDef->templateObject->AddComponent(std::make_unique<Renderer>(Shape{RenderShape::R_BOX, WHITE, Vec2(1.0f, 1.0f)}));
+                            templateChanged = true;
+                            ImGui::CloseCurrentPopup();
+                        }
+                    }
+                    
+                    ImGui::EndPopup();
                 }
             }
 
@@ -108,7 +174,7 @@ void InspectorPanel::OnImGui(World& world) {
 
         // Transform is a special component (inline struct)
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-            selected->transform.OnInspectorGui();
+            selected->transform.OnInspectorGui(&world);
         }
 
         // Iterate through all other components
@@ -128,13 +194,72 @@ void InspectorPanel::OnImGui(World& world) {
             }
 
             if (open) {
-                components[i]->OnInspectorGui();
+                components[i]->OnInspectorGui(&world);
             }
             ImGui::PopID();
         }
 
         if (componentToRemove) {
             selected->RemoveComponent(componentToRemove);
+        }
+
+        // Constraints Section
+        ImGui::Separator();
+        ImGui::TextDisabled("Constraints");
+
+        auto constraints = world.GetConstraintsForObject(selected);
+        Constraint* constraintToRemove = nullptr;
+
+        for (size_t i = 0; i < constraints.size(); i++) {
+            ImGui::PushID((int)(i + 1000));
+            bool open = ImGui::CollapsingHeader(constraints[i]->GetName(), ImGuiTreeNodeFlags_DefaultOpen);
+            
+            if (ImGui::BeginPopupContextItem()) {
+                if (ImGui::MenuItem("Delete Constraint")) {
+                    constraintToRemove = constraints[i];
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open) {
+                constraints[i]->OnInspectorGui(&world);
+            }
+            ImGui::PopID();
+        }
+
+        if (constraintToRemove) {
+            world.RemoveConstraint(constraintToRemove->GetID());
+        }
+
+        ImGui::Separator();
+
+        // Add Constraint Button
+        if (ImGui::Button("Add Constraint...", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+            ImGui::OpenPopup("AddConstraintPopup");
+        }
+
+        if (ImGui::BeginPopup("AddConstraintPopup")) {
+            bool inPickingMode = (EditorState::Get().GetPickingMode() == EditorState::PickingMode::CONSTRAINT_TARGET);
+            if (inPickingMode) {
+                ImGui::Text("Click another object in viewport...");
+                if (ImGui::Button("Cancel Picking")) EditorState::Get().ClearPickingMode();
+            } else {
+                if (ImGui::MenuItem("Distance Constraint")) {
+                    EditorState::Get().SetPickingMode(EditorState::PickingMode::CONSTRAINT_TARGET, ConstraintType::DISTANCE);
+                }
+                if (ImGui::MenuItem("Joint Constraint")) {
+                    EditorState::Get().SetPickingMode(EditorState::PickingMode::CONSTRAINT_TARGET, ConstraintType::JOINT);
+                }
+                if (ImGui::MenuItem("Pin Constraint")) {
+                    world.AddConstraint(std::make_unique<PinConstraint>(
+                        std::vector<PinAttachment>{{selected, 0.0f, 0.0f}}, 
+                        selected->transform.position, true, true));
+                }
+                if (ImGui::MenuItem("Motor Constraint")) {
+                    world.AddConstraint(std::make_unique<MotorConstraint>(selected, Vec2(), 10.0f));
+                }
+            }
+            ImGui::EndPopup();
         }
 
         ImGui::Separator();

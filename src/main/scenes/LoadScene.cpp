@@ -98,6 +98,12 @@ void LoadScene::LoadFromJSON(const json& sceneData, World& world, int screenWidt
                 {
                     obj->SetGroupName(item["groupName"].get<std::string>());
                 }
+                if (item.contains("ignored"))
+                {
+                    for (const auto& ignoreId : item["ignored"]) {
+                        obj->AddIgnored(ignoreId.get<size_t>());
+                    }
+                }
             }
         }
     }
@@ -339,15 +345,16 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
     for (const auto& item : constraints)
     {
         int ID = item.value("id", -1);
-        std::string type = item["type"];
+        std::string type = item.value("type", "");
 
         if (type == "DISTANCE")
         {
+            if (!item.contains("anchor") || !item.contains("attached")) continue;
             auto itA = idMap.find(item["anchor"]);
             auto itB = idMap.find(item["attached"]);
             if (itA == idMap.end() || itB == idMap.end()) continue;
 
-            auto distance = std::make_unique<DistanceConstraint>(itA->second, itB->second, item["length"], 
+            auto distance = std::make_unique<DistanceConstraint>(itA->second, itB->second, item.value("length", 0.0f), 
                 item.contains("anchorOffset") ? ParseVec2(item["anchorOffset"]) : Vec2(),
                 item.contains("attachedOffset") ? ParseVec2(item["attachedOffset"]) : Vec2());
             if (ID != -1) distance->SetID(ID);
@@ -356,16 +363,28 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
         else if (type == "PIN")
         {
             std::vector<PinAttachment> attachments;
-            for (const auto& att : item["attachments"])
-            {
-                auto it = idMap.find(att["id"].get<int>());
-                if (it != idMap.end())
-                    attachments.push_back({ it->second, att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2() });
+            if (item.contains("attachments")) {
+                for (const auto& att : item["attachments"])
+                {
+                    if (!att.contains("id")) continue;
+                    auto it = idMap.find(att["id"].get<int>());
+                    if (it != idMap.end()) {
+                        float lx = 0, ly = 0;
+                        if (att.contains("localX")) {
+                            lx = att.value("localX", 0.0f);
+                            ly = att.value("localY", 0.0f);
+                        } else if (att.contains("localAnchor")) {
+                            Vec2 v = ParseVec2(att["localAnchor"]);
+                            lx = v.x; ly = v.y;
+                        }
+                        attachments.push_back({ it->second, lx, ly });
+                    }
+                }
             }
 
             if (attachments.empty()) continue;
             auto pin = std::make_unique<PinConstraint>(attachments, 
-                item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position,
+                item.contains("position") ? ParseVec2(item["position"]) : Vec2(attachments[0].obj->transform.position.x + attachments[0].localX, attachments[0].obj->transform.position.y + attachments[0].localY),
                 item.value("fixedX", true), item.value("fixedY", true));
             if (ID != -1) pin->SetID(ID);
             world.AddConstraint(std::move(pin));
@@ -373,11 +392,23 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
         else if (type == "JOINT")
         {
             std::vector<JointAttachment> attachments;
-            for (const auto& att : item["attachments"])
-            {
-                auto it = idMap.find(att["id"].get<int>());
-                if (it != idMap.end())
-                    attachments.push_back({ it->second, att.contains("localAnchor") ? ParseVec2(att["localAnchor"]) : Vec2() });
+            if (item.contains("attachments")) {
+                for (const auto& att : item["attachments"])
+                {
+                    if (!att.contains("id")) continue;
+                    auto it = idMap.find(att["id"].get<int>());
+                    if (it != idMap.end()) {
+                        float lx = 0, ly = 0;
+                        if (att.contains("localX")) {
+                            lx = att.value("localX", 0.0f);
+                            ly = att.value("localY", 0.0f);
+                        } else if (att.contains("localAnchor")) {
+                            Vec2 v = ParseVec2(att["localAnchor"]);
+                            lx = v.x; ly = v.y;
+                        }
+                        attachments.push_back({ it->second, lx, ly });
+                    }
+                }
             }
 
             if (attachments.size() < 2) continue;
@@ -388,19 +419,20 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
                 }
 
             auto joint = std::make_unique<JointConstraint>(attachments, 
-                item.contains("position") ? ParseVec2(item["position"]) : attachments[0].obj->transform.position,
+                item.contains("position") ? ParseVec2(item["position"]) : Vec2(attachments[0].obj->transform.position.x + attachments[0].localX, attachments[0].obj->transform.position.y + attachments[0].localY),
                 item.value("collisions", false));
             if (ID != -1) joint->SetID(ID);
             world.AddConstraint(std::move(joint));
         }
         else if (type == "MOTOR")
         {
+            if (!item.contains("rotor")) continue;
             auto it = idMap.find(item["rotor"]);
             if (it == idMap.end()) continue;
 
             auto motor = std::make_unique<MotorConstraint>(it->second, 
                 item.contains("localPosition") ? ParseVec2(item["localPosition"]) : Vec2(),
-                item["torque"].get<float>());
+                item.value("torque", 0.0f));
             if (ID != -1) motor->SetID(ID);
             world.AddConstraint(std::move(motor));
         }
