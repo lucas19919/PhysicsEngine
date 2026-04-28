@@ -1,7 +1,8 @@
 #pragma once
-#include "main/components/Constraint.h"
-#include "main/components/Component.h"
 #include <vector>
+
+#include "main/components/Component.h"
+#include "main/components/Constraint.h"
 
 enum ControllerType
 {

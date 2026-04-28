@@ -1,6 +1,6 @@
 #pragma once
-#include "math/Vec2.h"
 #include "main/components/Collider.h"
+#include "math/Vec2.h"
 
 class CircleCollider : public Collider
 {
@@ -12,6 +12,7 @@ class CircleCollider : public Collider
 
         void UpdateCache(const TransformComponent& transform) override;
         bool TestPoint(Vec2 point) const override;
+        void Scale(float sx, float sy) override;
 
         bool OnInspectorGui(class World* world = nullptr) override;
 };

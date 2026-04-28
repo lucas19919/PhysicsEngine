@@ -1,21 +1,23 @@
 #include "main/scenes/BoundarySystem.h"
-#include "main/utility/Instantiate.h"
+
+#include <algorithm>
+
 #include "main/editor/EditorState.h"
 #include "main/physics/Config.h"
-#include <algorithm>
+#include "main/utility/Instantiate.h"
 
 void BoundarySystem::UpdateBoundaries(World& world)
 {
     auto& gameObjects = world.GetGameObjects();
     
     // Check if selected object is one of the walls and clear it if so
-    GameObject* selected = EditorState::Get().GetSelected();
+    GameObject* selected = EditorState::Get().GetSelected(world);
     
     // Remove existing internal walls
     auto it = std::remove_if(gameObjects.begin(), gameObjects.end(), [selected](const std::unique_ptr<GameObject>& obj) {
         bool isWall = obj->GetGroupName() == "INTERNAL_WALL";
         if (isWall && obj.get() == selected) {
-            EditorState::Get().SetSelected(nullptr);
+            EditorState::Get().ClearSelection();
         }
         return isWall;
     });

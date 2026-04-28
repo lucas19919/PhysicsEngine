@@ -1,7 +1,9 @@
 #include "main/editor/DebugPanel.h"
+
 #include "external/imgui/imgui.h"
-#include "main/physics/Config.h"
+
 #include "main/editor/ThemeManager.h"
+#include "main/physics/Config.h"
 
 namespace Editor {
 

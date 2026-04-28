@@ -1,10 +1,13 @@
 #include "main/components/controllertypes/MotorController.h"
-#include "main/components/constrainttypes/Motor.h"
-#include "main/components/Constraint.h"
+
+#include <algorithm>
+
+#include "raylib.h"
+
 #include "main/GameObject.h"
 #include "main/World.h"
-#include "raylib.h"
-#include <algorithm>
+#include "main/components/Constraint.h"
+#include "main/components/constrainttypes/Motor.h"
 
 MotorController::MotorController(bool active, std::vector<MotorConstraint*> motors, float torqueMax)
 {

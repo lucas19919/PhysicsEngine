@@ -1,4 +1,5 @@
 #include "main/GameObject.h"
+#include "main/components/Renderer.h"
 #include <algorithm>
 
 GameObject::GameObject() : id((size_t)-1)
@@ -34,4 +35,12 @@ void GameObject::RemoveComponent(Component* component)
 
         components.erase(it, components.end());
     }
+}
+
+void GameObject::Scale(float sx, float sy)
+{
+    if (c) c->Scale(sx, sy);
+    Renderer* r = GetComponent<Renderer>();
+    if (r) r->Scale(sx, sy);
+    transform.isDirty = true;
 }

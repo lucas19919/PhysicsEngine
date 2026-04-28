@@ -1,9 +1,12 @@
 #include "main/components/Collider.h"
-#include "main/World.h"
-#include "main/GameObject.h"
-#include "external/imgui/imgui.h"
+
 #include <string>
 #include <vector>
+
+#include "external/imgui/imgui.h"
+
+#include "main/GameObject.h"
+#include "main/World.h"
 
 bool Collider::OnInspectorGui(World* world) {
     bool changed = false;

@@ -1,7 +1,8 @@
 #include "main/physics/Manifold.h"
-#include "main/physics/SAT.h"
+
 #include "main/GameObject.h"
-        
+#include "main/physics/SAT.h"
+
 CollisionManifold Manifold::GenCircleCircle(GameObject* obj1, GameObject* obj2)
 {
     Collision collision = SAT::CircleCircle(obj1, obj2);

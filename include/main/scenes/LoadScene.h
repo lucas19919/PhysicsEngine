@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
 #include <unordered_map>
+
 #include <external/nlohmann/json.hpp>
+
 #include "main/World.h"
 
 class GameObject;
@@ -18,6 +20,6 @@ class LoadScene
         static void LoadCollection(const nlohmann::json& data, World& world, Vec2 offset = Vec2(0,0), const std::string& groupName = "");
 
     private:
-        static void LoadConstraints(const nlohmann::json& constraints, World& world, const std::unordered_map<int, GameObject*>& idMap);
+        static size_t LoadConstraints(const nlohmann::json& constraints, World& world, const std::unordered_map<int, GameObject*>& idMap);
         static void LoadControllers(const nlohmann::json& controllers, World& world);
 };

@@ -1,7 +1,9 @@
 #include "main/editor/ThemeManager.h"
-#include "main/editor/EditorState.h"
-#include "raylib.h"
+
 #include "external/imgui/imgui.h"
+#include "raylib.h"
+
+#include "main/editor/EditorState.h"
 
 namespace Editor {
 
@@ -64,19 +66,21 @@ void ThemeManager::ApplyTheme(EditorTheme theme) {
         case EditorTheme::ModernLight:
         {
             ImGui::StyleColorsLight();
-            ImVec4 mainBg      = ImVec4(0.98f, 0.98f, 0.99f, 1.00f);
-            ImVec4 childBg     = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-            ImVec4 accent      = ImVec4(0.00f, 0.48f, 1.00f, 1.00f);
+            ImVec4 mainBg      = ImVec4(0.92f, 0.92f, 0.94f, 1.00f); // Darkened from 0.98
+            ImVec4 childBg     = ImVec4(0.96f, 0.96f, 0.97f, 1.00f); // Darkened from 1.00
+            ImVec4 frameBg     = ImVec4(0.88f, 0.88f, 0.90f, 1.00f); // Darkened from 0.94
+            ImVec4 accent      = ImVec4(0.00f, 0.45f, 0.90f, 1.00f);
             ImVec4 text        = ImVec4(0.05f, 0.05f, 0.07f, 1.00f);
+            ImVec4 border      = ImVec4(0.75f, 0.75f, 0.78f, 1.00f); // Much more visible border
 
             colors[ImGuiCol_Text]                   = text;
             colors[ImGuiCol_WindowBg]               = mainBg;
             colors[ImGuiCol_ChildBg]                = childBg;
-            colors[ImGuiCol_PopupBg]                = childBg;
-            colors[ImGuiCol_Border]                 = ImVec4(0.90f, 0.90f, 0.93f, 1.00f);
-            colors[ImGuiCol_FrameBg]                = ImVec4(0.94f, 0.94f, 0.96f, 1.00f);
-            colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.90f, 0.90f, 0.93f, 1.00f);
-            colors[ImGuiCol_FrameBgActive]          = ImVec4(0.88f, 0.88f, 0.91f, 1.00f);
+            colors[ImGuiCol_PopupBg]                = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
+            colors[ImGuiCol_Border]                 = border;
+            colors[ImGuiCol_FrameBg]                = frameBg;
+            colors[ImGuiCol_FrameBgHovered]         = ImVec4(0.82f, 0.82f, 0.85f, 1.00f);
+            colors[ImGuiCol_FrameBgActive]          = ImVec4(0.78f, 0.78f, 0.82f, 1.00f);
             colors[ImGuiCol_TitleBg]                = mainBg;
             colors[ImGuiCol_TitleBgActive]          = mainBg;
             colors[ImGuiCol_TitleBgCollapsed]       = mainBg;
@@ -84,23 +88,26 @@ void ThemeManager::ApplyTheme(EditorTheme theme) {
             colors[ImGuiCol_CheckMark]              = accent;
             colors[ImGuiCol_SliderGrab]             = accent;
             colors[ImGuiCol_SliderGrabActive]       = ImVec4(0.00f, 0.38f, 0.85f, 1.00f);
-            colors[ImGuiCol_Button]                 = ImVec4(0.94f, 0.94f, 0.96f, 1.00f);
+            colors[ImGuiCol_Button]                 = ImVec4(0.85f, 0.85f, 0.88f, 1.00f);
             colors[ImGuiCol_ButtonHovered]          = accent;
             colors[ImGuiCol_ButtonActive]           = ImVec4(0.00f, 0.38f, 0.85f, 1.00f);
-            colors[ImGuiCol_Header]                 = ImVec4(0.94f, 0.94f, 0.96f, 1.00f);
+            colors[ImGuiCol_Header]                 = ImVec4(0.85f, 0.85f, 0.88f, 1.00f);
             colors[ImGuiCol_HeaderHovered]          = accent;
             colors[ImGuiCol_HeaderActive]           = accent;
-            colors[ImGuiCol_Separator]              = ImVec4(0.90f, 0.90f, 0.93f, 1.00f);
-            colors[ImGuiCol_Tab]                    = ImVec4(0.97f, 0.97f, 0.98f, 1.00f);
+            colors[ImGuiCol_Separator]              = border;
+            colors[ImGuiCol_Tab]                    = ImVec4(0.88f, 0.88f, 0.90f, 1.00f);
             colors[ImGuiCol_TabHovered]             = accent;
             colors[ImGuiCol_TabActive]              = childBg;
             colors[ImGuiCol_TabUnfocused]           = mainBg;
             colors[ImGuiCol_TabUnfocusedActive]     = childBg;
 
+            style.WindowBorderSize = 1.0f; // Add borders for better definition
+            style.FrameBorderSize  = 1.0f;
+
             EditorState::Get().SetThemeColors({
-                Color{245, 245, 247, 255},    
-                Color{220, 220, 225, 120},    
-                Color{210, 210, 215, 255},    
+                Color{220, 222, 225, 255},    // Darkened Viewport BG so WHITE objects pop
+                Color{180, 182, 185, 120},    
+                Color{170, 172, 175, 255},    
                 Color{0, 122, 255, 255}       
             });
             break;

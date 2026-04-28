@@ -1,7 +1,9 @@
 #include "main/physics/SAT.h"
+
+#include <cmath>
+
 #include "main/GameObject.h"
 #include "main/components/Collider.h"
-#include <cmath>
 
 bool SAT::TestBounds(GameObject* obj1, GameObject* obj2)
 {

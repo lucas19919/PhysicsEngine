@@ -1,6 +1,7 @@
 #pragma once
-#include "main/editor/Panel.h"
 #include <string>
+
+#include "main/editor/Panel.h"
 
 namespace Editor {
 

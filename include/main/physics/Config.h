@@ -1,6 +1,7 @@
 #pragma once
-#include "math/Vec2.h"
 #include <string>
+
+#include "math/Vec2.h"
 
 struct Config
 {

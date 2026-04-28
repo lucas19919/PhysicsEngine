@@ -1,11 +1,16 @@
 #include "main/components/constrainttypes/Pin.h"
-#include "main/components/Constraint.h"
-#include "main/World.h"
-#include "main/GameObject.h"
-#include "main/physics/Config.h"
-#include "math/RotationMatrix.h"
-#include "math/Matrix2x2.h"
+
 #include <algorithm>
+
+#include "external/imgui/imgui.h"
+
+#include "main/GameObject.h"
+#include "main/World.h"
+#include "main/components/Constraint.h"
+#include "main/editor/EditorState.h"
+#include "main/physics/Config.h"
+#include "math/Matrix2x2.h"
+#include "math/RotationMatrix.h"
 
 PinConstraint::PinConstraint(std::vector<PinAttachment> attachments, Vec2 pos, bool fixedX, bool fixedY)
     : attachments(std::move(attachments)), fixedX(fixedX), fixedY(fixedY)
@@ -103,7 +108,6 @@ bool PinConstraint::InvolvesObject(GameObject* obj) const
     return false;
 }
 
-#include "external/imgui/imgui.h"
 
 bool PinConstraint::OnInspectorGui(World* world)
 {
@@ -123,13 +127,26 @@ bool PinConstraint::OnInspectorGui(World* world)
     }
 
     ImGui::Text("Attachments:");
+    int toRemove = -1;
     for (size_t i = 0; i < attachments.size(); i++) {
         auto& att = attachments[i];
         ImGui::PushID(i);
+        if (ImGui::Button("X")) toRemove = i;
+        ImGui::SameLine();
         ImGui::BulletText("%s", att.obj->GetName().c_str());
         if (ImGui::DragFloat("Local X", &att.localX, 0.01f)) changed = true;
         if (ImGui::DragFloat("Local Y", &att.localY, 0.01f)) changed = true;
         ImGui::PopID();
     }
+
+    if (toRemove != -1) {
+        attachments.erase(attachments.begin() + toRemove);
+        changed = true;
+    }
+
+    if (ImGui::Button("Add Attachment...")) {
+        EditorState::Get().SetPickingMode(EditorState::PickingMode::CONSTRAINT_TARGET, ConstraintType::PIN, GetID());
+    }
+
     return changed;
 }

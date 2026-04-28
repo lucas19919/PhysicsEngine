@@ -1,8 +1,9 @@
 #pragma once
-#include "math/Vec2.h"
+#include <vector>
+
 #include "main/components/Constraint.h"
 #include "main/components/constrainttypes/Pin.h"
-#include <vector>
+#include "math/Vec2.h"
 
 class GameObject;
 

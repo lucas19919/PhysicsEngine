@@ -1,5 +1,6 @@
-#include "main/components/TransformComponent.h"
 #include "external/imgui/imgui.h"
+
+#include "main/components/TransformComponent.h"
 
 bool TransformComponent::OnInspectorGui(World* world) {
     bool changed = false;

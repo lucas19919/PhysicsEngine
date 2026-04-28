@@ -1,194 +1,200 @@
 {
-  "name": "Optimization Stress Test",
-  "worldSize": {
-    "x": 25.6,
-    "y": 19.2
-  },
-  "useWalls": true,
-  "objects": [
-    {
-      "id": 500,
-      "name": "Static_V_Left",
-      "components": {
-        "TransformComponent": {
-          "position": {
-            "x": -6.0,
-            "y": 6.4
-          },
-          "rotation": 0.4
+    "constraints": [],
+    "controllers": [],
+    "generators": [
+        {
+            "grid": {
+                "columns": 28,
+                "rows": 12,
+                "spacingX": 0.800000011920929,
+                "spacingY": 0.800000011920929,
+                "startX": -10.800000190734863,
+                "startY": -9.399999618530273
+            },
+            "name": "Circle Rain",
+            "object": {
+                "components": {
+                    "Collider": {
+                        "radius": 0.30000001192092896,
+                        "type": "CIRCLE"
+                    },
+                    "Renderer": {
+                        "color": "BLUE",
+                        "form": "R_CIRCLE",
+                        "scale": 0.30000001192092896
+                    },
+                    "RigidBody": {
+                        "angularState": {
+                            "angularAcceleration": 0.0,
+                            "angularVelocity": 0.0,
+                            "torque": 0.0
+                        },
+                        "gravityEnabled": true,
+                        "linearState": {
+                            "acceleration": {
+                                "x": 0.0,
+                                "y": 0.0
+                            },
+                            "netForce": {
+                                "x": 0.0,
+                                "y": 0.0
+                            },
+                            "velocity": {
+                                "x": 0.0,
+                                "y": 0.0
+                            }
+                        },
+                        "properties": {
+                            "friction": 0.4000000059604645,
+                            "inertia": 0.07999999821186066,
+                            "mass": 1.0,
+                            "restitution": 0.20000000298023224
+                        }
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -12.800000190734863,
+                            "y": -9.600000381469727
+                        },
+                        "rotation": 0.0
+                    }
+                },
+                "id": 18446744073709551615,
+                "name": ""
+            }
         },
-        "Collider": {
-          "type": "BOX",
-          "size": {
-            "x": 12.0,
-            "y": 0.8
-          }
-        },
-        "Renderer": {
-          "form": "R_BOX",
-          "color": "DARKGRAY",
-          "scale": {
-            "x": 12.0,
-            "y": 0.8
-          }
+        {
+            "grid": {
+                "columns": 20,
+                "rows": 4,
+                "spacingX": 0.8999999761581421,
+                "spacingY": 0.8999999761581421,
+                "startX": -8.800000190734863,
+                "startY": 0.4000000059604645
+            },
+            "name": "Box Rain",
+            "object": {
+                "components": {
+                    "Collider": {
+                        "size": {
+                            "x": 0.5,
+                            "y": 0.5
+                        },
+                        "type": "BOX"
+                    },
+                    "Renderer": {
+                        "color": "ORANGE",
+                        "form": "R_BOX",
+                        "scale": {
+                            "x": 0.5,
+                            "y": 0.5
+                        }
+                    },
+                    "RigidBody": {
+                        "angularState": {
+                            "angularAcceleration": 0.0,
+                            "angularVelocity": 0.0,
+                            "torque": 0.0
+                        },
+                        "gravityEnabled": true,
+                        "linearState": {
+                            "acceleration": {
+                                "x": 0.0,
+                                "y": 0.0
+                            },
+                            "netForce": {
+                                "x": 0.0,
+                                "y": 0.0
+                            },
+                            "velocity": {
+                                "x": 0.0,
+                                "y": 0.0
+                            }
+                        },
+                        "properties": {
+                            "friction": 0.6000000238418579,
+                            "inertia": 0.20000000298023224,
+                            "mass": 1.5,
+                            "restitution": 0.10000000149011612
+                        }
+                    },
+                    "TransformComponent": {
+                        "position": {
+                            "x": -12.800000190734863,
+                            "y": -9.600000381469727
+                        },
+                        "rotation": 0.0
+                    }
+                },
+                "id": 18446744073709551615,
+                "name": ""
+            }
         }
-      }
-    },
-    {
-      "id": 501,
-      "name": "Static_V_Right",
-      "components": {
-        "TransformComponent": {
-          "position": {
-            "x": 6.0,
-            "y": 6.4
-          },
-          "rotation": -0.4
+    ],
+    "name": "Saved Scene",
+    "objects": [
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 12.0,
+                        "y": 0.800000011920929
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "DARKGRAY",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 12.0,
+                        "y": 0.800000011920929
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": -6.0,
+                        "y": 6.400000095367432
+                    },
+                    "rotation": 0.4000000059604645
+                }
+            },
+            "id": 500,
+            "name": "Static_V_Left"
         },
-        "Collider": {
-          "type": "BOX",
-          "size": {
-            "x": 12.0,
-            "y": 0.8
-          }
-        },
-        "Renderer": {
-          "form": "R_BOX",
-          "color": "DARKGRAY",
-          "scale": {
-            "x": 12.0,
-            "y": 0.8
-          }
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 12.0,
+                        "y": 0.800000011920929
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "DARKGRAY",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 12.0,
+                        "y": 0.800000011920929
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": 6.0,
+                        "y": 6.400000095367432
+                    },
+                    "rotation": -0.4000000059604645
+                }
+            },
+            "id": 501,
+            "name": "Static_V_Right"
         }
-      }
+    ],
+    "screenHeight": 960,
+    "screenWidth": 1280,
+    "useWalls": true,
+    "worldSize": {
+        "x": 25.600000381469727,
+        "y": 19.200000762939453
     }
-  ],
-  "generators": [
-    {
-      "name": "Circle Rain",
-      "grid": {
-        "rows": 12,
-        "columns": 28,
-        "startX": -10.8,
-        "startY": -9.4,
-        "spacingX": 0.8,
-        "spacingY": 0.8
-      },
-      "object": {
-        "components": {
-          "TransformComponent": {
-            "position": {
-              "x": -12.8,
-              "y": -9.6
-            },
-            "rotation": 0.0
-          },
-          "Collider": {
-            "type": "CIRCLE",
-            "radius": 0.3
-          },
-          "Renderer": {
-            "form": "R_CIRCLE",
-            "color": "BLUE",
-            "scale": 0.3
-          },
-          "RigidBody": {
-            "gravityEnabled": true,
-            "properties": {
-              "mass": 1.0,
-              "restitution": 0.2,
-              "friction": 0.4,
-              "inertia": 0.08
-            },
-            "linearState": {
-              "velocity": {
-                "x": 0.0,
-                "y": 0.0
-              },
-              "acceleration": {
-                "x": 0.0,
-                "y": 0.0
-              },
-              "netForce": {
-                "x": 0.0,
-                "y": 0.0
-              }
-            },
-            "angularState": {
-              "angularVelocity": 0,
-              "angularAcceleration": 0,
-              "torque": 0
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "Box Rain",
-      "grid": {
-        "rows": 4,
-        "columns": 20,
-        "startX": -8.8,
-        "startY": 0.4,
-        "spacingX": 0.9,
-        "spacingY": 0.9
-      },
-      "object": {
-        "components": {
-          "TransformComponent": {
-            "position": {
-              "x": -12.8,
-              "y": -9.6
-            },
-            "rotation": 0.0
-          },
-          "Collider": {
-            "type": "BOX",
-            "size": {
-              "x": 0.5,
-              "y": 0.5
-            }
-          },
-          "Renderer": {
-            "form": "R_BOX",
-            "color": "ORANGE",
-            "scale": {
-              "x": 0.5,
-              "y": 0.5
-            }
-          },
-          "RigidBody": {
-            "gravityEnabled": true,
-            "properties": {
-              "mass": 1.5,
-              "restitution": 0.1,
-              "friction": 0.6,
-              "inertia": 0.2
-            },
-            "linearState": {
-              "velocity": {
-                "x": 0.0,
-                "y": 0.0
-              },
-              "acceleration": {
-                "x": 0.0,
-                "y": 0.0
-              },
-              "netForce": {
-                "x": 0.0,
-                "y": 0.0
-              }
-            },
-            "angularState": {
-              "angularVelocity": 0,
-              "angularAcceleration": 0,
-              "torque": 0
-            }
-          }
-        }
-      }
-    }
-  ],
-  "constraints": [],
-  "controllers": []
 }

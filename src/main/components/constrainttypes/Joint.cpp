@@ -1,11 +1,16 @@
 #include "main/components/constrainttypes/Joint.h"
-#include "main/components/Constraint.h"
-#include "main/World.h"
-#include "main/GameObject.h"
-#include "main/physics/Config.h"
-#include "math/RotationMatrix.h"
-#include "math/Matrix2x2.h"
+
 #include <algorithm>
+
+#include "external/imgui/imgui.h"
+
+#include "main/GameObject.h"
+#include "main/World.h"
+#include "main/components/Constraint.h"
+#include "main/editor/EditorState.h"
+#include "main/physics/Config.h"
+#include "math/Matrix2x2.h"
+#include "math/RotationMatrix.h"
 
 JointConstraint::JointConstraint(std::vector<JointAttachment> attachments, Vec2 position, bool collisions)
     : attachments(attachments), collisions(collisions)
@@ -102,29 +107,38 @@ void JointConstraint::ComplexJoint(float dt)
     Vec2 centerPos = Vec2();
     Vec2 centerVel = Vec2();
     float totalMass = 0.0f;
+    int staticCount = 0;
+    Vec2 staticPos = Vec2();
+    Vec2 staticVel = Vec2();
 
     for (JointAttachment& attachment : attachments) {
         GameObject* obj = attachment.obj;
         RigidBody* rb = obj->rb;
 
-        if (!rb) continue;
-
-        float mass = rb->GetMass(); 
-        totalMass += mass;
-
         RotMatrix rot(obj->transform.rotation);
         Vec2 r = rot.Rotate(Vec2(attachment.localX, attachment.localY));
         Vec2 p = obj->transform.position + r;
 
-        Vec2 v = rb->GetVelocity();
-        float w = rb->GetAngularVelocity();
+        Vec2 v = rb ? rb->GetVelocity() : Vec2(0, 0);
+        float w = rb ? rb->GetAngularVelocity() : 0.0f;
         Vec2 anchorVel(v.x - w * r.y, v.y + w * r.x);
 
-        centerPos += p * mass;
-        centerVel += anchorVel * mass;
+        if (!rb || rb->GetInvMass() == 0.0f) {
+            staticCount++;
+            staticPos += p;
+            staticVel += anchorVel;
+        } else {
+            float mass = rb->GetMass(); 
+            totalMass += mass;
+            centerPos += p * mass;
+            centerVel += anchorVel * mass;
+        }
     }
 
-    if (totalMass > 0.0f) {
+    if (staticCount > 0) {
+        centerPos = staticPos / (float)staticCount;
+        centerVel = staticVel / (float)staticCount;
+    } else if (totalMass > 0.0f) {
         centerPos /= totalMass;
         centerVel /= totalMass;
     }
@@ -134,7 +148,7 @@ void JointConstraint::ComplexJoint(float dt)
     for (JointAttachment& attachment : attachments) {
         GameObject* obj = attachment.obj;
         RigidBody* rb = obj->rb;
-        if (!rb) continue;
+        if (!rb || rb->GetInvMass() == 0.0f) continue;
 
         float invMass = rb->GetInvMass();
         float invInertia = rb->GetInvInertia();
@@ -186,13 +200,26 @@ bool JointConstraint::InvolvesObject(GameObject* obj) const
     return false;
 }
 
-#include "external/imgui/imgui.h"
 
 bool JointConstraint::OnInspectorGui(World* world)
 {
     ImGui::Text("Type: Joint");
     bool changed = false;
-    if (ImGui::Checkbox("Collisions", &collisions)) changed = true;
+
+    if (ImGui::Checkbox("Collisions", &collisions)) {
+        changed = true;
+        for (size_t i = 0; i < attachments.size(); i++) {
+            for (size_t j = i + 1; j < attachments.size(); j++) {
+                if (collisions) {
+                    attachments[i].obj->RemoveIgnored(attachments[j].obj->GetID());
+                    attachments[j].obj->RemoveIgnored(attachments[i].obj->GetID());
+                } else {
+                    attachments[i].obj->AddIgnored(attachments[j].obj->GetID());
+                    attachments[j].obj->AddIgnored(attachments[i].obj->GetID());
+                }
+            }
+        }
+    }
     
     if (ImGui::DragFloat2("Position", &position.x, 0.05f)) {
         for (auto& att : attachments) {
@@ -204,13 +231,26 @@ bool JointConstraint::OnInspectorGui(World* world)
     }
 
     ImGui::Text("Attachments:");
+    int toRemove = -1;
     for (size_t i = 0; i < attachments.size(); i++) {
         auto& att = attachments[i];
         ImGui::PushID(i);
+        if (ImGui::Button("X")) toRemove = i;
+        ImGui::SameLine();
         ImGui::BulletText("%s", att.obj->GetName().c_str());
         if (ImGui::DragFloat("Local X", &att.localX, 0.01f)) changed = true;
         if (ImGui::DragFloat("Local Y", &att.localY, 0.01f)) changed = true;
         ImGui::PopID();
     }
+
+    if (toRemove != -1) {
+        attachments.erase(attachments.begin() + toRemove);
+        changed = true;
+    }
+
+    if (ImGui::Button("Add Attachment...")) {
+        EditorState::Get().SetPickingMode(EditorState::PickingMode::CONSTRAINT_TARGET, ConstraintType::JOINT, GetID());
+    }
+
     return changed;
 }

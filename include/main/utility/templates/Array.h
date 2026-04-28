@@ -19,4 +19,5 @@ struct Array
     const Vec2& operator[](size_t i) const { return data[i]; }
     size_t Size() const { return count; }
     bool Empty() const { return count == 0; }
+    void Clear() { count = 0; }
 };

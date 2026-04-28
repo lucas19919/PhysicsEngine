@@ -1,14 +1,15 @@
 #pragma once
+#include <algorithm>
+#include <memory>
+#include <vector>
+
 #include "main/GameObject.h"
 #include "main/components/Constraint.h"
 #include "main/components/Controller.h"
 #include "main/physics/pipeline/Broadphase.h"
-#include "main/physics/pipeline/Integrate.h"
 #include "main/physics/pipeline/ContactManager.h"
+#include "main/physics/pipeline/Integrate.h"
 #include "main/utility/Timer.h"
-#include <vector>
-#include <memory>
-#include <algorithm>
 #include "math/Vec2.h"
 
 struct GeneratorDef {
@@ -71,6 +72,9 @@ class World
         void RegenerateGenerator(const std::string& currentName, const std::string& oldName = "");
         void RenameGenerator(const std::string& oldName, const std::string& newName);
 
+        void SetNextID(size_t id) { nextID = id; }
+        void SetNextConstraintID(size_t id) { nextConstraintID = id; }
+
         //abstract stuff like this later ???
         bool isPaused = true;
 
@@ -90,6 +94,7 @@ class World
         void RemoveGroupInternal(const std::string& groupName, bool prune);
 
         size_t nextID = 0;
+        size_t nextConstraintID = 0;
 
         //timing
         Timer timer;

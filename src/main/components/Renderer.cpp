@@ -1,8 +1,11 @@
 #include "main/components/Renderer.h"
-#include "math/Vec2.h"
+
 #include <cmath>
 
 #include "external/imgui/imgui.h"
+
+#include "math/RotationMatrix.h"
+#include "math/Vec2.h"
 
 bool Renderer::OnInspectorGui(World* world) {
     bool changed = false;
@@ -77,6 +80,25 @@ void Renderer::UpdateLocalCoordinates()
     }
 }
 
+void Renderer::Scale(float sx, float sy)
+{
+    if (shape.form == RenderShape::R_BOX) {
+        Vec2& s = std::get<Vec2>(shape.scale);
+        s.x *= sx;
+        s.y *= sy;
+    } else if (shape.form == RenderShape::R_CIRCLE) {
+        float& r = std::get<float>(shape.scale);
+        r *= (sx + sy) / 2.0f;
+    } else if (shape.form == RenderShape::R_POLYGON) {
+        Array<20>& verts = std::get<Array<20>>(shape.scale);
+        for (size_t i = 0; i < verts.Size(); i++) {
+            verts[i].x *= sx;
+            verts[i].y *= sy;
+        }
+    }
+    UpdateLocalCoordinates();
+}
+
 Array<20> Renderer::GetLocalCoordinates() const
 {
     return localCoordinates;
@@ -100,7 +122,6 @@ Array<20> Renderer::GetWorldCoordinates(Vec2 position) const
     return {};
 }
 
-#include "math/RotationMatrix.h"
 
 Array<20> Renderer::UpdateWorldCoordinates(Vec2 position, float rotation)
 {

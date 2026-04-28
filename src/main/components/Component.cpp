@@ -1,4 +1,5 @@
 #include "main/components/Component.h"
+
 #include "main/GameObject.h"
 
 void Component::OnObjectRemoved(size_t id) {

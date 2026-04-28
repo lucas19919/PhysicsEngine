@@ -1,8 +1,8 @@
 #pragma once
-#include "main/utility/templates/Array.h"
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/collidertypes/PolygonCollider.h"
+#include "main/utility/templates/Array.h"
 
 struct Collision {
     bool isColliding;

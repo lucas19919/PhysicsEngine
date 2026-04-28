@@ -1,10 +1,12 @@
 #include "main/components/constrainttypes/Distance.h"
-#include "main/components/Constraint.h"
-#include "main/World.h"
+
+#include "external/imgui/imgui.h"
+
 #include "main/GameObject.h"
+#include "main/World.h"
+#include "main/components/Constraint.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
-
 
 DistanceConstraint::DistanceConstraint(GameObject* anchor, GameObject* attached, float length, Vec2 anchorOffset, Vec2 attachedOffset) 
 : anchor(anchor), attached(attached), length(length), anchorOffset(anchorOffset), attachedOffset(attachedOffset)
@@ -91,7 +93,6 @@ bool DistanceConstraint::InvolvesObject(GameObject* obj) const
     return anchor == obj || attached == obj;
 }
 
-#include "external/imgui/imgui.h"
 
 bool DistanceConstraint::OnInspectorGui(World* world)
 {

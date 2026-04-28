@@ -1,7 +1,9 @@
 #include "main/physics/pipeline/Broadphase.h"
-#include "main/physics/SAT.h"
-#include "main/components/RigidBody.h"
+
 #include <algorithm>
+
+#include "main/components/RigidBody.h"
+#include "main/physics/SAT.h"
 
 void Broadphase::Clear()
 {

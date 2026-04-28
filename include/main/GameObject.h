@@ -1,14 +1,15 @@
 #pragma once
-#include "components/TransformComponent.h"
-#include "components/Component.h"
-#include "utility/templates/Array.h"
-#include "components/RigidBody.h"
-#include "components/Collider.h"
-#include <vector>
 #include <memory>
-#include <utility>
 #include <string>
 #include <unordered_set>
+#include <utility>
+#include <vector>
+
+#include "components/Collider.h"
+#include "components/Component.h"
+#include "components/RigidBody.h"
+#include "components/TransformComponent.h"
+#include "utility/templates/Array.h"
 
 class GameObject
 {
@@ -48,6 +49,7 @@ class GameObject
         }
 
         void RemoveComponent(Component* component);
+        void Scale(float sx, float sy);
 
         void SetID(size_t newID) { id = newID; }
         const size_t& GetID() const { return id; }

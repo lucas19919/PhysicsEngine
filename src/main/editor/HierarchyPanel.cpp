@@ -1,18 +1,22 @@
 #include "main/editor/HierarchyPanel.h"
-#include "external/imgui/imgui.h"
-#include "main/editor/EditorState.h"
-#include "main/utility/Instantiate.h"
-#include "main/scenes/LoadScene.h"
-#include "main/scenes/SaveScene.h"
-#include "main/components/collidertypes/BoxCollider.h"
-#include "main/components/collidertypes/CircleCollider.h"
-#include "main/components/Renderer.h"
-#include "main/components/RigidBody.h"
-#include <string>
-#include <map>
-#include <vector>
+
 #include <filesystem>
 #include <fstream>
+#include <map>
+#include <string>
+#include <vector>
+
+#include "external/imgui/imgui.h"
+
+#include "main/components/Renderer.h"
+#include "main/components/RigidBody.h"
+#include "main/components/collidertypes/BoxCollider.h"
+#include "main/components/collidertypes/CircleCollider.h"
+#include "main/editor/EditorState.h"
+#include "main/editor/HistoryManager.h"
+#include "main/scenes/LoadScene.h"
+#include "main/scenes/SaveScene.h"
+#include "main/utility/Instantiate.h"
 
 namespace Editor {
 
@@ -22,7 +26,6 @@ void HierarchyPanel::OnImGui(World& world) {
     ImGui::Begin(GetName(), &isOpen);
 
     const auto& objects = world.GetGameObjects();
-    GameObject* selected = EditorState::Get().GetSelected();
 
     // 1. Populate the groups map with all known group names (Manual + Generators)
     std::map<std::string, std::vector<GameObject*>> groups;
@@ -40,7 +43,6 @@ void HierarchyPanel::OnImGui(World& world) {
         if (obj->GetGroupName().empty()) {
             ungrouped.push_back(obj);
         } else {
-            // This also handles groups that weren't explicitly added to World::groups
             groups[obj->GetGroupName()].push_back(obj);
         }
     }
@@ -56,11 +58,26 @@ void HierarchyPanel::OnImGui(World& world) {
         }
         
         ImGui::PushID((int)obj->GetID());
-        ImGuiTreeNodeFlags flags = ((selected == obj) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
+        bool isSelected = EditorState::Get().IsSelected(obj->GetID());
+        ImGuiTreeNodeFlags flags = (isSelected ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanAvailWidth;
         bool opened = ImGui::TreeNodeEx(objName.c_str(), flags);
         
+        if (ImGui::BeginPopupContextItem()) {
+            if (ImGui::MenuItem("Delete")) {
+                idToRemove = obj->GetID();
+            }
+            ImGui::EndPopup();
+        }
+
         if (ImGui::IsItemClicked()) {
-            EditorState::Get().SetSelected(obj);
+            if (ImGui::GetIO().KeyCtrl) {
+                if (isSelected) EditorState::Get().RemoveSelectedObject(obj->GetID());
+                else EditorState::Get().AddSelectedObject(obj->GetID());
+            } else if (ImGui::GetIO().KeyShift) {
+                EditorState::Get().AddSelectedObject(obj->GetID());
+            } else {
+                EditorState::Get().SetSelectedObject(obj->GetID());
+            }
         }
 
         if (ImGui::BeginDragDropSource()) {
@@ -68,13 +85,6 @@ void HierarchyPanel::OnImGui(World& world) {
             ImGui::SetDragDropPayload("HIERARCHY_OBJ", &id, sizeof(size_t));
             ImGui::Text("Moving %s", objName.c_str());
             ImGui::EndDragDropSource();
-        }
-
-        if (ImGui::BeginPopupContextItem()) {
-            if (ImGui::MenuItem("Delete")) {
-                idToRemove = obj->GetID();
-            }
-            ImGui::EndPopup();
         }
 
         if (opened) {
@@ -91,23 +101,6 @@ void HierarchyPanel::OnImGui(World& world) {
 
         bool opened = ImGui::TreeNodeEx(pair.first.c_str(), folderFlags);
         
-        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
-            EditorState::Get().SetSelectedGroup(pair.first);
-        }
-
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_OBJ")) {
-                size_t id = *(const size_t*)payload->Data;
-                for (auto& objPtr : world.GetGameObjects()) {
-                    if (objPtr->GetID() == id) {
-                        objPtr->SetGroupName(pair.first);
-                        break;
-                    }
-                }
-            }
-            ImGui::EndDragDropTarget();
-        }
-
         if (ImGui::BeginPopupContextItem()) {
             static char renameBuf[64];
             if (ImGui::MenuItem("Rename Group")) {
@@ -141,6 +134,23 @@ void HierarchyPanel::OnImGui(World& world) {
             }
 
             ImGui::EndPopup();
+        }
+
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen()) {
+            EditorState::Get().SetSelectedGroup(pair.first);
+        }
+
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_OBJ")) {
+                size_t id = *(const size_t*)payload->Data;
+                for (auto& objPtr : world.GetGameObjects()) {
+                    if (objPtr->GetID() == id) {
+                        objPtr->SetGroupName(pair.first);
+                        break;
+                    }
+                }
+            }
+            ImGui::EndDragDropTarget();
         }
 
         if (opened) {
@@ -182,12 +192,18 @@ void HierarchyPanel::OnImGui(World& world) {
 
     // 5. Cleanup and Popups
     if (idToRemove != (size_t)-1) {
-        if (selected && selected->GetID() == idToRemove) EditorState::Get().SetSelected(nullptr);
+        HistoryManager::Get().RecordState(world);
+        if (EditorState::Get().IsSelected(idToRemove)) {
+             EditorState::Get().RemoveSelectedObject(idToRemove);
+        }
         world.RemoveGameObject(idToRemove);
+        HistoryManager::Get().RecordState(world);
     }
 
     if (!groupToRemove.empty()) {
+        HistoryManager::Get().RecordState(world);
         world.RemoveGroup(groupToRemove);
+        HistoryManager::Get().RecordState(world);
     }
 
     if (openCreateGroupPopup) {
@@ -199,6 +215,7 @@ void HierarchyPanel::OnImGui(World& world) {
         static char groupNameBuf[64] = "New Group";
         ImGui::InputText("Group Name", groupNameBuf, 63);
         if (ImGui::Button("Create") || ImGui::IsKeyPressed(ImGuiKey_Enter)) {
+            HistoryManager::Get().RecordState(world);
             std::string name = groupNameBuf;
             // Ensure unique name
             int counter = 1;
@@ -206,6 +223,7 @@ void HierarchyPanel::OnImGui(World& world) {
                 name = std::string(groupNameBuf) + " " + std::to_string(counter++);
             }
             world.AddGroup(name);
+            HistoryManager::Get().RecordState(world);
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
@@ -219,6 +237,7 @@ void HierarchyPanel::OnImGui(World& world) {
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Box")) {
+                HistoryManager::Get().RecordState(world);
                 Instantiate()
                     .WithTransform(Vec2(0,0), 0)
                     .WithCollider(ColliderType::BOX, Vec2(1.0f, 1.0f))
@@ -230,8 +249,10 @@ void HierarchyPanel::OnImGui(World& world) {
                         Settings{true}
                     )
                     .Create(world, -1)->SetName("New Box");
+                HistoryManager::Get().RecordState(world);
             }
             if (ImGui::MenuItem("Circle")) {
+                HistoryManager::Get().RecordState(world);
                 Instantiate()
                     .WithTransform(Vec2(0,0), 0)
                     .WithCollider(ColliderType::CIRCLE, 0.5f)
@@ -243,11 +264,14 @@ void HierarchyPanel::OnImGui(World& world) {
                         Settings{true}
                     )
                     .Create(world, -1)->SetName("New Circle");
+                HistoryManager::Get().RecordState(world);
             }
             if (ImGui::MenuItem("Empty Object")) {
+                HistoryManager::Get().RecordState(world);
                 Instantiate()
                     .WithTransform(Vec2(0,0), 0)
                     .Create(world, -1)->SetName("New GameObject");
+                HistoryManager::Get().RecordState(world);
             }
 
             if (ImGui::BeginMenu("Prefab")) {
@@ -272,6 +296,7 @@ void HierarchyPanel::OnImGui(World& world) {
                                         for (const auto& obj : world.GetGameObjects()) if (obj->GetGroupName() == uniqueGroupName) { exists = true; break; }
                                     }
 
+                                    HistoryManager::Get().RecordState(world);
                                     if (data.contains("objects")) {
                                         LoadScene::LoadCollection(data, world, Vec2(0,0), uniqueGroupName);
                                         EditorState::Get().SetSelectedGroup(uniqueGroupName);
@@ -283,6 +308,7 @@ void HierarchyPanel::OnImGui(World& world) {
                                             EditorState::Get().SetSelectedGroup(uniqueGroupName);
                                         }
                                     }
+                                    HistoryManager::Get().RecordState(world);
                                 }
                             }
                         }
@@ -294,6 +320,7 @@ void HierarchyPanel::OnImGui(World& world) {
             }
 
             if (ImGui::MenuItem("Generator")) {
+                HistoryManager::Get().RecordState(world);
                 std::string baseName = "New Generator";
                 std::string uniqueName = baseName;
                 int counter = 1;
@@ -324,6 +351,7 @@ void HierarchyPanel::OnImGui(World& world) {
                 world.AddGenerator(std::move(def));
                 // Initial generation
                 world.RegenerateGenerator(uniqueName);
+                HistoryManager::Get().RecordState(world);
             }
             ImGui::EndMenu();
         }

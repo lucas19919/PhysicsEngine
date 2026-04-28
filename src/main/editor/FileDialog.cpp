@@ -1,8 +1,9 @@
-#ifdef _WIN32
-#define NOMINMAX
-#include <windows.h>
 #include <shobjidl.h>
 #include <string>
+#include <windows.h>
+
+#ifdef _WIN32
+#define NOMINMAX
 
 namespace Editor {
 
@@ -78,7 +79,6 @@ std::string ShowFolderDialog() {
 
 } // namespace Editor
 #else
-#include <string>
 namespace Editor {
     std::string ShowFileDialog(bool save) { return ""; }
     std::string ShowFolderDialog() { return ""; }

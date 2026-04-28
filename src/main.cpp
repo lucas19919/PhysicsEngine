@@ -1,14 +1,16 @@
-#include "raylib.h"
+#include <string>
+
 #include "external/imgui/imgui.h"
 #include "external/imgui/rlImGui.h"
+#include "raylib.h"
+
 #include "main/World.h"
-#include "main/scenes/LoadScene.h"
-#include "main/utility/InputHandler.h"
-#include "main/physics/Config.h"
+#include "main/editor/Editor.h"
 #include "main/editor/EditorCamera.h"
 #include "main/editor/EditorState.h"
-#include "main/editor/Editor.h"
-#include <string>
+#include "main/physics/Config.h"
+#include "main/scenes/LoadScene.h"
+#include "main/utility/InputHandler.h"
 
 int main() {
     const int screenWidth = Config::screenWidth;
@@ -39,6 +41,7 @@ int main() {
         
         input.Update(world, camera, EditorState::Get().GetActiveScenePath(), currentScreenWidth, currentScreenHeight, dt);
         
+        if (world.isPaused) world.UpdateCaches();
         world.Step(dt);
 
         BeginDrawing();

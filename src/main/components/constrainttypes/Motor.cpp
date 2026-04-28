@@ -1,7 +1,10 @@
 #include "main/components/constrainttypes/Motor.h"
-#include "main/components/Constraint.h"
-#include "main/World.h"
+
+#include "external/imgui/imgui.h"
+
 #include "main/GameObject.h"
+#include "main/World.h"
+#include "main/components/Constraint.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
 
@@ -53,7 +56,6 @@ bool MotorConstraint::InvolvesObject(GameObject* obj) const
     return rotor == obj;
 }
 
-#include "external/imgui/imgui.h"
 
 bool MotorConstraint::OnInspectorGui(World* world)
 {

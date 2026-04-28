@@ -1,10 +1,13 @@
 #include "main/editor/ScenePanel.h"
-#include "external/imgui/imgui.h"
-#include "main/scenes/LoadScene.h"
-#include "main/editor/EditorState.h"
-#include "main/editor/FileDialog.h"
+
 #include <cstring>
 #include <filesystem>
+
+#include "external/imgui/imgui.h"
+
+#include "main/editor/EditorState.h"
+#include "main/editor/FileDialog.h"
+#include "main/scenes/LoadScene.h"
 
 namespace Editor {
 
@@ -26,7 +29,7 @@ void RenderFileTree(const std::filesystem::path& path, World& world, int screenW
                 bool isSelected = (EditorState::Get().GetActiveScenePath() == entry.path().string());
                 
                 if (ImGui::Selectable(fileName.c_str(), isSelected)) {
-                    EditorState::Get().SetSelected(nullptr);
+                    EditorState::Get().ClearSelection();
                     EditorState::Get().SetActiveScenePath(entry.path().string());
                     world.isPaused = true;
                     world.Clear();

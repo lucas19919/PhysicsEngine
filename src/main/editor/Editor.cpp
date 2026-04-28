@@ -1,20 +1,24 @@
 #include "main/editor/Editor.h"
-#include "main/editor/PerformancePanel.h"
-#include "main/editor/ScenePanel.h"
-#include "main/editor/ViewportPanel.h"
-#include "main/editor/HierarchyPanel.h"
-#include "main/editor/InspectorPanel.h"
-#include "main/editor/DebugPanel.h"
-#include "main/editor/ThemeManager.h"
-#include "main/editor/FileDialog.h"
+
 #include "external/imgui/imgui.h"
 #include "external/imgui/imgui_internal.h"
 #include "external/imgui/rlImGui.h"
+
+#include "main/editor/ConstraintPanel.h"
+#include "main/editor/DebugPanel.h"
+#include "main/editor/EditorState.h"
+#include "main/editor/FileDialog.h"
+#include "main/editor/HierarchyPanel.h"
+#include "main/editor/HistoryManager.h"
+#include "main/editor/InspectorPanel.h"
+#include "main/editor/PerformancePanel.h"
+#include "main/editor/ScenePanel.h"
+#include "main/editor/ThemeManager.h"
+#include "main/editor/ViewportPanel.h"
 #include "main/physics/Config.h"
+#include "main/scenes/BoundarySystem.h"
 #include "main/scenes/LoadScene.h"
 #include "main/scenes/SaveScene.h"
-#include "main/scenes/BoundarySystem.h"
-#include "main/editor/EditorState.h"
 
 namespace Editor {
 
@@ -23,10 +27,13 @@ Editor::Editor(World& world, EditorCamera& camera, InputHandler& input) {
     panels.push_back(std::make_unique<PerformancePanel>(camera, input));
     panels.push_back(std::make_unique<HierarchyPanel>());
     panels.push_back(std::make_unique<InspectorPanel>());
+    panels.push_back(std::make_unique<ConstraintPanel>());
     panels.push_back(std::make_unique<DebugPanel>());
     panels.push_back(std::make_unique<ScenePanel>(Config::screenWidth, Config::screenHeight));
 
     ThemeManager::ApplyTheme(EditorTheme::Retro);
+
+    HistoryManager::Get().RecordState(world);
 }
 
 Editor::~Editor() {
@@ -48,18 +55,25 @@ void Editor::Update(World& world) {
         ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
 
         ImGuiID dock_id_main = dockspace_id;
-        ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Left, 0.20f, nullptr, &dock_id_main);
-        ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Right, 0.25f, nullptr, &dock_id_main);
-        ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Down, 0.25f, nullptr, &dock_id_main);
+        ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Left, 0.18f, nullptr, &dock_id_main);
+        ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Right, 0.22f, nullptr, &dock_id_main);
+        ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Down, 0.20f, nullptr, &dock_id_main);
         
-        ImGuiID dock_id_bottom_left = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.30f, nullptr, &dock_id_left);
-        ImGuiID dock_id_bottom_right = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.40f, nullptr, &dock_id_right);
+        // Split main center area: Viewport (left) and Inspector (right)
+        ImGuiID dock_id_inspector = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Right, 0.30f, nullptr, &dock_id_main);
+
+        // Split left column: Hierarchy (top) and Performance (bottom - taller)
+        ImGuiID dock_id_perf = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.45f, nullptr, &dock_id_left);
+
+        // Split right column: Debug (top) and Constraints (bottom)
+        ImGuiID dock_id_constraints = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.50f, nullptr, &dock_id_right);
 
         ImGui::DockBuilderDockWindow("Viewport", dock_id_main);
         ImGui::DockBuilderDockWindow("Hierarchy", dock_id_left);
-        ImGui::DockBuilderDockWindow("Inspector", dock_id_right);
-        ImGui::DockBuilderDockWindow("Performance & Viewport", dock_id_bottom_left);
-        ImGui::DockBuilderDockWindow("Debug Settings", dock_id_bottom_right);
+        ImGui::DockBuilderDockWindow("Inspector", dock_id_inspector);
+        ImGui::DockBuilderDockWindow("Debug", dock_id_right);
+        ImGui::DockBuilderDockWindow("Constraints", dock_id_constraints);
+        ImGui::DockBuilderDockWindow("Performance & Viewport", dock_id_perf);
         ImGui::DockBuilderDockWindow("Scene Manager", dock_id_bottom);
         
         ImGui::DockBuilderFinish(dockspace_id);
@@ -82,7 +96,7 @@ void Editor::Update(World& world) {
     }
     if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_N)) {
         LoadScene::Load("", world, Config::screenWidth, Config::screenHeight);
-        EditorState::Get().SetSelected(nullptr);
+        EditorState::Get().ClearSelection();
         EditorState::Get().SetActiveScenePath("");
         world.isPaused = true;
     }
@@ -93,14 +107,14 @@ void Editor::Update(World& world) {
         {
             if (ImGui::MenuItem("New", "Ctrl+N")) {
                 LoadScene::Load("", world, Config::screenWidth, Config::screenHeight);
-                EditorState::Get().SetSelected(nullptr);
+                EditorState::Get().ClearSelection();
                 EditorState::Get().SetActiveScenePath("");
                 world.isPaused = true;
             }
             if (ImGui::MenuItem("Load")) {
                 std::string path = ShowFileDialog(false);
                 if (!path.empty()) {
-                    EditorState::Get().SetSelected(nullptr);
+                    EditorState::Get().ClearSelection();
                     EditorState::Get().SetActiveScenePath(path);
                     world.isPaused = true;
                     LoadScene::Load(path, world, Config::screenWidth, Config::screenHeight);
@@ -126,6 +140,12 @@ void Editor::Update(World& world) {
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit")) { /* ... */ }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Undo", "Ctrl+Z", false, HistoryManager::Get().CanUndo())) HistoryManager::Get().Undo(world);
+            if (ImGui::MenuItem("Redo", "Ctrl+Y", false, HistoryManager::Get().CanRedo())) HistoryManager::Get().Redo(world);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Theme"))
@@ -169,42 +189,6 @@ void Editor::Update(World& world) {
                 Config::screenWidth = (int)(size.x * Config::MeterToPixel);
                 Config::screenHeight = (int)(size.y * Config::MeterToPixel);
                 if (Config::useWalls) BoundarySystem::UpdateBoundaries(world);
-            }
-            ImGui::EndMenu();
-        }
-
-        // playbar
-        float barWidth = ImGui::GetWindowWidth();
-        float btnW = 30.0f;
-        float groupW = (btnW * 3.0f) + (ImGui::GetStyle().ItemSpacing.x * 2.0f);
-        ImGui::SetCursorPosX((barWidth - groupW) * 0.5f);
-        
-        if (world.isPaused) {
-            if (ImGui::Button(">", ImVec2(btnW, 0))) {
-                if (!EditorState::Get().HasInitialState()) {
-                    EditorState::Get().CaptureInitialState(SaveScene::SerializeScene(world));
-                }
-                world.isPaused = false;
-            }
-        } else {
-            if (ImGui::Button("||", ImVec2(btnW, 0))) world.isPaused = true;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("|>", ImVec2(btnW, 0))) {
-            if (!EditorState::Get().HasInitialState()) {
-                EditorState::Get().CaptureInitialState(SaveScene::SerializeScene(world));
-            }
-            world.isPaused = false;
-            world.Step(1.0f / 60.0f);
-            world.isPaused = true;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("R", ImVec2(btnW, 0))) {
-            if (EditorState::Get().HasInitialState()) {
-                EditorState::Get().SetSelected(nullptr);
-                world.isPaused = true;
-                LoadScene::LoadFromJSON(EditorState::Get().GetInitialState(), world, Config::screenWidth, Config::screenHeight);
-                EditorState::Get().ClearInitialState();
             }
         }
         ImGui::EndMainMenuBar();

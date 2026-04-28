@@ -1,10 +1,11 @@
 #pragma once
-#include "main/World.h"
-#include "main/editor/Panel.h"
-#include "main/editor/EditorCamera.h"
-#include "main/utility/InputHandler.h"
-#include <vector>
 #include <memory>
+#include <vector>
+
+#include "main/World.h"
+#include "main/editor/EditorCamera.h"
+#include "main/editor/Panel.h"
+#include "main/utility/InputHandler.h"
 
 namespace Editor {
 

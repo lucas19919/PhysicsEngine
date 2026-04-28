@@ -1,10 +1,11 @@
 #pragma once
+#include <variant>
+#include <vector>
+
 #include "main/GameObject.h"
 #include "main/World.h"
-#include "main/utility/templates/Array.h"
 #include "main/components/Renderer.h"
-#include <vector>
-#include <variant>
+#include "main/utility/templates/Array.h"
 
 class Instantiate
 {

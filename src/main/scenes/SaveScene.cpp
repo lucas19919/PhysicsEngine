@@ -18,18 +18,9 @@
 
 using json = nlohmann::json;
 
-static std::string ColorToString(Color color)
+static json ColorToJSON(Color color)
 {
-    if (color.r == 230 && color.g == 41 && color.b == 55) return "RED";
-    if (color.r == 0 && color.g == 228 && color.b == 48) return "GREEN";
-    if (color.r == 0 && color.g == 121 && color.b == 241) return "BLUE";
-    if (color.r == 127 && color.g == 106 && color.b == 79) return "BROWN";
-    if (color.r == 80 && color.g == 80 && color.b == 80) return "DARKGRAY";
-    if (color.r == 253 && color.g == 249 && color.b == 0) return "YELLOW";
-    if (color.r == 255 && color.g == 161 && color.b == 0) return "ORANGE";
-    if (color.r == 255 && color.g == 255 && color.b == 255) return "WHITE";
-    if (color.r == 0 && color.g == 0 && color.b == 0) return "BLACK";
-    return "GRAY";
+    return { {"r", color.r}, {"g", color.g}, {"b", color.b}, {"a", color.a} };
 }
 
 static json Vec2ToJSON(Vec2 v)
@@ -209,7 +200,7 @@ json SaveScene::SerializeObject(GameObject* obj)
     {
         json r;
         Shape shape = ren->GetShape();
-        r["color"] = ColorToString(shape.color);
+        r["color"] = ColorToJSON(shape.color);
         if (shape.form == RenderShape::R_BOX) {
             r["form"] = "R_BOX";
             r["scale"] = Vec2ToJSON(std::get<Vec2>(shape.scale));

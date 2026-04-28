@@ -1,7 +1,8 @@
 #pragma once
-#include "main/editor/Panel.h"
-#include "main/editor/EditorCamera.h"
 #include "raylib.h"
+
+#include "main/editor/EditorCamera.h"
+#include "main/editor/Panel.h"
 
 namespace Editor {
 

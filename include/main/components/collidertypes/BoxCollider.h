@@ -1,6 +1,6 @@
 #pragma once
-#include "math/Vec2.h"
 #include "main/components/Collider.h"
+#include "math/Vec2.h"
 
 class BoxCollider : public Collider
 {
@@ -9,9 +9,9 @@ class BoxCollider : public Collider
         BoxCollider(Vec2 size);
         ColliderType GetType() const override;
         const char* GetName() const override { return "BoxCollider"; }
+void UpdateCache(const TransformComponent& transform) override;
+bool TestPoint(Vec2 point) const override;
+void Scale(float sx, float sy) override;
 
-        void UpdateCache(const TransformComponent& transform) override;
-        bool TestPoint(Vec2 point) const override;
-
-        bool OnInspectorGui(class World* world = nullptr) override;
+bool OnInspectorGui(class World* world = nullptr) override;
 };

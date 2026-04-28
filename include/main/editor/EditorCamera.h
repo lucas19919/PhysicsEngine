@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+
 #include "math/Vec2.h"
 
 class EditorCamera {

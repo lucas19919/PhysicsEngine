@@ -1,70 +1,57 @@
 #include "main/components/collidertypes/PolygonCollider.h"
-#include "main/GameObject.h"
-#include <cmath>
 #include "external/imgui/imgui.h"
+#include "math/RotationMatrix.h"
+#include <algorithm>
 
 PolygonCollider::PolygonCollider(const Array<20>& vertices) : vertices(vertices) {}
 
-bool PolygonCollider::OnInspectorGui(World* world)
-{
-    bool colliderBaseChanged = Collider::OnInspectorGui(world);
-    bool verticesChanged = false;
-    for (size_t i = 0; i < vertices.Size(); i++)
-    {
-        ImGui::PushID((int)i);
-        if (ImGui::DragFloat2("Vertex", &vertices[i].x, 0.1f))
-        {
-            verticesChanged = true;
-        }
-        ImGui::PopID();
-    }
-    
-    if (ImGui::Button("Add Vertex") && vertices.Size() < 20)
-    {
-        vertices.PushBack(Vec2(0,0));
-        verticesChanged = true;
-    }
-    
-    if (verticesChanged && owner) UpdateCache(owner->transform);
-    return colliderBaseChanged || verticesChanged;
-}
+ColliderType PolygonCollider::GetType() const { return POLYGON; }
 
-ColliderType PolygonCollider::GetType() const
-{
-    return ColliderType::POLYGON;
-}
-
-#include "math/RotationMatrix.h"
-
-void PolygonCollider::UpdateCache(const TransformComponent& transform)
-{
-    cachedVertices.count = 0;
-    cachedNormals.count = 0;
-
+void PolygonCollider::UpdateCache(const TransformComponent& transform) {
+    cachedVertices.Clear();
     RotMatrix rot(transform.rotation);
+    Vec2 pos = transform.position;
 
-    for (size_t i = 0; i < vertices.Size(); i++)
-    {
-        Vec2 rotated = rot.Rotate(vertices[i]);
-        cachedVertices.PushBack(rotated + transform.position);
+    for (size_t i = 0; i < vertices.Size(); i++) {
+        cachedVertices.PushBack(pos + rot.Rotate(vertices[i]));
     }
 
-    // Update normals
-    for (size_t i = 0; i < cachedVertices.Size(); i++)
-    {
+    cachedNormals.Clear();
+    for (size_t i = 0; i < cachedVertices.Size(); i++) {
         Vec2 edge = cachedVertices[(i + 1) % cachedVertices.Size()] - cachedVertices[i];
-        Vec2 normal = Vec2(edge.y, -edge.x);
-        cachedNormals.PushBack(normal.Norm());
+        cachedNormals.PushBack(Vec2(edge.y, -edge.x).Norm());
+    }
+
+    if (cachedVertices.Size() > 0) {
+        bounds.min = cachedVertices[0];
+        bounds.max = cachedVertices[0];
+        for (size_t i = 1; i < cachedVertices.Size(); i++) {
+            bounds.min.x = std::min(bounds.min.x, cachedVertices[i].x);
+            bounds.min.y = std::min(bounds.min.y, cachedVertices[i].y);
+            bounds.max.x = std::max(bounds.max.x, cachedVertices[i].x);
+            bounds.max.y = std::max(bounds.max.y, cachedVertices[i].y);
+        }
     }
 }
 
-bool PolygonCollider::TestPoint(Vec2 point) const
-{
-    for (size_t i = 0; i < cachedVertices.Size(); i++)
-    {
+bool PolygonCollider::TestPoint(Vec2 point) const {
+    for (size_t i = 0; i < cachedVertices.Size(); i++) {
         Vec2 v = cachedVertices[i];
         Vec2 n = cachedNormals[i];
-        if (n.Dot(point - v) > 0.0f) return false;
+        if (n.Dot(point - v) > 0) return false;
     }
     return true;
+}
+
+void PolygonCollider::Scale(float sx, float sy) {
+    for (size_t i = 0; i < vertices.Size(); i++) {
+        vertices[i].x *= sx;
+        vertices[i].y *= sy;
+    }
+}
+
+bool PolygonCollider::OnInspectorGui(World* world) {
+    bool changed = Collider::OnInspectorGui(world);
+    ImGui::Text("Polygon Vertices: %zu", vertices.Size());
+    return changed;
 }

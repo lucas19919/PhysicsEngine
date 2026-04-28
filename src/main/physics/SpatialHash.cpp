@@ -1,7 +1,9 @@
 #include "main/physics/SpatialHash.h"
-#include "main/utility/templates/Array.h"
-#include "main/physics/SAT.h"
+
 #include <vector>
+
+#include "main/physics/SAT.h"
+#include "main/utility/templates/Array.h"
 
 unsigned int SpatialHash::GetHash(Vec2 position) const
 {

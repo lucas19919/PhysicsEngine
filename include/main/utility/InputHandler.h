@@ -1,9 +1,10 @@
 #pragma once
-#include "main/World.h"
 #include <string>
-#include "main/scenes/LoadScene.h"
+
+#include "main/World.h"
 #include "main/components/Controller.h"
 #include "main/editor/EditorCamera.h"
+#include "main/scenes/LoadScene.h"
 
 class InputHandler
 {

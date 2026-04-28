@@ -1,10 +1,12 @@
 #pragma once
-#include "raylib.h"
-#include <vector>
-#include "math/Vec2.h"
-#include "main/utility/templates/Array.h"
 #include <variant>
+#include <vector>
+
+#include "raylib.h"
+
 #include "main/components/Component.h"
+#include "main/utility/templates/Array.h"
+#include "math/Vec2.h"
 
 class GameObject;
 
@@ -36,6 +38,7 @@ class Renderer : public Component
         Shape GetShape() const { return shape; }
 
         void UpdateLocalCoordinates();
+        void Scale(float sx, float sy);
 
         //Debug helper
         void SetColor(Color color) { shape.color = color; }

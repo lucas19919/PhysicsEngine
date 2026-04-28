@@ -1,38 +1,51 @@
 #include "main/scenes/LoadScene.h"
-#include "main/scenes/SaveScene.h"
-#include "main/scenes/BoundarySystem.h"
-#include "main/utility/Instantiate.h"
-#include "main/GameObject.h"
-#include "math/Vec2.h"
-#include "main/physics/Config.h"
+
 #include <fstream>
-#include <string>
-#include <vector>
 #include <random>
+#include <string>
 #include <unordered_map>
+#include <vector>
+
+#include "main/GameObject.h"
 #include "main/components/Collider.h"
 #include "main/components/Renderer.h"
 #include "main/components/RigidBody.h"
 #include "main/components/TransformComponent.h"
 #include "main/components/constrainttypes/Distance.h"
-#include "main/components/constrainttypes/Pin.h"
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/constrainttypes/Motor.h"
+#include "main/components/constrainttypes/Pin.h"
 #include "main/components/controllertypes/MotorController.h"
+#include "main/physics/Config.h"
+#include "main/scenes/BoundarySystem.h"
+#include "main/scenes/SaveScene.h"
+#include "main/utility/Instantiate.h"
+#include "math/Vec2.h"
 
 using json = nlohmann::json;
 
-static Color ParseColor(const std::string& str)
+static Color ParseColor(const json& j)
 {
-    if (str == "RED")      return RED;
-    if (str == "GREEN")    return GREEN;
-    if (str == "BLUE")     return BLUE;
-    if (str == "BROWN")    return BROWN;
-    if (str == "DARKGRAY") return DARKGRAY;
-    if (str == "YELLOW")   return YELLOW;
-    if (str == "ORANGE")   return ORANGE;
-    if (str == "WHITE")    return WHITE;
-    if (str == "BLACK")    return BLACK;
+    if (j.is_string()) {
+        std::string str = j.get<std::string>();
+        if (str == "RED")      return RED;
+        if (str == "GREEN")    return GREEN;
+        if (str == "BLUE")     return BLUE;
+        if (str == "BROWN")    return BROWN;
+        if (str == "DARKGRAY") return DARKGRAY;
+        if (str == "YELLOW")   return YELLOW;
+        if (str == "ORANGE")   return ORANGE;
+        if (str == "WHITE")    return WHITE;
+        if (str == "BLACK")    return BLACK;
+        return GRAY;
+    } else if (j.is_object()) {
+        return { 
+            j.value("r", (unsigned char)255), 
+            j.value("g", (unsigned char)255), 
+            j.value("b", (unsigned char)255), 
+            j.value("a", (unsigned char)255) 
+        };
+    }
     return GRAY;
 }
 
@@ -77,6 +90,7 @@ void LoadScene::LoadFromJSON(const json& sceneData, World& world, int screenWidt
     BoundarySystem::UpdateBoundaries(world);
 
     std::unordered_map<int, GameObject*> idMap;
+    size_t maxID = 0;
 
     if (sceneData.contains("objects"))
     {
@@ -87,8 +101,10 @@ void LoadScene::LoadFromJSON(const json& sceneData, World& world, int screenWidt
             {
                 if (item.contains("id"))
                 {
-                    obj->SetID(item["id"].get<int>());
-                    idMap[item["id"].get<int>()] = obj;
+                    int id = item["id"].get<int>();
+                    obj->SetID(id);
+                    idMap[id] = obj;
+                    if ((size_t)id >= maxID) maxID = (size_t)id + 1;
                 }
                 if (item.contains("name"))
                 {
@@ -107,6 +123,7 @@ void LoadScene::LoadFromJSON(const json& sceneData, World& world, int screenWidt
             }
         }
     }
+    world.SetNextID(maxID);
 
     if (sceneData.contains("generators"))
     {
@@ -173,7 +190,8 @@ void LoadScene::LoadFromJSON(const json& sceneData, World& world, int screenWidt
 
     if (sceneData.contains("constraints"))
     {
-        LoadConstraints(sceneData["constraints"], world, idMap);
+        size_t maxC = LoadConstraints(sceneData["constraints"], world, idMap);
+        world.SetNextConstraintID(maxC);
     }
 
     if (sceneData.contains("controllers"))
@@ -190,9 +208,6 @@ void LoadScene::Regenerate(World& world, GeneratorDef& def, const std::string& c
 
     def.objectJson = SaveScene::SerializeObject(def.templateObject.get()).dump();
     nlohmann::json genObject = nlohmann::json::parse(def.objectJson);
-
-    std::string toRemove = clearGroupName.empty() ? def.name : clearGroupName;
-    world.RemoveGroup(toRemove);
 
     for (int r = 0; r < def.rows; r++)
     {
@@ -218,6 +233,8 @@ void LoadScene::Regenerate(World& world, GeneratorDef& def, const std::string& c
 void LoadScene::LoadCollection(const nlohmann::json& data, World& world, Vec2 offset, const std::string& groupName)
 {
     std::unordered_map<int, GameObject*> idMap;
+    size_t maxID = 0;
+    size_t maxC = 0;
 
     if (data.contains("objects"))
     {
@@ -234,6 +251,7 @@ void LoadScene::LoadCollection(const nlohmann::json& data, World& world, Vec2 of
                     // We generate a NEW ID for the world, but we need the mapping for internal constraints
                     idMap[item["id"].get<int>()] = obj;
                 }
+                if (obj->GetID() >= maxID) maxID = obj->GetID() + 1;
             }
         }
     }
@@ -241,8 +259,17 @@ void LoadScene::LoadCollection(const nlohmann::json& data, World& world, Vec2 of
     if (data.contains("constraints"))
     {
         // We need to be careful with IDs here. LoadConstraints expects an idMap
-        LoadConstraints(data["constraints"], world, idMap);
+        maxC = LoadConstraints(data["constraints"], world, idMap);
     }
+
+    // Synchronize world counters if the loaded IDs are higher than current
+    // Note: LoadObject/AddConstraint might have already advanced these.
+    // This is a safety check.
+    // We don't have GetNextID, so we just set it. 
+    // Actually AddGameObject already increments nextID if id was -1.
+    // LoadObject uses builder.Create(world, -1), which calls AddGameObject, 
+    // so nextID is already handled correctly for NEW objects.
+    // But LoadConstraints uses SetID(ID) directly if ID is present.
 
     if (data.contains("controllers"))
     {
@@ -340,11 +367,14 @@ std::unique_ptr<GameObject> LoadScene::LoadObjectOrphan(const json& item, World&
     return builder.CreateOrphan(-1);
 }
 
-void LoadScene::LoadConstraints(const json& constraints, World& world, const std::unordered_map<int, GameObject*>& idMap)
+size_t LoadScene::LoadConstraints(const json& constraints, World& world, const std::unordered_map<int, GameObject*>& idMap)
 {
+    size_t maxID = 0;
     for (const auto& item : constraints)
     {
         int ID = item.value("id", -1);
+        if (ID != -1 && (size_t)ID >= maxID) maxID = (size_t)ID + 1;
+
         std::string type = item.value("type", "");
 
         if (type == "DISTANCE")
@@ -412,15 +442,19 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             }
 
             if (attachments.size() < 2) continue;
-            for (size_t i = 0; i < attachments.size(); i++)
-                for (size_t j = i + 1; j < attachments.size(); j++) {
-                    attachments[i].obj->AddIgnored(attachments[j].obj->GetID());
-                    attachments[j].obj->AddIgnored(attachments[i].obj->GetID());
-                }
+            
+            bool allowCollisions = item.value("collisions", false);
+            if (!allowCollisions) {
+                for (size_t i = 0; i < attachments.size(); i++)
+                    for (size_t j = i + 1; j < attachments.size(); j++) {
+                        attachments[i].obj->AddIgnored(attachments[j].obj->GetID());
+                        attachments[j].obj->AddIgnored(attachments[i].obj->GetID());
+                    }
+            }
 
             auto joint = std::make_unique<JointConstraint>(attachments, 
                 item.contains("position") ? ParseVec2(item["position"]) : Vec2(attachments[0].obj->transform.position.x + attachments[0].localX, attachments[0].obj->transform.position.y + attachments[0].localY),
-                item.value("collisions", false));
+                allowCollisions);
             if (ID != -1) joint->SetID(ID);
             world.AddConstraint(std::move(joint));
         }
@@ -437,6 +471,7 @@ void LoadScene::LoadConstraints(const json& constraints, World& world, const std
             world.AddConstraint(std::move(motor));
         }
     }
+    return maxID;
 }
 
 void LoadScene::LoadControllers(const json& controllers, World& world)

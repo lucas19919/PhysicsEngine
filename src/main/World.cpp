@@ -1,9 +1,12 @@
 #include "main/World.h"
-#include "main/GameObject.h"
-#include "math/Vec2.h"
-#include "main/physics/Config.h"
-#include "main/editor/EditorState.h"
+
 #include <algorithm>
+
+#include "main/GameObject.h"
+#include "main/editor/EditorState.h"
+#include "main/physics/Config.h"
+#include "main/scenes/LoadScene.h"
+#include "math/Vec2.h"
 
 World::World()
 { 
@@ -29,6 +32,17 @@ void World::AddGameObject(std::unique_ptr<GameObject> obj)
 
 void World::AddConstraint(std::unique_ptr<Constraint> c)
 {
+    // If it has no ID or its ID is already taken, generate a new one
+    auto isIdTaken = [&](size_t id) {
+        for (const auto& existing : constraints) if (existing->GetID() == id) return true;
+        return false;
+    };
+
+    if (c->GetID() == 0 || c->GetID() == (size_t)-1 || isIdTaken(c->GetID()))
+    {
+        while (isIdTaken(nextConstraintID)) nextConstraintID++;
+        c->SetID(nextConstraintID++);
+    }
     constraints.push_back(std::move(c));
 }
 
@@ -59,7 +73,7 @@ void World::UpdateCaches()
 
 void World::Clear()
 {
-    EditorState::Get().SetSelected(nullptr);
+    EditorState::Get().ClearSelection();
     gameObjects.clear();
     constraints.clear();
     controllers.clear();  
@@ -70,6 +84,7 @@ void World::Clear()
     contactManager->Clear();
 
     nextID = 0;
+    nextConstraintID = 0;
 }
 
 void World::RemoveGameObject(size_t id)
@@ -103,6 +118,7 @@ void World::RemoveGameObject(size_t id)
 void World::RemoveGroup(const std::string& groupName)
 {
     RemoveGroupInternal(groupName, true);
+    RemoveGenerator(groupName);
     groups.erase(std::remove(groups.begin(), groups.end(), groupName), groups.end());
 }
 
@@ -145,7 +161,6 @@ void World::RemoveGroupInternal(const std::string& groupName, bool prune)
     UpdateCaches();
 }
 
-#include "main/scenes/LoadScene.h"
 
 void World::RegenerateGenerator(const std::string& currentName, const std::string& oldName)
 {

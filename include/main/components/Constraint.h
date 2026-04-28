@@ -1,6 +1,6 @@
 #pragma once
-#include "math/Vec2.h"
 #include "main/components/Component.h"
+#include "math/Vec2.h"
 
 class GameObject;
 

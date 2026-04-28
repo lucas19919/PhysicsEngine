@@ -1,13 +1,13 @@
 #pragma once
-#include "main/GameObject.h"
-#include "math/Vec2.h"
-#include "main/components/RigidBody.h"
-#include "main/utility/templates/Array.h"
-#include "main/components/Constraint.h"
-
-#include <vector>
 #include <memory>
 #include <unordered_map>
+#include <vector>
+
+#include "main/GameObject.h"
+#include "main/components/Constraint.h"
+#include "main/components/RigidBody.h"
+#include "main/utility/templates/Array.h"
+#include "math/Vec2.h"
 
 struct ImpulseCache
 {

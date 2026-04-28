@@ -1,12 +1,13 @@
 #pragma once
-#include "main/GameObject.h"
-#include "main/physics/SpatialHash.h"
-#include "main/physics/Config.h"
-#include <vector>
+#include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
-#include <cstdint>
+#include <vector>
+
+#include "main/GameObject.h"
+#include "main/physics/Config.h"
+#include "main/physics/SpatialHash.h"
 
 class Broadphase
 {

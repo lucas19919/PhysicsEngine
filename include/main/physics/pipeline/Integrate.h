@@ -1,7 +1,8 @@
 #pragma once
-#include "main/GameObject.h"
-#include <vector>
 #include <memory>
+#include <vector>
+
+#include "main/GameObject.h"
 
 class GameObject;
 

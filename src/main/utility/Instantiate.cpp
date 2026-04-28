@@ -1,10 +1,11 @@
 #include "main/utility/Instantiate.h"
-#include "main/components/collidertypes/CircleCollider.h"
+
 #include "main/components/collidertypes/BoxCollider.h"
+#include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/collidertypes/PolygonCollider.h"
 #include "main/components/constrainttypes/Distance.h"
-#include "main/components/constrainttypes/Pin.h"
 #include "main/components/constrainttypes/Joint.h"
+#include "main/components/constrainttypes/Pin.h"
 
 Instantiate& Instantiate::WithRigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings)
 {

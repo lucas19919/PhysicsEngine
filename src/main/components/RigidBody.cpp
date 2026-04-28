@@ -1,8 +1,10 @@
 #include "main/components/RigidBody.h"
-#include "math/Vec2.h"
+
 #include <algorithm>
 
 #include "external/imgui/imgui.h"
+
+#include "math/Vec2.h"
 
 bool RigidBody::OnInspectorGui(World* world) {
     bool changed = false;
