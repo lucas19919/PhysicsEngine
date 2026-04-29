@@ -1,7 +1,8 @@
 #pragma once
-#include "main/components/Constraint.h"
-#include "main/components/Component.h"
 #include <vector>
+
+#include "main/components/Component.h"
+#include "main/components/Constraint.h"
 
 enum ControllerType
 {
@@ -15,4 +16,7 @@ struct Controller : public Component
     virtual ~Controller() = default;
     virtual ControllerType GetType() const = 0;
     virtual void Update(float dt) = 0;
+
+    const char* GetName() const override { return "Controller"; }
+    bool OnInspectorGui(class World* world = nullptr) override;
 };

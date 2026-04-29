@@ -1,103 +1,351 @@
 {
-  "name": "Full Screen Plinko - Tweaked",
+  "name": "Full Screen Plinko",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
       "name": "Floor",
       "components": {
-        "TransformComponent": { "position": { "x": 640.0, "y": 940.0 }, "rotation": 0.0 },
-        "Collider": { "type": "BOX", "isActive": true, "size": { "x": 1280.0, "y": 40.0 } },
-        "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 1280.0, "y": 40.0 } }
-      }
-    },
-    { "name": "Div_1", "components": { "TransformComponent": { "position": { "x": 160.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-    { "name": "Div_2", "components": { "TransformComponent": { "position": { "x": 320.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-    { "name": "Div_3", "components": { "TransformComponent": { "position": { "x": 480.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-    { "name": "Div_4", "components": { "TransformComponent": { "position": { "x": 640.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-    { "name": "Div_5", "components": { "TransformComponent": { "position": { "x": 800.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-    { "name": "Div_6", "components": { "TransformComponent": { "position": { "x": 960.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-    { "name": "Div_7", "components": { "TransformComponent": { "position": { "x": 1120.0, "y": 870.0 }, "rotation": 0.0 }, "Collider": { "type": "BOX", "isActive": true, "size": { "x": 10.0, "y": 140.0 } }, "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 10.0, "y": 140.0 } } } },
-
-    { "name": "Peg_R1_1", "components": { "TransformComponent": { "position": { "x": 480.0, "y": 90.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R1_2", "components": { "TransformComponent": { "position": { "x": 640.0, "y": 90.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R1_3", "components": { "TransformComponent": { "position": { "x": 800.0, "y": 90.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-
-    { "name": "Peg_R2_1", "components": { "TransformComponent": { "position": { "x": 400.0, "y": 220.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R2_2", "components": { "TransformComponent": { "position": { "x": 560.0, "y": 220.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R2_3", "components": { "TransformComponent": { "position": { "x": 720.0, "y": 220.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R2_4", "components": { "TransformComponent": { "position": { "x": 880.0, "y": 220.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-
-    { "name": "Peg_R3_1", "components": { "TransformComponent": { "position": { "x": 320.0, "y": 350.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R3_2", "components": { "TransformComponent": { "position": { "x": 480.0, "y": 350.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R3_3", "components": { "TransformComponent": { "position": { "x": 640.0, "y": 350.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R3_4", "components": { "TransformComponent": { "position": { "x": 800.0, "y": 350.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R3_5", "components": { "TransformComponent": { "position": { "x": 960.0, "y": 350.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-
-    { "name": "Peg_R4_1", "components": { "TransformComponent": { "position": { "x": 240.0, "y": 480.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R4_2", "components": { "TransformComponent": { "position": { "x": 400.0, "y": 480.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R4_3", "components": { "TransformComponent": { "position": { "x": 560.0, "y": 480.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R4_4", "components": { "TransformComponent": { "position": { "x": 720.0, "y": 480.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R4_5", "components": { "TransformComponent": { "position": { "x": 880.0, "y": 480.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R4_6", "components": { "TransformComponent": { "position": { "x": 1040.0, "y": 480.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-
-    { "name": "Peg_R5_1", "components": { "TransformComponent": { "position": { "x": 160.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R5_2", "components": { "TransformComponent": { "position": { "x": 320.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R5_3", "components": { "TransformComponent": { "position": { "x": 480.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R5_4", "components": { "TransformComponent": { "position": { "x": 640.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R5_5", "components": { "TransformComponent": { "position": { "x": 800.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R5_6", "components": { "TransformComponent": { "position": { "x": 960.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R5_7", "components": { "TransformComponent": { "position": { "x": 1120.0, "y": 610.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-
-    { "name": "Peg_R6_1", "components": { "TransformComponent": { "position": { "x": 80.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_2", "components": { "TransformComponent": { "position": { "x": 240.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_3", "components": { "TransformComponent": { "position": { "x": 400.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_4", "components": { "TransformComponent": { "position": { "x": 560.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_5", "components": { "TransformComponent": { "position": { "x": 720.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_6", "components": { "TransformComponent": { "position": { "x": 880.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_7", "components": { "TransformComponent": { "position": { "x": 1040.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-    { "name": "Peg_R6_8", "components": { "TransformComponent": { "position": { "x": 1200.0, "y": 740.0 }, "rotation": 0.0 }, "Collider": { "type": "CIRCLE", "isActive": true, "radius": 30.0 }, "Renderer": { "form": "R_CIRCLE", "color": "BLUE", "scale": 30.0 } } },
-
-    {
-      "name": "Ball_1",
-      "components": {
-        "TransformComponent": { "position": { "x": 495.0, "y": 25.0 }, "rotation": 0.0 },
-        "Collider": { "type": "CIRCLE", "isActive": true, "radius": 25.0 },
-        "Renderer": { "form": "R_CIRCLE", "color": "YELLOW", "scale": 25.0 },
-        "RigidBody": {
-          "gravityEnabled": true,
-          "properties": { "mass": 2.0, "restitution": 0.7, "friction": 0.1, "inertia": 625.0 },
-          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
-          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        "TransformComponent": {
+          "position": {
+            "x": 0.0,
+            "y": 9.2
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 25.6,
+            "y": 0.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 25.6,
+            "y": 0.8
+          }
         }
       }
     },
     {
-      "name": "Ball_2",
+      "name": "Div_1",
       "components": {
-        "TransformComponent": { "position": { "x": 628.0, "y": 15.0 }, "rotation": 0.0 },
-        "Collider": { "type": "CIRCLE", "isActive": true, "radius": 25.0 },
-        "Renderer": { "form": "R_CIRCLE", "color": "RED", "scale": 25.0 },
-        "RigidBody": {
-          "gravityEnabled": true,
-          "properties": { "mass": 2.0, "restitution": 0.7, "friction": 0.1, "inertia": 625.0 },
-          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
-          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        "TransformComponent": {
+          "position": {
+            "x": -9.6,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
         }
       }
     },
     {
-      "name": "Ball_3",
+      "name": "Div_2",
       "components": {
-        "TransformComponent": { "position": { "x": 782.0, "y": 35.0 }, "rotation": 0.0 },
-        "Collider": { "type": "CIRCLE", "isActive": true, "radius": 25.0 },
-        "Renderer": { "form": "R_CIRCLE", "color": "GREEN", "scale": 25.0 },
-        "RigidBody": {
-          "gravityEnabled": true,
-          "properties": { "mass": 2.0, "restitution": 0.7, "friction": 0.1, "inertia": 625.0 },
-          "linearState": { "velocity": { "x": 0.0, "y": 0.0 }, "acceleration": { "x": 0.0, "y": 0.0 }, "netForce": { "x": 0.0, "y": 0.0 } },
-          "angularState": { "angularVelocity": 0.0, "angularAcceleration": 0.0, "torque": 0.0 }
+        "TransformComponent": {
+          "position": {
+            "x": -6.4,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        }
+      }
+    },
+    {
+      "name": "Div_3",
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": -3.2,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        }
+      }
+    },
+    {
+      "name": "Div_4",
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 0.0,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        }
+      }
+    },
+    {
+      "name": "Div_5",
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 3.2,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        }
+      }
+    },
+    {
+      "name": "Div_6",
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 6.4,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        }
+      }
+    },
+    {
+      "name": "Div_7",
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 9.6,
+            "y": 7.8
+          },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.2,
+            "y": 2.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.2,
+            "y": 2.8
+          }
         }
       }
     }
-  ]
+  ],
+  "generators": [
+    {
+      "name": "Pegs Odd Rows",
+      "grid": {
+        "rows": 3,
+        "columns": 8,
+        "startX": -11.2,
+        "startY": -7.8,
+        "spacingX": 3.2,
+        "spacingY": 5.2
+      },
+      "object": {
+        "components": {
+          "TransformComponent": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotation": 0.0
+          },
+          "Collider": {
+            "type": "CIRCLE",
+            "radius": 0.6
+          },
+          "Renderer": {
+            "form": "R_CIRCLE",
+            "color": "BLUE",
+            "scale": 0.6
+          }
+        }
+      }
+    },
+    {
+      "name": "Pegs Even Rows",
+      "grid": {
+        "rows": 3,
+        "columns": 7,
+        "startX": -9.6,
+        "startY": -5.2,
+        "spacingX": 3.2,
+        "spacingY": 5.2
+      },
+      "object": {
+        "components": {
+          "TransformComponent": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotation": 0.0
+          },
+          "Collider": {
+            "type": "CIRCLE",
+            "radius": 0.6
+          },
+          "Renderer": {
+            "form": "R_CIRCLE",
+            "color": "BLUE",
+            "scale": 0.6
+          }
+        }
+      }
+    },
+    {
+      "name": "Balls",
+      "grid": {
+        "rows": 1,
+        "columns": 15,
+        "startX": -11.2,
+        "startY": -10.0,
+        "spacingX": 1.6,
+        "spacingY": 0.0
+      },
+      "object": {
+        "components": {
+          "TransformComponent": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotation": 0.0
+          },
+          "Collider": {
+            "type": "CIRCLE",
+            "radius": 0.5
+          },
+          "Renderer": {
+            "form": "R_CIRCLE",
+            "color": "YELLOW",
+            "scale": 0.5
+          },
+          "RigidBody": {
+            "gravityEnabled": true,
+            "properties": {
+              "mass": 2.0,
+              "restitution": 0.7,
+              "friction": 0.1,
+              "inertia": 0.25
+            },
+            "linearState": {
+              "velocity": {
+                "x": 0.0,
+                "y": 0.0
+              },
+              "acceleration": {
+                "x": 0.0,
+                "y": 0.0
+              },
+              "netForce": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "angularState": {
+              "angularVelocity": 0.0,
+              "angularAcceleration": 0.0,
+              "torque": 0.0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "constraints": [],
+  "controllers": []
 }

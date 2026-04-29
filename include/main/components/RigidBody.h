@@ -1,6 +1,6 @@
 #pragma once
-#include "math/Vec2.h"
 #include "main/components/Component.h"
+#include "math/Vec2.h"
 
 class GameObject;
 
@@ -36,6 +36,9 @@ class RigidBody : public Component
     public: 
         RigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings);
         ~RigidBody();
+
+        const char* GetName() const override { return "RigidBody"; }
+        bool OnInspectorGui(class World* world = nullptr) override;
 
         void SetGravity(bool enabled) { gravityEnabled = enabled; }
         const bool& IsGravityEnabled() const { return gravityEnabled; }

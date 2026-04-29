@@ -1,6 +1,7 @@
 #pragma once
-#include "Vec2.h"
 #include <cmath>
+
+#include "Vec2.h"
 
 struct Matrix2x2
 {

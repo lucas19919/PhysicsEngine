@@ -1,9 +1,12 @@
 #include "main/components/constrainttypes/Distance.h"
-#include "main/components/Constraint.h"
+
+#include "external/imgui/imgui.h"
+
+#include "main/GameObject.h"
 #include "main/World.h"
+#include "main/components/Constraint.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
-
 
 DistanceConstraint::DistanceConstraint(GameObject* anchor, GameObject* attached, float length, Vec2 anchorOffset, Vec2 attachedOffset) 
 : anchor(anchor), attached(attached), length(length), anchorOffset(anchorOffset), attachedOffset(attachedOffset)
@@ -74,4 +77,33 @@ void DistanceConstraint::Solve(float dt)
         rb2->SetVelocity(v2 + impulse * invMass2);
         rb2->SetAngularVelocity(w2 + (r2.Cross(impulse) * invInertia2));
     }
+}
+
+void DistanceConstraint::OnObjectRemoved(size_t id)
+{
+    Component::OnObjectRemoved(id);
+    if (anchor->GetID() == id || attached->GetID() == id)
+    {
+        isComponentDeleted = true;
+    }
+}
+
+bool DistanceConstraint::InvolvesObject(GameObject* obj) const
+{
+    return anchor == obj || attached == obj;
+}
+
+
+bool DistanceConstraint::OnInspectorGui(World* world)
+{
+    ImGui::Text("Type: Distance");
+    ImGui::Text("Anchor: %s (ID: %zu)", anchor->GetName().c_str(), anchor->GetID());
+    ImGui::Text("Attached: %s (ID: %zu)", attached->GetName().c_str(), attached->GetID());
+
+    bool changed = false;
+    if (ImGui::DragFloat("Length", &length, 0.05f, 0.0f, 100.0f)) changed = true;
+    if (ImGui::DragFloat2("Anchor Offset", &anchorOffset.x, 0.05f)) changed = true;
+    if (ImGui::DragFloat2("Attached Offset", &attachedOffset.x, 0.05f)) changed = true;
+
+    return changed;
 }

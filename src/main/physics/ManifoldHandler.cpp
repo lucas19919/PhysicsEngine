@@ -1,6 +1,7 @@
 #include "main/physics/ManifoldHandler.h"
-#include "main/physics/Manifold.h"
+
 #include "main/components/Collider.h"
+#include "main/physics/Manifold.h"
 
 CollisionManifold ManifoldHandler::SortManifold(GameObject* obj1, GameObject* obj2)
 {

@@ -1,8 +1,9 @@
 #pragma once
-#include "math/Vec2.h"
-#include "main/components/Collider.h"
-#include "main/GameObject.h"
 #include <vector>
+
+#include "main/GameObject.h"
+#include "main/components/Collider.h"
+#include "math/Vec2.h"
 
 class SpatialHash
 {

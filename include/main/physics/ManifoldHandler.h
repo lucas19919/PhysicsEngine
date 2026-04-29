@@ -1,6 +1,6 @@
 #pragma once
-#include "main/physics/Manifold.h"
 #include "main/GameObject.h"
+#include "main/physics/Manifold.h"
 
 class ManifoldHandler
 {

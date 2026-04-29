@@ -1,68 +1,53 @@
-#include "raylib.h"
+#include <string>
+
 #include "external/imgui/imgui.h"
 #include "external/imgui/rlImGui.h"
+#include "raylib.h"
+
 #include "main/World.h"
-#include "main/GameObject.h"
-#include "main/scenes/LoadScene.h"
-#include "main/utility/Draw.h"
-#include "main/utility/InputHandler.h"
+#include "main/editor/Editor.h"
+#include "main/editor/EditorCamera.h"
+#include "main/editor/EditorState.h"
 #include "main/physics/Config.h"
-#include <string>
+#include "main/scenes/LoadScene.h"
+#include "main/utility/InputHandler.h"
 
 int main() {
     const int screenWidth = Config::screenWidth;
     const int screenHeight = Config::screenHeight;
 
     InitWindow(screenWidth, screenHeight, "Halliday2D");
+    SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_MAXIMIZED);
     SetTargetFPS(Config::targetFPS);    
 
+    Image icon = LoadImage("icon.ico"); 
+    SetWindowIcon(icon);
+    UnloadImage(icon);
+
     rlImGuiSetup(true);
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     World world;
     InputHandler input;
+    EditorCamera camera((float)screenWidth, (float)screenHeight);
+    Editor::Editor editor(world, camera, input);
 
-    std::string selectedFile = "../assets/examples/PrattTruss.json";
-    char filePathBuffer[256] = "../assets/examples/";
-
-    LoadScene::Load(selectedFile, world, screenWidth, screenHeight);
-
-    //draw fps?
-    bool FPS = Config::drawFPS;
+    LoadScene::Load(EditorState::Get().GetActiveScenePath(), world, screenWidth, screenHeight);
 
     const float dt = 1.0f / 60.0f;
     while (!WindowShouldClose()) {
-        input.Update(world, selectedFile, screenWidth, screenHeight, dt);
+        int currentScreenWidth = GetScreenWidth();
+        int currentScreenHeight = GetScreenHeight();
+        
+        input.Update(world, camera, EditorState::Get().GetActiveScenePath(), currentScreenWidth, currentScreenHeight, dt);
+        
+        if (world.isPaused) world.UpdateCaches();
         world.Step(dt);
 
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(EditorState::Get().GetThemeColors().viewportBg);
 
-            Render(world); 
-            
-            rlImGuiBegin();
-            ImGui::Begin("Physics Tools");
-            
-            ImGui::InputText("Level Path", filePathBuffer, 256);
-            
-            if (ImGui::Button("Load Level")) {
-                selectedFile = filePathBuffer;
-                world.isPaused = true;
-                world.Clear();
-                
-                LoadScene::Load(selectedFile, world, screenWidth, screenHeight);  
-          }
-
-            if (!selectedFile.empty()) {
-                ImGui::Text("Currently active file: %s", selectedFile.c_str());
-            }
-
-            ImGui::End();
-
-            rlImGuiEnd();
-            
-            if (FPS) {
-                DrawFPS(10, 10);
-            }
+            editor.Update(world);
         
         EndDrawing();
     }

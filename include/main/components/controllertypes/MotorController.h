@@ -10,6 +10,14 @@ class MotorController : public Controller
         MotorController(bool active, std::vector<MotorConstraint*> motors, float torqueMax); 
         ControllerType GetType() const override;
         void Update(float dt) override;
+        const char* GetName() const override { return "MotorController"; }
+
+        const std::vector<MotorConstraint*>& GetMotors() const { return motors; }
+        void RemoveMotor(MotorConstraint* motor);
+        float GetTorqueMax() const { return torqueMax; }
+
+        void OnObjectRemoved(size_t id) override;
+        bool IsInvalid() const override;
 
     private:
         std::vector<MotorConstraint*> motors;

@@ -1,6 +1,6 @@
 #pragma once
-#include "math/Vec2.h"
 #include "main/components/Component.h"
+#include "math/Vec2.h"
 
 class GameObject;
 
@@ -23,6 +23,9 @@ class Constraint : public Component
         virtual ~Constraint() = default;
         virtual ConstraintType GetType() const = 0;
         virtual void Solve(float dt) = 0;
+        virtual bool InvolvesObject(GameObject* obj) const = 0;
+
+        bool OnInspectorGui(class World* world = nullptr) override { return false; }
         
     private:
         size_t id;

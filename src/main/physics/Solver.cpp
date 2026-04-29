@@ -1,9 +1,11 @@
 #include "main/physics/Solver.h"
-#include "main/GameObject.h"
-#include "main/physics/SAT.h"
-#include "main/physics/ManifoldHandler.h"
-#include "main/physics/Config.h"
+
 #include <algorithm>
+
+#include "main/GameObject.h"
+#include "main/physics/Config.h"
+#include "main/physics/ManifoldHandler.h"
+#include "main/physics/SAT.h"
 
 CollisionManifold Solver::ResolveManifold(GameObject* obj1, GameObject* obj2)
 {

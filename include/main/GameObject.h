@@ -1,12 +1,15 @@
 #pragma once
-#include "components/TransformComponent.h"
-#include "components/Component.h"
-#include "utility/templates/Array.h"
-#include "components/RigidBody.h"
-#include "components/Collider.h"
-#include <vector>
 #include <memory>
+#include <string>
+#include <unordered_set>
 #include <utility>
+#include <vector>
+
+#include "components/Collider.h"
+#include "components/Component.h"
+#include "components/RigidBody.h"
+#include "components/TransformComponent.h"
+#include "utility/templates/Array.h"
 
 class GameObject
 {
@@ -45,16 +48,29 @@ class GameObject
             return ref;
         }
 
+        void RemoveComponent(Component* component);
+        void Scale(float sx, float sy);
+
         void SetID(size_t newID) { id = newID; }
         const size_t& GetID() const { return id; }
 
-        void AddIgnored(int id);
-        void RemoveIgnored(int id);
-        const std::vector<int>& GetIgnoredIDs() const { return ignoredIDs; }
+        void AddIgnored(size_t id);
+        void RemoveIgnored(size_t id);
+        const std::unordered_set<size_t>& GetIgnoredIDs() const { return ignoredIDs; }
+
+        const std::vector<std::unique_ptr<Component>>& GetComponents() const { return components; }
+
+        void SetName(const std::string& objName) { name = objName; }
+        const std::string& GetName() const { return name; }
+
+        void SetGroupName(const std::string& name) { groupName = name; }
+        const std::string& GetGroupName() const { return groupName; }
         
     private:
         std::vector<std::unique_ptr<Component>> components;
 
         size_t id;
-        std::vector<int> ignoredIDs;
+        std::string groupName;
+        std::unordered_set<size_t> ignoredIDs;
+        std::string name;
 };

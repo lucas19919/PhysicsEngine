@@ -1,0 +1,548 @@
+{
+    "constraints": [
+        {
+            "attachments": [
+                {
+                    "id": 1,
+                    "localX": -0.503000020980835,
+                    "localY": 0.4880000054836273
+                },
+                {
+                    "id": 0,
+                    "localX": 0.4880000054836273,
+                    "localY": -0.5019999742507935
+                }
+            ],
+            "collisions": false,
+            "id": 524295,
+            "position": {
+                "x": 1.0216073989868164,
+                "y": 0.5568931102752686
+            },
+            "type": "JOINT"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 0,
+                    "localX": -0.499552845954895,
+                    "localY": 0.5000072717666626
+                }
+            ],
+            "fixedX": true,
+            "fixedY": true,
+            "id": 18446744072620933728,
+            "position": {
+                "x": -0.2939999997615814,
+                "y": 1.0549999475479126
+            },
+            "type": "PIN"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 2,
+                    "localX": 0.5001997947692871,
+                    "localY": -0.7503235340118408
+                }
+            ],
+            "fixedX": false,
+            "fixedY": true,
+            "id": 524295,
+            "position": {
+                "x": 0.39607977867126465,
+                "y": -4.191999912261963
+            },
+            "type": "PIN"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 2,
+                    "localX": -0.5368001461029053,
+                    "localY": 2.4916763305664063
+                },
+                {
+                    "id": 1,
+                    "localX": 0.49104225635528564,
+                    "localY": -0.4823674261569977
+                }
+            ],
+            "collisions": false,
+            "id": 18446744072620937984,
+            "position": {
+                "x": 0.9709610939025879,
+                "y": -0.8345756530761719
+            },
+            "type": "JOINT"
+        },
+        {
+            "anchor": 3,
+            "anchorOffset": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "attached": 0,
+            "attachedOffset": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "id": 18446744072752800656,
+            "length": 5.0,
+            "type": "DISTANCE"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 4,
+                    "localX": 0.04976654052734375,
+                    "localY": 0.0
+                }
+            ],
+            "fixedX": false,
+            "fixedY": true,
+            "id": 18446744072620933728,
+            "position": {
+                "x": -4.755402088165283,
+                "y": 2.4155845642089844
+            },
+            "type": "PIN"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 3,
+                    "localX": 0.5582348108291626,
+                    "localY": -0.013988101854920387
+                },
+                {
+                    "id": 6,
+                    "localX": 3.9700000286102295,
+                    "localY": -0.47999998927116394
+                }
+            ],
+            "collisions": false,
+            "id": 18446744072620933728,
+            "position": {
+                "x": 1.0405468940734863,
+                "y": 6.9672698974609375
+            },
+            "type": "JOINT"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 4,
+                    "localX": -0.47223329544067383,
+                    "localY": 0.5294153690338135
+                },
+                {
+                    "id": 6,
+                    "localX": -3.9238228797912598,
+                    "localY": -0.49984681606292725
+                }
+            ],
+            "collisions": false,
+            "id": 18446744072620933728,
+            "position": {
+                "x": -5.489666938781738,
+                "y": 2.532559394836426
+            },
+            "type": "JOINT"
+        },
+        {
+            "anchor": 4,
+            "anchorOffset": {
+                "x": 0.15000000596046448,
+                "y": 0.0
+            },
+            "attached": 2,
+            "attachedOffset": {
+                "x": -0.5,
+                "y": -2.4000000953674316
+            },
+            "id": 0,
+            "length": 8.394822120666504,
+            "type": "DISTANCE"
+        },
+        {
+            "attachments": [
+                {
+                    "id": 4,
+                    "localX": -0.46585187315940857,
+                    "localY": -0.46386289596557617
+                }
+            ],
+            "fixedX": true,
+            "fixedY": false,
+            "id": 18446744072759238144,
+            "position": {
+                "x": -4.896999835968018,
+                "y": 1.7359999418258667
+            },
+            "type": "PIN"
+        }
+    ],
+    "controllers": [],
+    "generators": [],
+    "name": "Saved Scene",
+    "objects": [
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "WHITE",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "RigidBody": {
+                    "angularState": {
+                        "angularAcceleration": 0.0,
+                        "angularVelocity": -0.09866023063659668,
+                        "torque": 0.0
+                    },
+                    "gravityEnabled": true,
+                    "linearState": {
+                        "acceleration": {
+                            "x": 0.0,
+                            "y": 9.8100004196167
+                        },
+                        "netForce": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "velocity": {
+                            "x": -0.022989727556705475,
+                            "y": -0.04600304365158081
+                        }
+                    },
+                    "properties": {
+                        "friction": 0.5,
+                        "inertia": 0.5,
+                        "mass": 1.0,
+                        "restitution": 0.5
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": 0.3688713014125824,
+                        "y": 0.8118332624435425
+                    },
+                    "rotation": 0.4309169054031372
+                }
+            },
+            "id": 0,
+            "ignored": [
+                1
+            ],
+            "name": "New Box"
+        },
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "WHITE",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "RigidBody": {
+                    "angularState": {
+                        "angularAcceleration": 0.0,
+                        "angularVelocity": 3.2818946838378906,
+                        "torque": 0.0
+                    },
+                    "gravityEnabled": true,
+                    "linearState": {
+                        "acceleration": {
+                            "x": 0.0,
+                            "y": 9.8100004196167
+                        },
+                        "netForce": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "velocity": {
+                            "x": 2.257556915283203,
+                            "y": -0.2322404980659485
+                        }
+                    },
+                    "properties": {
+                        "friction": 0.5,
+                        "inertia": 0.5,
+                        "mass": 1.0,
+                        "restitution": 0.5
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": 1.0017238855361938,
+                        "y": -0.1468988060951233
+                    },
+                    "rotation": -0.8281581997871399
+                }
+            },
+            "id": 1,
+            "ignored": [
+                2,
+                0
+            ],
+            "name": "New Box"
+        },
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 1.0,
+                        "y": 5.0
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "WHITE",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 1.0,
+                        "y": 5.0
+                    }
+                },
+                "RigidBody": {
+                    "angularState": {
+                        "angularAcceleration": 0.0,
+                        "angularVelocity": -0.6264536380767822,
+                        "torque": 0.0
+                    },
+                    "gravityEnabled": true,
+                    "linearState": {
+                        "acceleration": {
+                            "x": 0.0,
+                            "y": 9.8100004196167
+                        },
+                        "netForce": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "velocity": {
+                            "x": 3.0647523403167725,
+                            "y": 0.086931973695755
+                        }
+                    },
+                    "properties": {
+                        "friction": 0.5,
+                        "inertia": 0.5,
+                        "mass": 1.0,
+                        "restitution": 0.5
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": 0.30515220761299133,
+                        "y": -3.2928717136383057
+                    },
+                    "rotation": -0.4811694622039795
+                }
+            },
+            "id": 2,
+            "ignored": [
+                1
+            ],
+            "name": "New Box"
+        },
+        {
+            "components": {
+                "Collider": {
+                    "radius": 0.5,
+                    "type": "CIRCLE"
+                },
+                "Renderer": {
+                    "color": "WHITE",
+                    "form": "R_CIRCLE",
+                    "scale": 0.5
+                },
+                "RigidBody": {
+                    "angularState": {
+                        "angularAcceleration": 0.0,
+                        "angularVelocity": 1.186673641204834,
+                        "torque": 0.0
+                    },
+                    "gravityEnabled": true,
+                    "linearState": {
+                        "acceleration": {
+                            "x": 0.0,
+                            "y": 9.8100004196167
+                        },
+                        "netForce": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "velocity": {
+                            "x": 0.30676618218421936,
+                            "y": -0.10252143442630768
+                        }
+                    },
+                    "properties": {
+                        "friction": 0.5,
+                        "inertia": 0.5,
+                        "mass": 50.0,
+                        "restitution": 0.5
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": 1.2220094203948975,
+                        "y": 6.437911510467529
+                    },
+                    "rotation": -4.355658054351807
+                }
+            },
+            "id": 3,
+            "ignored": [
+                6
+            ],
+            "name": "New Circle"
+        },
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "WHITE",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    }
+                },
+                "RigidBody": {
+                    "angularState": {
+                        "angularAcceleration": 0.0,
+                        "angularVelocity": 0.018889276310801506,
+                        "torque": 0.0
+                    },
+                    "gravityEnabled": true,
+                    "linearState": {
+                        "acceleration": {
+                            "x": 0.0,
+                            "y": 9.8100004196167
+                        },
+                        "netForce": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "velocity": {
+                            "x": -0.510294497013092,
+                            "y": -0.009625568985939026
+                        }
+                    },
+                    "properties": {
+                        "friction": 0.5,
+                        "inertia": 0.5,
+                        "mass": 1.0,
+                        "restitution": 0.5
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": -4.796557426452637,
+                        "y": 2.385690689086914
+                    },
+                    "rotation": 0.6341515183448792
+                }
+            },
+            "id": 4,
+            "ignored": [
+                6
+            ],
+            "name": "New Box"
+        },
+        {
+            "components": {
+                "Collider": {
+                    "size": {
+                        "x": 8.0,
+                        "y": 1.0
+                    },
+                    "type": "BOX"
+                },
+                "Renderer": {
+                    "color": "WHITE",
+                    "form": "R_BOX",
+                    "scale": {
+                        "x": 8.0,
+                        "y": 1.0
+                    }
+                },
+                "RigidBody": {
+                    "angularState": {
+                        "angularAcceleration": 0.0,
+                        "angularVelocity": -0.04224386066198349,
+                        "torque": 0.0
+                    },
+                    "gravityEnabled": true,
+                    "linearState": {
+                        "acceleration": {
+                            "x": 0.0,
+                            "y": 9.8100004196167
+                        },
+                        "netForce": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "velocity": {
+                            "x": -0.40673863887786865,
+                            "y": -0.14226992428302765
+                        }
+                    },
+                    "properties": {
+                        "friction": 0.5,
+                        "inertia": 0.5,
+                        "mass": 1.0,
+                        "restitution": 0.5
+                    }
+                },
+                "TransformComponent": {
+                    "position": {
+                        "x": -2.5189809799194336,
+                        "y": 5.143089294433594
+                    },
+                    "rotation": 0.5940397381782532
+                }
+            },
+            "id": 6,
+            "ignored": [
+                4,
+                3
+            ],
+            "name": "New Box"
+        }
+    ],
+    "screenHeight": 1250,
+    "screenWidth": 1250,
+    "useWalls": true,
+    "worldSize": {
+        "x": 25.0,
+        "y": 25.0
+    }
+}

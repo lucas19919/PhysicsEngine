@@ -1,10 +1,11 @@
 #include "main/utility/Instantiate.h"
-#include "main/components/collidertypes/CircleCollider.h"
+
 #include "main/components/collidertypes/BoxCollider.h"
+#include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/collidertypes/PolygonCollider.h"
 #include "main/components/constrainttypes/Distance.h"
-#include "main/components/constrainttypes/Pin.h"
 #include "main/components/constrainttypes/Joint.h"
+#include "main/components/constrainttypes/Pin.h"
 
 Instantiate& Instantiate::WithRigidBody(Properties properties, LinearState linearState, AngularState angularState, Settings settings)
 {
@@ -53,6 +54,12 @@ GameObject* Instantiate::Create(World& world, size_t id)
     GameObject* ptr = obj.get();
     world.AddGameObject(std::move(obj));
     return ptr;
+}
+
+std::unique_ptr<GameObject> Instantiate::CreateOrphan(size_t id)
+{
+    obj->SetID(id);
+    return std::move(obj);
 }
 
 Instantiate::Instantiate()

@@ -1,7 +1,7 @@
 #pragma once
+#include "main/World.h"
 #include "main/physics/Manifold.h"
 #include "main/physics/ManifoldHandler.h"
-#include "main/World.h"
 
 class GameObject;
 class ContactConstraint;

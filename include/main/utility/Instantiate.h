@@ -1,10 +1,11 @@
 #pragma once
+#include <variant>
+#include <vector>
+
 #include "main/GameObject.h"
 #include "main/World.h"
-#include "main/utility/templates/Array.h"
 #include "main/components/Renderer.h"
-#include <vector>
-#include <variant>
+#include "main/utility/templates/Array.h"
 
 class Instantiate
 {
@@ -16,7 +17,10 @@ class Instantiate
         Instantiate& WithRenderer(Shape shape);
         Instantiate& WithCollider(ColliderType type, std::variant<Vec2, float, Array<20>> bounds);
         Instantiate& WithTransform(Vec2 position, float rotation);
+        
         GameObject* Create(World& world, size_t id);
+        std::unique_ptr<GameObject> CreateOrphan(size_t id);
+
     private:
         std::unique_ptr<GameObject> obj;
 };

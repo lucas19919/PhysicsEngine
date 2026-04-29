@@ -1,0 +1,159 @@
+{
+  "name": "Car",
+  "objects": [
+    {
+      "id": 10,
+      "name": "Chassis",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 0.0, "y": 0.0 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": { "x": 4.0, "y": 1.0 }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": { "x": 4.0, "y": 1.0 }
+        },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": {
+            "mass": 50.0,
+            "restitution": 0.2,
+            "friction": 0.5,
+            "inertia": 10.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": {
+            "angularVelocity": 0.0,
+            "angularAcceleration": 0.0,
+            "torque": 0.0
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "name": "Front Wheel",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": 1.5, "y": 0.5 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "CIRCLE",
+          "radius": 0.5
+        },
+        "Renderer": {
+          "form": "R_CIRCLE",
+          "color": "RED",
+          "scale": 0.5
+        },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": {
+            "mass": 15.0,
+            "restitution": 0.3,
+            "friction": 0.9,
+            "inertia": 2.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": {
+            "angularVelocity": 0.0,
+            "angularAcceleration": 0.0,
+            "torque": 0.0
+          }
+        }
+      }
+    },
+    {
+      "id": 12,
+      "name": "Rear Wheel",
+      "components": {
+        "TransformComponent": {
+          "position": { "x": -1.5, "y": 0.5 },
+          "rotation": 0.0
+        },
+        "Collider": {
+          "type": "CIRCLE",
+          "radius": 0.5
+        },
+        "Renderer": {
+          "form": "R_CIRCLE",
+          "color": "RED",
+          "scale": 0.5
+        },
+        "RigidBody": {
+          "gravityEnabled": true,
+          "properties": {
+            "mass": 15.0,
+            "restitution": 0.3,
+            "friction": 0.9,
+            "inertia": 2.0
+          },
+          "linearState": {
+            "velocity": { "x": 0.0, "y": 0.0 },
+            "acceleration": { "x": 0.0, "y": 0.0 },
+            "netForce": { "x": 0.0, "y": 0.0 }
+          },
+          "angularState": {
+            "angularVelocity": 0.0,
+            "angularAcceleration": 0.0,
+            "torque": 0.0
+          }
+        }
+      }
+    }
+  ],
+  "constraints": [
+    {
+      "id": 20,
+      "type": "JOINT",
+      "attachments": [
+        { "id": 10, "localAnchor": { "x": 1.5, "y": 0.5 } },
+        { "id": 11, "localAnchor": { "x": 0.0, "y": 0.0 } }
+      ],
+      "position": { "x": 1.5, "y": 0.5 }
+    },
+    {
+      "id": 21,
+      "type": "JOINT",
+      "attachments": [
+        { "id": 10, "localAnchor": { "x": -1.5, "y": 0.5 } },
+        { "id": 12, "localAnchor": { "x": 0.0, "y": 0.0 } }
+      ],
+      "position": { "x": -1.5, "y": 0.5 }
+    },
+    {
+      "id": 22,
+      "type": "MOTOR",
+      "rotor": 11,
+      "torque": 0.0
+    },
+    {
+      "id": 23,
+      "type": "MOTOR",
+      "rotor": 12,
+      "torque": 0.0
+    }
+  ],
+  "controllers": [
+    {
+      "type": "MOTOR",
+      "active": true,
+      "constraints": [ 22, 23 ],
+      "torqueMax": 200.0
+    }
+  ]
+}

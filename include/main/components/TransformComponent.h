@@ -1,6 +1,6 @@
 #pragma once
-#include "math/Vec2.h"
 #include "main/components/Component.h"
+#include "math/Vec2.h"
 
 class GameObject;
 
@@ -8,6 +8,9 @@ class TransformComponent : public Component
 {
     public:
         TransformComponent();
+
+        const char* GetName() const override { return "Transform"; }
+        bool OnInspectorGui(class World* world = nullptr) override;
 
         Vec2 position;
         float rotation;

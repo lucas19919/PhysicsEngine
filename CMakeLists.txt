@@ -1,19 +1,17 @@
-cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
-project(PhysicsEngine VERSION 1.0)
+cmake_minimum_required(VERSION 3.11)
+project(Halliday2D VERSION 1.0)
+
+enable_language(RC)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# --------------------------------------------------------------------------
-# Dependencies: Raylib
-# --------------------------------------------------------------------------
 set(RAYLIB_VERSION 5.5)
-find_package(raylib ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
+find_package(raylib ${RAYLIB_VERSION} QUIET)
 
-if (NOT raylib_FOUND) # If there's none, fetch and build raylib
+if (NOT raylib_FOUND)
   include(FetchContent)
   FetchContent_Declare(
     raylib
@@ -21,18 +19,14 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
   )
   FetchContent_GetProperties(raylib)
-  if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
+  if (NOT raylib_POPULATED)
     set(FETCHCONTENT_QUIET NO)
     FetchContent_MakeAvailable(raylib)
   endif()
 endif()
 
-# --------------------------------------------------------------------------
-# Our Project Sources
-# --------------------------------------------------------------------------
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-# Explicitly list ImGui sources to ensure the linker finds them
 set(IMGUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/imgui.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/imgui_draw.cpp
@@ -41,11 +35,18 @@ set(IMGUI_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/external/imgui/rlImGui.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES})
+if (WIN32)
+    add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} "icon.rc")
+else()
+    add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES})
+endif()
 
-# --------------------------------------------------------------------------
-# Include Directories & Linking
-# --------------------------------------------------------------------------
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/icon.ico"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/icon.ico"
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
     include 
     ${CMAKE_CURRENT_SOURCE_DIR} 
@@ -54,22 +55,19 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} raylib)
 
-# --------------------------------------------------------------------------
-# Platform Specific Configurations
-# --------------------------------------------------------------------------
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} comdlg32)
+endif()
 
-# Windows (MinGW) static linking
 if(MINGW)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 endif()
 
-# Web Configurations
 if (${PLATFORM} STREQUAL "Web")
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html") # Tell Emscripten to build an example.html file.
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1")
 endif()
 
-# Checks if OSX and links appropriate frameworks (Only required on MacOS)
 if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework IOKit")
     target_link_libraries(${PROJECT_NAME} "-framework Cocoa")

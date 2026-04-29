@@ -1,6 +1,10 @@
 #include "main/components/constrainttypes/Motor.h"
-#include "main/components/Constraint.h"
+
+#include "external/imgui/imgui.h"
+
+#include "main/GameObject.h"
 #include "main/World.h"
+#include "main/components/Constraint.h"
 #include "main/physics/Config.h"
 #include "math/RotationMatrix.h"
 
@@ -36,4 +40,31 @@ void MotorConstraint::Solve(float dt)
         float newAngularVel = rb->GetAngularVelocity() + (iterationImpulse * rb->GetInvInertia());
         rb->SetAngularVelocity(newAngularVel);
     }
+}
+
+void MotorConstraint::OnObjectRemoved(size_t id)
+{
+    Component::OnObjectRemoved(id);
+    if (rotor->GetID() == id)
+    {
+        isComponentDeleted = true;
+    }
+}
+
+bool MotorConstraint::InvolvesObject(GameObject* obj) const
+{
+    return rotor == obj;
+}
+
+
+bool MotorConstraint::OnInspectorGui(World* world)
+{
+    ImGui::Text("Type: Motor");
+    ImGui::Text("Rotor: %s (ID: %zu)", rotor->GetName().c_str(), rotor->GetID());
+
+    bool changed = false;
+    if (ImGui::DragFloat("Torque", &torque, 1.0f)) changed = true;
+    if (ImGui::DragFloat2("Local Pos", &localPosition.x, 0.05f)) changed = true;
+
+    return changed;
 }

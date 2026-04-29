@@ -1,93 +1,341 @@
 {
-    "useWalls": true,
-    "objects": [
-        {
-            "id": 1,
-            "components": {
-                "TransformComponent": { "position": { "x": 640, "y": 920 }, "rotation": 0 },
-                "Collider": { "type": "BOX", "size": { "x": 1280, "y": 40 } },
-                "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 1280, "y": 40 } }
-            }
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
+  "useWalls": true,
+  "objects": [
+    {
+      "id": 1,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 0.0,
+            "y": 8.800000000000002
+          },
+          "rotation": 0
         },
-        {
-            "id": 2,
-            "components": {
-                "TransformComponent": { "position": { "x": 250, "y": 500 }, "rotation": 0.4 },
-                "Collider": { "type": "BOX", "size": { "x": 350, "y": 20 } },
-                "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 350, "y": 20 } }
-            }
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 25.6,
+            "y": 0.8
+          }
         },
-        {
-            "id": 3,
-            "components": {
-                "TransformComponent": { "position": { "x": 120, "y": 350 }, "rotation": 0.4 },
-                "Collider": { "type": "BOX", "size": { "x": 40, "y": 40 } },
-                "Renderer": { "form": "R_BOX", "color": "CYAN", "scale": { "x": 40, "y": 40 } },
-                "RigidBody": {
-                    "properties": { "mass": 5, "restitution": 0.1, "inertia": 1333, "friction": 0.02 },
-                    "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
-                    "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
-                    "gravityEnabled": true
-                }
-            }
-        },
-        {
-            "id": 4,
-            "components": {
-                "TransformComponent": { "position": { "x": 640, "y": 500 }, "rotation": 0.4 },
-                "Collider": { "type": "BOX", "size": { "x": 350, "y": 20 } },
-                "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 350, "y": 20 } }
-            }
-        },
-        {
-            "id": 5,
-            "components": {
-                "TransformComponent": { "position": { "x": 510, "y": 350 }, "rotation": 0.4 },
-                "Collider": { "type": "BOX", "size": { "x": 40, "y": 40 } },
-                "Renderer": { "form": "R_BOX", "color": "GREEN", "scale": { "x": 40, "y": 40 } },
-                "RigidBody": {
-                    "properties": { "mass": 5, "restitution": 0.1, "inertia": 1333, "friction": 0.4 },
-                    "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
-                    "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
-                    "gravityEnabled": true
-                }
-            }
-        },
-        {
-            "id": 6,
-            "components": {
-                "TransformComponent": { "position": { "x": 1030, "y": 500 }, "rotation": 0.4 },
-                "Collider": { "type": "BOX", "size": { "x": 350, "y": 20 } },
-                "Renderer": { "form": "R_BOX", "color": "BLUE", "scale": { "x": 350, "y": 20 } }
-            }
-        },
-        {
-            "id": 7,
-            "components": {
-                "TransformComponent": { "position": { "x": 900, "y": 350 }, "rotation": 0.4 },
-                "Collider": { "type": "BOX", "size": { "x": 40, "y": 40 } },
-                "Renderer": { "form": "R_BOX", "color": "RED", "scale": { "x": 40, "y": 40 } },
-                "RigidBody": {
-                    "properties": { "mass": 5, "restitution": 0.3, "inertia": 1333, "friction": 0.9 },
-                    "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
-                    "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
-                    "gravityEnabled": true
-                }
-            }
-        },
-        {
-            "id": 8,
-            "components": {
-                "TransformComponent": { "position": { "x": 100, "y": 860 }, "rotation": 0 },
-                "Collider": { "type": "BOX", "size": { "x": 60, "y": 30 } },
-                "Renderer": { "form": "R_BOX", "color": "YELLOW", "scale": { "x": 60, "y": 30 } },
-                "RigidBody": {
-                    "properties": { "mass": 10, "restitution": 0, "inertia": 3000, "friction": 0.3 },
-                    "linearState": { "velocity": { "x": 800, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
-                    "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 },
-                    "gravityEnabled": true
-                }
-            }
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 25.6,
+            "y": 0.8
+          }
         }
-    ]
+      }
+    },
+    {
+      "id": 2,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": -7.800000000000001,
+            "y": 0.40000000000000036
+          },
+          "rotation": 0.4
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 7.0,
+            "y": 0.4
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 7.0,
+            "y": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": -10.4,
+            "y": -2.5999999999999996
+          },
+          "rotation": 0.4
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.8,
+            "y": 0.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 0.8,
+            "y": 0.8
+          }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 5,
+            "restitution": 0.1,
+            "inertia": 0.5332,
+            "friction": 0.02
+          },
+          "linearState": {
+            "velocity": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "acceleration": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "netForce": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          "angularState": {
+            "angularVelocity": 0,
+            "angularAcceleration": 0,
+            "torque": 0
+          },
+          "gravityEnabled": true
+        }
+      }
+    },
+    {
+      "id": 4,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 0.0,
+            "y": 0.40000000000000036
+          },
+          "rotation": 0.4
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 7.0,
+            "y": 0.4
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 7.0,
+            "y": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": -2.5999999999999996,
+            "y": -2.5999999999999996
+          },
+          "rotation": 0.4
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.8,
+            "y": 0.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "GREEN",
+          "scale": {
+            "x": 0.8,
+            "y": 0.8
+          }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 5,
+            "restitution": 0.1,
+            "inertia": 0.5332,
+            "friction": 0.4
+          },
+          "linearState": {
+            "velocity": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "acceleration": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "netForce": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          "angularState": {
+            "angularVelocity": 0,
+            "angularAcceleration": 0,
+            "torque": 0
+          },
+          "gravityEnabled": true
+        }
+      }
+    },
+    {
+      "id": 6,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 7.800000000000001,
+            "y": 0.40000000000000036
+          },
+          "rotation": 0.4
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 7.0,
+            "y": 0.4
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "BLUE",
+          "scale": {
+            "x": 7.0,
+            "y": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": 5.199999999999999,
+            "y": -2.5999999999999996
+          },
+          "rotation": 0.4
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 0.8,
+            "y": 0.8
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "RED",
+          "scale": {
+            "x": 0.8,
+            "y": 0.8
+          }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 5,
+            "restitution": 0.3,
+            "inertia": 0.5332,
+            "friction": 0.9
+          },
+          "linearState": {
+            "velocity": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "acceleration": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "netForce": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          "angularState": {
+            "angularVelocity": 0,
+            "angularAcceleration": 0,
+            "torque": 0
+          },
+          "gravityEnabled": true
+        }
+      }
+    },
+    {
+      "id": 8,
+      "components": {
+        "TransformComponent": {
+          "position": {
+            "x": -10.8,
+            "y": 7.6
+          },
+          "rotation": 0
+        },
+        "Collider": {
+          "type": "BOX",
+          "size": {
+            "x": 1.2,
+            "y": 0.6
+          }
+        },
+        "Renderer": {
+          "form": "R_BOX",
+          "color": "YELLOW",
+          "scale": {
+            "x": 1.2,
+            "y": 0.6
+          }
+        },
+        "RigidBody": {
+          "properties": {
+            "mass": 10,
+            "restitution": 0,
+            "inertia": 1.2,
+            "friction": 0.3
+          },
+          "linearState": {
+            "velocity": {
+              "x": 16.0,
+              "y": 0.0
+            },
+            "acceleration": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "netForce": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          "angularState": {
+            "angularVelocity": 0,
+            "angularAcceleration": 0,
+            "torque": 0
+          },
+          "gravityEnabled": true
+        }
+      }
+    }
+  ],
+  "generators": [],
+  "constraints": [],
+  "controllers": [],
+  "name": "Friction"
 }

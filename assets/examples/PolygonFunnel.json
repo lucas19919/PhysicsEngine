@@ -1,41 +1,211 @@
 {
   "name": "Polygon Funnel",
+  "worldSize": {
+    "x": 25.6,
+    "y": 19.2
+  },
   "useWalls": true,
   "objects": [
     {
-      "id": 1, "name": "Left_Funnel",
+      "id": 1,
+      "name": "Left_Funnel",
       "components": {
-        "TransformComponent": { "position": { "x": 300, "y": 300 }, "rotation": 0.5 },
-        "Collider": { "type": "POLYGON", "vertices": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] },
-        "Renderer": { "form": "R_POLYGON", "color": "DARKGRAY", "scale": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] }
+        "TransformComponent": {
+          "position": {
+            "x": -6.8,
+            "y": -3.6
+          },
+          "rotation": 0.5
+        },
+        "Collider": {
+          "type": "POLYGON",
+          "vertices": [
+            {
+              "x": -4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": 0.4
+            },
+            {
+              "x": -4.0,
+              "y": 0.4
+            }
+          ]
+        },
+        "Renderer": {
+          "form": "R_POLYGON",
+          "color": "DARKGRAY",
+          "scale": [
+            {
+              "x": -4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": 0.4
+            },
+            {
+              "x": -4.0,
+              "y": 0.4
+            }
+          ]
+        }
       }
     },
     {
-      "id": 2, "name": "Right_Funnel",
+      "id": 2,
+      "name": "Right_Funnel",
       "components": {
-        "TransformComponent": { "position": { "x": 980, "y": 300 }, "rotation": -0.5 },
-        "Collider": { "type": "POLYGON", "vertices": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] },
-        "Renderer": { "form": "R_POLYGON", "color": "DARKGRAY", "scale": [ { "x": -200, "y": -20 }, { "x": 200, "y": -20 }, { "x": 200, "y": 20 }, { "x": -200, "y": 20 } ] }
+        "TransformComponent": {
+          "position": {
+            "x": 6.8,
+            "y": -3.6
+          },
+          "rotation": -0.5
+        },
+        "Collider": {
+          "type": "POLYGON",
+          "vertices": [
+            {
+              "x": -4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": 0.4
+            },
+            {
+              "x": -4.0,
+              "y": 0.4
+            }
+          ]
+        },
+        "Renderer": {
+          "form": "R_POLYGON",
+          "color": "DARKGRAY",
+          "scale": [
+            {
+              "x": -4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": -0.4
+            },
+            {
+              "x": 4.0,
+              "y": 0.4
+            },
+            {
+              "x": -4.0,
+              "y": 0.4
+            }
+          ]
+        }
       }
     }
   ],
   "generators": [
     {
-      "comment": "Wide Irregular Shapes Rain",
-      "grid": { "rows": 6, "columns": 15, "startX": 300, "startY": 25, "spacingX": 45, "spacingY": 45 },
+      "name": "Triangle Rain",
+      "grid": {
+        "rows": 6,
+        "columns": 15,
+        "startX": -6.8,
+        "startY": -9.1,
+        "spacingX": 0.9,
+        "spacingY": 0.9
+      },
       "object": {
         "components": {
-            "TransformComponent": { "position": { "x": 0, "y": 0 }, "rotation": 0 },
-            "Collider": { "type": "POLYGON", "vertices": [ { "x": 0, "y": -25 }, { "x": 20, "y": 20 }, { "x": -20, "y": 20 } ] },
-            "Renderer": { "form": "R_POLYGON", "color": "ORANGE", "scale": [ { "x": 0, "y": -25 }, { "x": 20, "y": 20 }, { "x": -20, "y": 20 } ] },
-            "RigidBody": { 
-              "gravityEnabled": true, 
-              "properties": { "mass": 5, "restitution": 0.2, "friction": 0.5, "inertia": 1000 },
-              "linearState": { "velocity": { "x": 0, "y": 0 }, "acceleration": { "x": 0, "y": 0 }, "netForce": { "x": 0, "y": 0 } },
-              "angularState": { "angularVelocity": 0, "angularAcceleration": 0, "torque": 0 }
+          "TransformComponent": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "rotation": 0
+          },
+          "Collider": {
+            "type": "POLYGON",
+            "vertices": [
+              {
+                "x": 0.0,
+                "y": -0.5
+              },
+              {
+                "x": 0.4,
+                "y": 0.4
+              },
+              {
+                "x": -0.4,
+                "y": 0.4
+              }
+            ]
+          },
+          "Renderer": {
+            "form": "R_POLYGON",
+            "color": "ORANGE",
+            "scale": [
+              {
+                "x": 0.0,
+                "y": -0.5
+              },
+              {
+                "x": 0.4,
+                "y": 0.4
+              },
+              {
+                "x": -0.4,
+                "y": 0.4
+              }
+            ]
+          },
+          "RigidBody": {
+            "gravityEnabled": true,
+            "properties": {
+              "mass": 5.0,
+              "restitution": 0.2,
+              "friction": 0.5,
+              "inertia": 0.4
+            },
+            "linearState": {
+              "velocity": {
+                "x": 0.0,
+                "y": 0.0
+              },
+              "acceleration": {
+                "x": 0.0,
+                "y": 0.0
+              },
+              "netForce": {
+                "x": 0.0,
+                "y": 0.0
+              }
+            },
+            "angularState": {
+              "angularVelocity": 0.0,
+              "angularAcceleration": 0.0,
+              "torque": 0.0
             }
+          }
         }
       }
     }
-  ]
+  ],
+  "constraints": [],
+  "controllers": []
 }

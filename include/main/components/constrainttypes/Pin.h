@@ -1,14 +1,16 @@
 #pragma once
-#include "math/Vec2.h"
-#include "main/components/Constraint.h"
 #include <vector>
+
+#include "main/components/Constraint.h"
+#include "math/Vec2.h"
 
 class GameObject;
 
 struct PinAttachment
 {
     GameObject* obj;
-    Vec2 localAnchor;
+    float localX;
+    float localY;
 };
 
 class PinConstraint : public Constraint
@@ -19,7 +21,13 @@ class PinConstraint : public Constraint
         bool fixedX = true;
         bool fixedY = true;
 
-        PinConstraint(const std::vector<PinAttachment>& attachments, Vec2 pos, bool fixedX, bool fixedY);
+        PinConstraint(std::vector<PinAttachment> attachments, Vec2 position, bool fixedX, bool fixedY);
         ConstraintType GetType() const override;
+        const char* GetName() const override { return "PinConstraint"; }
+
         void Solve(float dt) override;
+        void OnObjectRemoved(size_t id) override;
+        bool IsInvalid() const override;
+        bool InvolvesObject(GameObject* obj) const override;
+        bool OnInspectorGui(class World* world = nullptr) override;
 };
