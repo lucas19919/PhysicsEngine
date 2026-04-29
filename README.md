@@ -3,7 +3,7 @@
 
 ---
 
-## Tech Demos
+## Demos
 #### Plinko
 ![](https://github.com/lucas19919/PhysicsEngine/blob/main/images/gifs/plinko.gif)
 
