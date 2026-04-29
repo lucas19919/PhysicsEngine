@@ -7,6 +7,7 @@
 #include "main/components/constrainttypes/Distance.h"
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/constrainttypes/Pin.h"
+#include "main/components/constrainttypes/Motor.h"
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
 #include "main/components/Renderer.h"
@@ -20,7 +21,7 @@
 
 namespace Editor {
 
-ViewportPanel::ViewportPanel(EditorCamera& camera) : camera(camera) {
+ViewportPanel::ViewportPanel(EditorCamera& camera, InputHandler& input) : camera(camera), input(input) {
     target = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 }
 
@@ -56,79 +57,6 @@ void ViewportPanel::OnImGui(World& world) {
     ImVec2 min = ImGui::GetCursorScreenPos();
     state.SetViewportMousePos(Vec2(mousePos.x - min.x, mousePos.y - min.y));
 
-    // Exclude toolbar area from selection
-    bool overToolbar = (mousePos.x >= min.x + 10 && mousePos.x <= min.x + 10 + 144 &&
-                        mousePos.y >= min.y + 10 && mousePos.y <= min.y + 10 + 38);
-
-    // Selection Logic
-    if (state.IsViewportHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !state.IsGizmoHovered() && !state.IsGizmoActive() && !overToolbar) {
-        size_t hitID = (size_t)-1;
-        std::string hitGroupName = "";
-        Vec2 physicsMousePos = camera.ScreenToWorldMeters(state.GetViewportMousePos());
-        const auto& objects = world.GetGameObjects();
-        
-        for (auto it = objects.rbegin(); it != objects.rend(); ++it) {
-            GameObject* obj = it->get();
-            if (obj->GetGroupName() == "INTERNAL_WALL") continue;
-            if (obj->c && obj->c->TestPoint(physicsMousePos)) {
-                hitID = obj->GetID();
-                hitGroupName = obj->GetGroupName();
-                break;
-            }
-        }
-
-        if (state.GetPickingMode() == EditorState::PickingMode::CONSTRAINT_TARGET) {
-            // Constraint picking (simplified for now)
-        } else {
-            if (hitID != (size_t)-1) {
-                GeneratorDef* gen = world.GetGenerator(hitGroupName);
-                if (gen) state.SetSelectedGroup(gen->name);
-                else {
-                    if (ImGui::GetIO().KeyShift || ImGui::GetIO().KeyCtrl) {
-                        if (state.IsSelected(hitID)) state.RemoveSelectedObject(hitID);
-                        else state.AddSelectedObject(hitID);
-                    } else {
-                        state.SetSelectedObject(hitID);
-                    }
-                }
-            } else {
-                if (!ImGui::GetIO().KeyShift && !ImGui::GetIO().KeyCtrl) {
-                    state.ClearSelection();
-                }
-                state.SetBoxSelection({ physicsMousePos, physicsMousePos, true });
-            }
-        }
-    }
-
-    if (state.GetBoxSelection().active) {
-        Vec2 physicsMousePos = camera.ScreenToWorldMeters(state.GetViewportMousePos());
-        EditorState::BoxSelection box = state.GetBoxSelection();
-        box.end = physicsMousePos;
-        state.SetBoxSelection(box);
-
-        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-            if (!ImGui::GetIO().KeyShift && !ImGui::GetIO().KeyCtrl) state.ClearSelection();
-            
-            float minX = std::min(box.start.x, box.end.x);
-            float maxX = std::max(box.start.x, box.end.x);
-            float minY = std::min(box.start.y, box.end.y);
-            float maxY = std::max(box.start.y, box.end.y);
-
-            // Avoid selecting everything if box is tiny (just a click)
-            if (std::abs(maxX - minX) > 0.01f || std::abs(maxY - minY) > 0.01f) {
-                for (const auto& objPtr : world.GetGameObjects()) {
-                    GameObject* obj = objPtr.get();
-                    if (obj->GetGroupName() == "INTERNAL_WALL") continue;
-                    Vec2 p = obj->transform.position;
-                    if (p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY) {
-                        state.AddSelectedObject(obj->GetID());
-                    }
-                }
-            }
-            state.SetBoxSelection({ {0,0}, {0,0}, false });
-        }
-    }
-
     // scene
     BeginTextureMode(target);
         ClearBackground(EditorState::Get().GetThemeColors().viewportBg);
@@ -145,7 +73,64 @@ void ViewportPanel::OnImGui(World& world) {
                 DrawRectangleRec({minX * Config::MeterToPixel, minY * Config::MeterToPixel, (maxX - minX) * Config::MeterToPixel, (maxY - minY) * Config::MeterToPixel}, Fade(SKYBLUE, 0.1f));
             }
         camera.End();
-        GizmoRender(world, camera);
+        
+        // Gizmo Rendering
+        input.GetGizmo().Render(world, camera);
+
+        // Anchor Rendering (Formerly in GizmoRender)
+        const std::vector<size_t>& selectedIDs = state.GetSelectedObjectIDs();
+        size_t selectedConstraintID = state.GetSelectedConstraintID();
+        EditorState::SelectedAnchor hoveredAnchor = { (size_t)-1, -1, false };
+        
+        std::vector<Constraint*> constraintsToShow;
+        if (selectedConstraintID != (size_t)-1) {
+            Constraint* sc = state.GetSelectedConstraint(world);
+            if (sc) constraintsToShow.push_back(sc);
+        } else if (!selectedIDs.empty() && !world.GetGameObjects().empty()) {
+            GameObject* selected = nullptr;
+            for (auto& obj : world.GetGameObjects()) if (obj->GetID() == selectedIDs[0]) { selected = obj.get(); break; }
+            if (selected) constraintsToShow = world.GetConstraintsForObject(selected);
+        }
+
+        if (!constraintsToShow.empty()) {
+            Vector2 mPos = GetMousePosition();
+            float dotRadius = 6.0f;
+
+            for (auto* c : constraintsToShow) {
+                std::vector<Vec2> worldAnchors;
+                if (c->GetType() == ConstraintType::DISTANCE) {
+                    DistanceConstraint* dc = static_cast<DistanceConstraint*>(c);
+                    worldAnchors.push_back(dc->anchor->transform.position + RotMatrix(dc->anchor->transform.rotation).Rotate(dc->anchorOffset));
+                    worldAnchors.push_back(dc->attached->transform.position + RotMatrix(dc->attached->transform.rotation).Rotate(dc->attachedOffset));
+                } else if (c->GetType() == ConstraintType::PIN) {
+                    PinConstraint* pc = static_cast<PinConstraint*>(c);
+                    worldAnchors.push_back(pc->position);
+                    for (auto& att : pc->attachments) worldAnchors.push_back(att.obj->transform.position + RotMatrix(att.obj->transform.rotation).Rotate(Vec2(att.localX, att.localY)));
+                } else if (c->GetType() == ConstraintType::JOINT) {
+                    JointConstraint* jc = static_cast<JointConstraint*>(c);
+                    worldAnchors.push_back(jc->position);
+                    for (auto& att : jc->attachments) worldAnchors.push_back(att.obj->transform.position + RotMatrix(att.obj->transform.rotation).Rotate(Vec2(att.localX, att.localY)));
+                } else if (c->GetType() == ConstraintType::MOTOR) {
+                    MotorConstraint* mc = static_cast<MotorConstraint*>(c);
+                    worldAnchors.push_back(mc->rotor->transform.position + RotMatrix(mc->rotor->transform.rotation).Rotate(mc->localPosition));
+                }
+
+                for (int i = (int)worldAnchors.size() - 1; i >= 0; i--) {
+                    Vec2 s = camera.WorldToScreenPixels(worldAnchors[i]);
+                    Vector2 sp = { s.x, s.y };
+                    float currentRadius = (i == 0 && (c->GetType() == ConstraintType::PIN || c->GetType() == ConstraintType::JOINT)) ? dotRadius * 1.5f : dotRadius * 0.8f;
+                    bool isHovered = CheckCollisionPointCircle(mPos, sp, currentRadius + 2.0f);
+                    if (isHovered && (i == 0 || !hoveredAnchor.isHovered)) hoveredAnchor = { c->GetID(), (int)i, true };
+                    bool isActive = (state.GetActiveAnchor().constraintID == c->GetID() && state.GetActiveAnchor().index == (int)i);
+                    Color color = (isHovered || isActive) ? YELLOW : (i == 0 ? ORANGE : LIME);
+                    DrawCircleV(sp, currentRadius, color);
+                    DrawCircleLinesV(sp, currentRadius, BLACK);
+                    if (isActive) DrawCircleLinesV(sp, currentRadius + 3.0f, YELLOW);
+                }
+            }
+        }
+        state.SetHoveredAnchor(hoveredAnchor);
+
         if (Config::drawFPS) DrawFPS(140, 20);
     EndTextureMode();
 

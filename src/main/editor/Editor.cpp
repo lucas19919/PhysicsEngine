@@ -23,7 +23,7 @@
 namespace Editor {
 
 Editor::Editor(World& world, EditorCamera& camera, InputHandler& input) {
-    panels.push_back(std::make_unique<ViewportPanel>(camera));
+    panels.push_back(std::make_unique<ViewportPanel>(camera, input));
     panels.push_back(std::make_unique<PerformancePanel>(camera, input));
     panels.push_back(std::make_unique<HierarchyPanel>());
     panels.push_back(std::make_unique<InspectorPanel>());
@@ -57,7 +57,7 @@ void Editor::Update(World& world) {
         ImGuiID dock_id_main = dockspace_id;
         ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Left, 0.18f, nullptr, &dock_id_main);
         ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Right, 0.22f, nullptr, &dock_id_main);
-        ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Down, 0.20f, nullptr, &dock_id_main);
+        ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Down, 0.35f, nullptr, &dock_id_main);
         
         // Split main center area: Viewport (left) and Inspector (right)
         ImGuiID dock_id_inspector = ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Right, 0.30f, nullptr, &dock_id_main);
@@ -173,6 +173,12 @@ void Editor::Update(World& world) {
             }
             ImGui::Separator();
 
+            ImGui::DragFloat2("Gravity (m/s^2)", &Config::gravity.x, 0.1f);
+            ImGui::DragInt("Substeps", &Config::pipelineSubTicks, 1, 1, 100);
+            ImGui::DragInt("Solver Iterations", &Config::impulseIterations, 1, 1, 100);
+
+            ImGui::Separator();
+
             bool changed = false;
             changed |= ImGui::DragInt("Screen Width", &Config::screenWidth, 1, 100, 4000);
             changed |= ImGui::DragInt("Screen Height", &Config::screenHeight, 1, 100, 4000);
@@ -190,6 +196,7 @@ void Editor::Update(World& world) {
                 Config::screenHeight = (int)(size.y * Config::MeterToPixel);
                 if (Config::useWalls) BoundarySystem::UpdateBoundaries(world);
             }
+            ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }

@@ -6,4 +6,3 @@
 #include "main/editor/EditorCamera.h"
 
 void Render(World& world, const EditorCamera& camera);
-void GizmoRender(World& world, const EditorCamera& camera);

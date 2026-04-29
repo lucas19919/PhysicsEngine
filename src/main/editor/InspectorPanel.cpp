@@ -12,6 +12,7 @@
 #include "main/components/TransformComponent.h"
 #include "main/components/collidertypes/BoxCollider.h"
 #include "main/components/collidertypes/CircleCollider.h"
+#include "main/components/collidertypes/PolygonCollider.h"
 #include "main/components/constrainttypes/Distance.h"
 #include "main/components/constrainttypes/Joint.h"
 #include "main/components/constrainttypes/Motor.h"
@@ -86,6 +87,14 @@ void InspectorPanel::OnImGui(World& world) {
             if (ImGui::DragFloat2("Spacing", &genDef->spacingX, 0.1f)) changed = true;
             if (ImGui::IsItemDeactivatedAfterEdit()) anyItemDeactivated = true;
             if (changed) world.RegenerateGenerator(selectedGroup);
+
+            ImGui::Separator();
+            if (ImGui::Button("Delete Generator", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                HistoryManager::Get().RecordState(world);
+                world.RemoveGenerator(selectedGroup);
+                EditorState::Get().ClearSelection();
+                HistoryManager::Get().RecordState(world);
+            }
         }
     }
     else if (!selectedObjectIDs.empty() && selectedObjectIDs.size() > 1) {
@@ -136,6 +145,71 @@ void InspectorPanel::OnImGui(World& world) {
                 selected->RemoveComponent(componentToRemove);
                 HistoryManager::Get().RecordState(world);
             }
+
+            ImGui::Separator();
+            if (ImGui::Button("Add Component", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                ImGui::OpenPopup("AddComponentPopup");
+            }
+
+            if (ImGui::BeginPopup("AddComponentPopup")) {
+                if (ImGui::MenuItem("RigidBody", nullptr, false, selected->rb == nullptr)) {
+                    HistoryManager::Get().RecordState(world);
+                    selected->AddComponent(std::make_unique<RigidBody>(
+                        Properties{ 1.0f, 0.5f, 0.5f, 0.5f },
+                        LinearState{ Vec2(0,0), Vec2(0,0), Vec2(0,0) },
+                        AngularState{ 0, 0, 0 },
+                        Settings{ true }
+                    ));
+                    HistoryManager::Get().RecordState(world);
+                }
+                if (ImGui::MenuItem("Box Collider", nullptr, false, selected->c == nullptr)) {
+                    HistoryManager::Get().RecordState(world);
+                    selected->AddComponent(std::make_unique<BoxCollider>(Vec2(1.0f, 1.0f)));
+                    HistoryManager::Get().RecordState(world);
+                }
+                if (ImGui::MenuItem("Circle Collider", nullptr, false, selected->c == nullptr)) {
+                    HistoryManager::Get().RecordState(world);
+                    selected->AddComponent(std::make_unique<CircleCollider>(0.5f));
+                    HistoryManager::Get().RecordState(world);
+                }
+                if (ImGui::MenuItem("Polygon Collider", nullptr, false, selected->c == nullptr)) {
+                    HistoryManager::Get().RecordState(world);
+                    Array<20> verts;
+                    verts.PushBack(Vec2(0, -0.5f));
+                    verts.PushBack(Vec2(0.5f, 0.5f));
+                    verts.PushBack(Vec2(-0.5f, 0.5f));
+                    selected->AddComponent(std::make_unique<PolygonCollider>(verts));
+                    HistoryManager::Get().RecordState(world);
+                }
+                if (ImGui::MenuItem("Renderer", nullptr, false, selected->GetComponent<Renderer>() == nullptr)) {
+                    HistoryManager::Get().RecordState(world);
+                    selected->AddComponent(std::make_unique<Renderer>(Shape{ RenderShape::R_BOX, WHITE, Vec2(1.0f, 1.0f) }));
+                    HistoryManager::Get().RecordState(world);
+                }
+                ImGui::EndPopup();
+            }
+
+            // Inline Constraints
+            auto objectConstraints = world.GetConstraintsForObject(selected);
+            if (!objectConstraints.empty()) {
+                ImGui::Separator();
+                ImGui::TextDisabled("Attached Constraints");
+                for (auto* c : objectConstraints) {
+                    ImGui::PushID((int)c->GetID() + 2000);
+                    if (ImGui::CollapsingHeader(c->GetName())) {
+                        if (c->OnInspectorGui(&world)) {
+                            anyItemDeactivated = true;
+                        }
+                        if (ImGui::Button("Delete Constraint", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                            HistoryManager::Get().RecordState(world);
+                            world.RemoveConstraint(c->GetID());
+                            HistoryManager::Get().RecordState(world);
+                        }
+                    }
+                    ImGui::PopID();
+                }
+            }
+
             ImGui::PopID();
         } else {
             EditorState::Get().SetSelectedObject((size_t)-1);
